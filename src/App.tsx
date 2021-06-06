@@ -22,6 +22,7 @@ function App() {
         process.env.REACT_APP_API_KEY! :
         process.env.REACT_APP_SANDBOX_KEY!
     }>
+
       <StockSymbolsContext.Provider value={filteredSymbols}>
         <ActiveInvestmentContext.Provider value={activeInvestmentProviderValue}>
           <Header></Header>
@@ -30,6 +31,7 @@ function App() {
           <StockChart></StockChart>
         </ActiveInvestmentContext.Provider>
       </StockSymbolsContext.Provider>
+      
     </TokenContext.Provider>
 
   );
