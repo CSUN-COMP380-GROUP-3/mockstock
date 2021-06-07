@@ -25,3 +25,5 @@ yarn-error.log*
 
 /src/initStock.json
 /src/symbols.json
+src/initCandles.json
+src/symbols.json
