@@ -22,7 +22,7 @@ export default function LiquidBalance() {
         updateLiquidBalance({prev, curr});
     };
 
-    const getPercent = () => (getProfit().value / prev.value) * 100.00 ;
+    const getPercent = () => ((getProfit().value / prev.value) * 100.00).toFixed(2) ;
 
     const getProfit = () => curr.subtract(prev);
 
@@ -30,8 +30,8 @@ export default function LiquidBalance() {
     return (
         <React.Fragment>
             <h1>LiquidBalance</h1>
-            <h2>${curr.toString()}</h2>
-            <h3>${getProfit().toString()}</h3>
+            <h2>{curr.format()}</h2>
+            <h3>{getProfit().format()}</h3>
             <h3>{getPercent().toString()}%</h3>
             <input 
                 type="number" 
