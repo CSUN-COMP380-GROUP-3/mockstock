@@ -1,6 +1,6 @@
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
-import Autocomplete, { AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteRenderGroupParams } from '@material-ui/lab/Autocomplete';
+import Autocomplete, { AutocompleteProps, AutocompleteRenderGroupParams } from '@material-ui/lab/Autocomplete';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import { useTheme, makeStyles } from '@material-ui/core/styles';
@@ -101,30 +101,31 @@ const renderGroup = (params: AutocompleteRenderGroupParams) => [
     params.children,
 ];
 
-export interface SymbolBoxProps {
-    value: StockSymbolData;
-    onChange?: (event: React.ChangeEvent<{}>, value: StockSymbolData | null, reason: AutocompleteChangeReason, details?: AutocompleteChangeDetails<StockSymbolData> | undefined) => void;
-}
+export const getOptionLabel = ({symbol, description}: StockSymbolData) => `${symbol} - ${description}`;
+
+export const groupBy = ({symbol}: StockSymbolData) => symbol[0];
+
+export interface SymbolBoxProps extends Partial<AutocompleteProps<StockSymbolData, false, false, false>> {};
 
 export default function SymbolBox(props: SymbolBoxProps) {
     const classes = useStyles();
     const { onChange, value } = props;
     return (
         <Autocomplete
-            id="symbol-box"
             style={{ width: 400 }}
             disableListWrap
             classes={classes}
             ListboxComponent={ListboxComponent as React.ComponentType<React.HTMLAttributes<HTMLElement>>}
             renderGroup={renderGroup}
             options={filteredSymbols}
-            groupBy={(option) => option.symbol[0]}
+            groupBy={groupBy}
             renderInput={(params) => <TextField {...params} variant="outlined" label="Stock Symbol"></TextField>}
-            getOptionLabel={({symbol, description}) => `${symbol} - ${description}`}
+            getOptionLabel={getOptionLabel}
             onChange={onChange}
-            autoSelect
-            autoHighlight
+            autoSelect={true}
+            autoHighlight={true}
             value={value}
+            data-testid="symbolbox"
         />
     );
 };
