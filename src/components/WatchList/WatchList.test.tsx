@@ -1,9 +1,8 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import WatchList from './WatchList';
 
-test('it renders component', () => {
-    render(<WatchList />);
-    const element = screen.getByText(/WatchList/i);
-    expect(element).toBeInTheDocument();
+it('renders component', () => {
+    const { queryByTestId } = render(<WatchList />);
+    expect(queryByTestId('watchlist')).toBeTruthy();
 });

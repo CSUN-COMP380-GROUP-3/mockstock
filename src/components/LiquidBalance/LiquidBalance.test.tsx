@@ -1,9 +1,8 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import LiquidBalance from './LiquidBalance';
 
-test('it renders component', () => {
-    render(<LiquidBalance />);
-    const element = screen.getByText(/LiquidBalance/i);
-    expect(element).toBeInTheDocument();
+it('renders component', () => {
+    const { queryByTestId } = render(<LiquidBalance />);
+    expect(queryByTestId('liquidbalance')).toBeTruthy();
 });

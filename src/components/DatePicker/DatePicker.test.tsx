@@ -1,9 +1,8 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import DatePicker from './DatePicker';
 
-test('it renders component', () => {
-    render(<DatePicker />);
-    const element = screen.getByText(/DatePicker/i);
-    expect(element).toBeInTheDocument();
+it('renders component', () => {
+    const { queryByTestId } = render(<DatePicker />);
+    expect(queryByTestId('datepicker')).toBeTruthy();
 });
