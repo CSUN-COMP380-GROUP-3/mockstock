@@ -12,7 +12,6 @@ import querystring from 'querystring';
 import { TokenContext } from '../../contexts/TokenContext';
 import currency from 'currency.js';
 import CandleStickData, { CandleStickQuery } from '../../interfaces/CandleStickData';
-import { truncateDecimal } from '../StatBox/StatBox';
 
 export default function BuyBox() {
     const token = React.useContext<string>(TokenContext);
@@ -148,10 +147,10 @@ export default function BuyBox() {
         // after the inital data is loaded we take the first candle and use that for our calculation
         // we assume that we had perfect entry into the market that day and bought at the lowest price available
         if (!!oneDayCandle) {
-            const price = currency(oneDayCandle['l'][0]).value;
-            const shares = currency(amount).value / price;
+            const price = currency(oneDayCandle['l'][0]);
+            const shares = currency(amount).value / price.value;
 
-            return `${truncateDecimal(shares.toString(), 4)} shares @ $${price.toString()}`;
+            return `${shares.toFixed(4)} shares @ ${price.format()}`;
         };
         return '';
     };
