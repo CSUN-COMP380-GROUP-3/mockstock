@@ -57,6 +57,10 @@ export default function StockChart() {
                         yaxis: {
                             tooltip: {
                                 enabled: true
+                            },
+                            labels: {formatter: function(val, index) {
+                                return val.toFixed(2);
+                              }
                             }
                         }
                     }
