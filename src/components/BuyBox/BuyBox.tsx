@@ -2,7 +2,6 @@
 import React from 'react';
 import moment, { Moment } from 'moment';
 import { ActiveInvestmentContext } from '../../contexts/ActiveInvestmentContext';
-import { PortfolioContext } from '../../contexts/PortfolioContext';
 
 
 import SymbolBox from '../SymbolBox/SymbolBox';
@@ -15,14 +14,12 @@ import querystring from 'querystring';
 import { TokenContext } from '../../contexts/TokenContext';
 import currency from 'currency.js';
 import CandleStickData, { CandleStickQuery } from '../../interfaces/CandleStickData';
-import PortfolioData from '../../interfaces/PortfolioData';
 import { truncateDecimal } from '../StatBox/StatBox';
 
 export default function BuyBox() {
     const token = React.useContext<string>(TokenContext);
 
     const { activeInvestment, updateActiveInvestment } = React.useContext(ActiveInvestmentContext);
-    const { portfolio, updatePortfolio } = React.useContext(PortfolioContext);
 
 
     const { stock, to, from, amount, candles } = activeInvestment;
@@ -31,10 +28,7 @@ export default function BuyBox() {
     const endpoint = 'https://finnhub.io/api/v1/stock/candle?';
 
     const [ oneDayCandle, updateOneDayCandle ] = React.useState<CandleStickData | undefined>(candles);
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
-    // FUNCTIONS BELOW ARE DUPLICATE FROM StatBox, refactor to another file later
-
+  
     const getAmountInvested = () => {
         return currency(amount);
     };
@@ -73,11 +67,7 @@ export default function BuyBox() {
         return end.subtract(start);
     };
 
-    // FUNCTIONS ABOVE ARE DUPLICATE FROM StatBox, refactor to another file later
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
     
-
     const updateStartDate: BaseKeyboardPickerProps['onChange'] = async (date) => {
         if (!!date) {
             updateActiveInvestment({
@@ -188,68 +178,6 @@ export default function BuyBox() {
                 stock: stock,
                 candles: res.data,
             });
-
-            const symbol = stock.symbol
-            const startDate = to.format('YYYY-MM-DD')
-            const endDate = from.format('YYYY-MM-DD')
-            const buyInPrice = '$'+getBuyInPrice().toString()
-            const sellPrice = '$'+getSellPrice().toString()
-            const shares = truncateDecimal(getShares().toString(), 4)
-            const getInvestmentAmount = '$'+getAmountInvested().toString()
-            const investmentTotal = '$'+getInvestmentTotal().toString()
-            const investmentPercentage = truncateDecimal(getInvestmentPercentage().toString()) + '%'
-            const investmentProfit = '$'+getInvestmentProfit().toString()
-            
-            const timestamp = moment()
-            
-            // console.log(symbol)
-            // console.log(startDate)
-            // console.log(endDate)
-            // console.log(buyInPrice)
-            // console.log(sellPrice)
-            // console.log(shares)
-            // console.log(getInvestmentAmount)
-            // console.log(investmentTotal)
-            // console.log(investmentPercentage)
-            // console.log(investmentProfit)
-            // console.log(timestamp)
-
-            const ob = {
-                symbol: symbol,
-                startDate: startDate,
-                endDate: endDate,
-                buyInPrice: buyInPrice,
-                sellPrice: sellPrice,
-                shares: shares,
-                getInvestmentAmount: getInvestmentAmount,
-                investmentTotal: investmentTotal,
-                investmentPercentage: investmentPercentage,
-                investmentProfit: investmentProfit,
-                timestamp: timestamp
-            }
-
-             
-            // const list = [...state.list, state.value];
- 
-            //         return {
-            //             list,
-            //             value: '',
-            //         };
-
-            
-            // list1.push(ob)
-            // console.log(list1)
-
-
-            // updatePortfolio({
-            //     ...portfolio,
-            //     list: list
-            // })
-                
-
-            
-            
-
 
         } catch(error) {
             errorHandler(error);
