@@ -8,6 +8,6 @@ export interface StartAdornmentProps {
 export default function StartAdornment(props: StartAdornmentProps) {
     const { adornment } = props;
     return (
-        <InputAdornment position="start">{adornment}</InputAdornment>
+        <InputAdornment data-testid="startadornment" position="start">{adornment}</InputAdornment>
     );
 };
