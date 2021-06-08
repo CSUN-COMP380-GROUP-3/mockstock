@@ -3,7 +3,6 @@ import './App.css';
 
 import BuyBox from './components/BuyBox/BuyBox';
 import Header from './components/Header/Header';
-import StatBox from './components/StatBox/StatBox';
 import StockChart from './components/StockChart/StockChart';
 
 import { ActiveInvestmentInterface, initActiveInvestmentContext, ActiveInvestmentContext } from './contexts/ActiveInvestmentContext';
@@ -36,7 +35,6 @@ function App() {
 
             <Header></Header>
             <BuyBox></BuyBox>
-            <StatBox></StatBox>
             <StockChart></StockChart>
             <LiquidBalance></LiquidBalance>
           </ActiveInvestmentContext.Provider>
