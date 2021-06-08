@@ -5,6 +5,7 @@ import { ActiveInvestmentContext } from '../../contexts/ActiveInvestmentContext'
 import SymbolBox from '../SymbolBox/SymbolBox';
 import DatePicker from '../DatePicker/DatePicker';
 import Input from '../Input/Input';
+import StatBox from '../StatBox/StatBox';
 import Button from '@material-ui/core/Button';
 import { BaseKeyboardPickerProps } from '@material-ui/pickers/_shared/hooks/useKeyboardPickerState';
 import axios from 'axios';
@@ -24,8 +25,54 @@ export default function BuyBox() {
     const endpoint = 'https://finnhub.io/api/v1/stock/candle?';
 
     const [ oneDayCandle, updateOneDayCandle ] = React.useState<CandleStickData | undefined>(candles);
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    // FUNCTIONS BELOW ARE DUPLICATE FROM StatBox, refactor to another file later
 
-    const updateStartDate: BaseKeyboardPickerProps['onChange'] = (date) => {
+    const getAmountInvested = () => {
+        return currency(amount);
+    };
+
+    const getBuyInPrice = () => { // we assume perfect market entry, meaning we buy at the lowest price at the start of our investment term
+        return currency(candles?.l[0]!);
+    };
+
+    const getSellPrice = () => { // we assume perfect exit, meaning we sell at the highest price at the end of our investment term
+        const length = candles?.h.length!;
+        return currency(candles?.h[length-1]!);
+    };
+
+    const getShares = () => {
+        const amountInvested = getAmountInvested().value;
+        const buyIn = getBuyInPrice().value;
+        return amountInvested / buyIn;
+    };
+
+    const getInvestmentTotal = () => { // number of shares sold at the final price
+        const shares = getShares();
+        const sellPrice = getSellPrice();
+        return currency(shares * sellPrice.value);
+    };
+
+    // https://www.investopedia.com/ask/answers/how-do-you-calculate-percentage-gain-or-loss-investment/
+    const getInvestmentPercentage = () => {
+        const end = getSellPrice().value;
+        const start = getBuyInPrice().value;
+        return ((end - start) / start) * 100;
+    };
+
+    const getInvestmentProfit = () => {
+        const end = getInvestmentTotal();
+        const start = getAmountInvested();
+        return end.subtract(start);
+    };
+
+    // FUNCTIONS ABOVE ARE DUPLICATE FROM StatBox, refactor to another file later
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+
+    const updateStartDate: BaseKeyboardPickerProps['onChange'] = async (date) => {
         if (!!date) {
             updateActiveInvestment({
                 ...activeInvestment,
@@ -40,15 +87,42 @@ export default function BuyBox() {
                 resolution: 'D',
                 token,
             });  
+
+            const from = date as Moment
+            
+
+            const res = await fetchCandles({
+                symbol: stock.symbol,
+                to: to.unix(),
+                from: from.unix(),
+                resolution: 'D',
+                token,
+            });
+    
+            updateActiveInvestment({
+                ...activeInvestment,
+                candles: res.data,
+                from: date as Moment
+            });
         };      
     };
 
-    const updateEndDate: BaseKeyboardPickerProps['onChange'] = (date) => {
+    const updateEndDate: BaseKeyboardPickerProps['onChange'] = async (date) => {
         if (!!date) {
+            const res = await fetchCandles({
+                symbol: stock.symbol,
+                to: date.unix(),
+                from: from.unix(),
+                resolution: 'D',
+                token,
+            });
+    
             updateActiveInvestment({
                 ...activeInvestment,
-                to: date as Moment,
+                candles: res.data,
+                to: date as Moment
             });
+
         };
     };
 
@@ -59,7 +133,7 @@ export default function BuyBox() {
         });
     };
 
-    const updateSymbol = (event: any, value: any) => {
+    const updateSymbol = async (event: any, value: any) => {
         if (!!value) {
             updateActiveInvestment({
                 ...activeInvestment,
@@ -70,11 +144,27 @@ export default function BuyBox() {
             fetchAndUpdateOneDayCandles({
                 symbol: value.symbol,
                 from: from.unix(),
-                to: from.unix(),
+                to: to.unix(),
                 resolution: 'D',
                 token,
             });
+
+            const res = await fetchCandles({
+                symbol: value.symbol,
+                to: to.unix(),
+                from: from.unix(),
+                resolution: 'D',
+                token,
+            });
+
+            updateActiveInvestment({
+                ...activeInvestment,
+                stock: value,
+                candles: res.data,
+            });
         };
+
+        
     };
 
     const onClickHandler = async () => {
@@ -87,12 +177,48 @@ export default function BuyBox() {
                 token,
             });
 
-            console.log(res.data);
-
             updateActiveInvestment({
                 ...activeInvestment,
+                stock: stock,
                 candles: res.data,
             });
+
+            const symbol = stock.symbol
+            const startDate = to.format('YYYY-MM-DD')
+            const endDate = from.format('YYYY-MM-DD')
+            const buyInPrice = '$'+getBuyInPrice().toString()
+            const sellPrice = '$'+getSellPrice().toString()
+            const shares = truncateDecimal(getShares().toString(), 4)
+            const getInvestmentAmount = '$'+getAmountInvested().toString()
+            const investmentTotal = '$'+getInvestmentTotal().toString()
+            const investmentPercentage = truncateDecimal(getInvestmentPercentage().toString()) + '%'
+            const investmentProfit = '$'+getInvestmentProfit().toString()
+            
+            console.log(symbol)
+            console.log(startDate)
+            console.log(endDate)
+            console.log(buyInPrice)
+            console.log(sellPrice)
+            console.log(shares)
+            console.log(getInvestmentAmount)
+            console.log(investmentTotal)
+            console.log(investmentPercentage)
+            console.log(investmentProfit)
+
+            // updatePortfolio({
+            //     symbol: symbol,
+            //     startDate: startDate,
+            //     endDate: endDate,
+            //     buyInPrice: buyInPrice,
+            //     sellPrice: sellPrice,
+            //     shares: shares,
+            //     getInvestmentAmount: getInvestmentAmount,
+            //     investmentTotal: investmentTotal,
+            //     investmentPercentage: investmentPercentage,
+            //     investmentProfit: investmentProfit
+            // })
+            
+
 
         } catch(error) {
             errorHandler(error);
@@ -175,7 +301,7 @@ export default function BuyBox() {
                 value={amount}
                 onChange={updateAmount}
             />
-            <Button variant="contained" onClick={onClickHandler}>Invest</Button>
+            <Button variant="contained" onClick={onClickHandler}>Add Stock to Portfolio</Button>
         </form>
     </React.Fragment>
 };
