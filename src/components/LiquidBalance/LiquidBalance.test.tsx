@@ -23,8 +23,10 @@ describe('LiquidBalance component', () => {
                 curr: currency(100),
                 prev: currency(100),
             },
-            updateLiquidBalance: updateLiquidBalance.bind(this),
+            updateLiquidBalance: () => {},
         };
+
+        value.updateLiquidBalance = updateLiquidBalance.bind(value);
 
         beforeEach(() => {
             renderResult = render(
@@ -53,6 +55,24 @@ describe('LiquidBalance component', () => {
             const content = queryByTestId('liquidbalance-profit')?.textContent;
             expect(content).toEqual('$0.00');
             expect(content?.startsWith('$')).toBeTruthy();
+        });
+
+        it('updates on new context', () => {
+            let { queryByTestId, rerender } = renderResult;
+            const { updateLiquidBalance } = value;
+            let content = queryByTestId('liquidbalance-cash')?.textContent;
+            expect(content).toEqual('$100.00');
+            updateLiquidBalance({curr: currency(200), prev: currency(100)});
+
+            rerender(
+                <LiquidBalanceContext.Provider value={value}>
+                    <LiquidBalance></LiquidBalance>
+                </LiquidBalanceContext.Provider>
+            );
+
+            content = queryByTestId('liquidbalance-cash')?.textContent;
+            expect(content).toEqual('$200.00');
+
         });
     });
 
