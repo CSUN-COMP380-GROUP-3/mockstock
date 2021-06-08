@@ -11,7 +11,6 @@ Please make sure to have a `.env` file created. This file acts as a config file 
 - `REACT_APP_API_KEY=<value>`: Finnhub.io api key, used in production environments
 - `REACT_APP_SANDBOX_KEY=<value>`: Finnhub.io sandbox api key, used in development environments
 - `REACT_APP_INITIAL_STOCK=<value>`: Stock to be fetched and preloaded, ex: GME.
-- `REACT_APP_INITIAL_AMOUNT=<value>`: Initial investment amount.
 - `REACT_APP_SEED_MONEY=<value>`: User seed money, how much each user starts off with.
 
 ## Available Scripts
