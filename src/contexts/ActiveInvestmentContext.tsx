@@ -1,7 +1,7 @@
 import React from 'react';
+import StockSymbolData from '../interfaces/StockSymbolData';
 
 import CandleStickData from '../interfaces/CandleStickData';
-import StockSymbolData from '../interfaces/StockSymbolData';
 import { minDate } from '../components/DatePicker/DatePicker';
 import moment, { Moment } from 'moment';
 import initCandles from '../initCandles.json';
