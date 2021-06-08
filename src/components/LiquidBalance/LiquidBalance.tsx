@@ -29,10 +29,10 @@ export default function LiquidBalance() {
     // input and button are only used to test the increase and decrease in balance value
     return (
         <React.Fragment>
-            <h1>LiquidBalance</h1>
-            <h2>{curr.format()}</h2>
-            <h3>{getProfit().format()}</h3>
-            <h3>{getPercent().toString()}%</h3>
+            <h1 data-testid="liquidbalance">LiquidBalance</h1>
+            <h2 data-testid="liquidbalance-cash">{curr.format()}</h2>
+            <h3 data-testid="liquidbalance-profit">{getProfit().format()}</h3>
+            <h3 data-testid="liquidbalance-percent">{getPercent().toString()}%</h3>
             <input 
                 type="number" 
                 id="test-lb" 
