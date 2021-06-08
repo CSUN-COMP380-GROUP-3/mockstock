@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 import moment, { Moment } from 'moment';
 import { ActiveInvestmentContext } from '../../contexts/ActiveInvestmentContext';
 import SymbolBox from '../SymbolBox/SymbolBox';
@@ -51,7 +51,7 @@ export default function BuyBox() {
         };
     };
 
-    const updateAmount = (event: any) => {
+    const updateAmount = (event: ChangeEvent<HTMLInputElement>) => {
         updateActiveInvestment({
             ...activeInvestment,
             amount: event.target.value
