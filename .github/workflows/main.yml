@@ -35,3 +35,8 @@ jobs:
         npm run prefetch
         npm run build --if-present
         npm test
+      env:
+        REACT_APP_API_KEY: sandbox_c2sn1e2ad3ic1qis5pug
+        REACT_APP_SANDBOX_KEY: sandbox_c2sn1e2ad3ic1qis5pug
+        REACT_APP_INITIAL_STOCK: GME
+        REACT_APP_SEED_MONEY: 100000
