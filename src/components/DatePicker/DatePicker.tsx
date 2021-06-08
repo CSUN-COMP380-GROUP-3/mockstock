@@ -5,13 +5,6 @@ import { MuiPickersUtilsProvider, KeyboardDatePicker, KeyboardDatePickerProps } 
 import { BaseKeyboardPickerProps } from '@material-ui/pickers/_shared/hooks/useKeyboardPickerState';
 import moment, { Moment } from 'moment';
 
-// export interface DatePickerProps {
-//     id: string;
-//     label: string;
-//     value: Moment;
-//     onChange: BaseKeyboardPickerProps['onChange'];
-// };
-
 export type DatePickerProps = KeyboardDatePickerProps;
 
 export const minDate = moment().subtract(1, 'year');
