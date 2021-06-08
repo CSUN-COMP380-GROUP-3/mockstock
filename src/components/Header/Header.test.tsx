@@ -2,7 +2,9 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import Header from './Header';
 
-it('renders component', () => {
-    const { queryByTestId } = render(<Header />);
-    expect(queryByTestId('header')).toBeTruthy();
+fdescribe('Header Component', () => {
+    it('renders correctly', () => {
+        const { queryByTestId } = render(<Header />);
+        expect(queryByTestId('header')).toBeTruthy();
+    });
 });
