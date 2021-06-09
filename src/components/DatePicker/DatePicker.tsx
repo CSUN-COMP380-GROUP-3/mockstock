@@ -2,7 +2,7 @@ import React from 'react';
 
 import MomentUtils from '@date-io/moment';
 import { MuiPickersUtilsProvider, KeyboardDatePicker, KeyboardDatePickerProps } from '@material-ui/pickers';
-import moment, { Moment } from 'moment';
+import moment from 'moment';
 
 export type DatePickerProps = KeyboardDatePickerProps;
 

@@ -6,11 +6,14 @@ import Header from './components/Header/Header';
 import StockChart from './components/StockChart/StockChart';
 
 import { ActiveInvestmentInterface, initActiveInvestmentContext, ActiveInvestmentContext } from './contexts/ActiveInvestmentContext';
-import { TokenContext } from './contexts/TokenContext';
+import { TokenContext, TOKEN } from './contexts/TokenContext';
 import { StockSymbolsContext, filteredSymbols } from './contexts/StockSymbolsContext';
 
 import { initLiquidBalanceContext, LiquidBalanceContext, LiquidBalanceInterface } from './contexts/LiquidBalanceContext';
 import LiquidBalance from './components/LiquidBalance/LiquidBalance';
+
+import { initWatchListContext, WatchListContext, WatchListInterface } from './contexts/WatchListContext';
+import WatchList from './components/WatchList/WatchList';
 
 function App() {
 
@@ -21,24 +24,25 @@ function App() {
   const [liquidBalance, updateLiquidBalance] = React.useState<LiquidBalanceInterface>(initLiquidBalanceContext.liquidBalance);
   const liquidBalanceProviderValue = { liquidBalance, updateLiquidBalance };
 
+  const [ watchList, updateWatchList ] = React.useState<WatchListInterface>(initWatchListContext.watchList);
+  const watchListProviderValue = { watchList, updateWatchList };
+
   return (
-    <TokenContext.Provider value={
-      process.env.NODE_ENV === 'production' ? 
-        process.env.REACT_APP_API_KEY! :
-        process.env.REACT_APP_SANDBOX_KEY!
-    }>
+    <TokenContext.Provider value={TOKEN}>
       <LiquidBalanceContext.Provider value={liquidBalanceProviderValue}>
 
         <StockSymbolsContext.Provider value={filteredSymbols}>
+          <WatchListContext.Provider value={watchListProviderValue}>
+            <ActiveInvestmentContext.Provider value={activeInvestmentProviderValue}>
 
-          <ActiveInvestmentContext.Provider value={activeInvestmentProviderValue}>
+              <Header></Header>
+              <BuyBox></BuyBox>
+              <StockChart></StockChart>
+              <LiquidBalance></LiquidBalance>
+              <WatchList></WatchList>
 
-            <Header></Header>
-            <BuyBox></BuyBox>
-            <StockChart></StockChart>
-            <LiquidBalance></LiquidBalance>
-          </ActiveInvestmentContext.Provider>
-          
+            </ActiveInvestmentContext.Provider>
+          </WatchListContext.Provider>
         </StockSymbolsContext.Provider>
 
       </LiquidBalanceContext.Provider>
