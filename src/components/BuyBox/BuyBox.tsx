@@ -1,7 +1,3 @@
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
 import React, {useEffect} from 'react';
 import moment, { Moment } from 'moment';
 import { ActiveInvestmentContext } from '../../contexts/ActiveInvestmentContext';
@@ -21,14 +17,10 @@ import currency from 'currency.js';
 import CandleStickData, { CandleStickQuery } from '../../interfaces/CandleStickData';
 import Trade from '../../interfaces/Trade';
 
-<<<<<<< Updated upstream
-import { truncateDecimal } from '../StatBox/StatBox';
-=======
 const truncateDecimal = (percent: string, places?: number) => {
     const decimalIndex = percent.indexOf('.') + 1;
     return percent.slice(0, decimalIndex + (places || 2));
 };
->>>>>>> Stashed changes
 
 export default function BuyBox() {
     const token = React.useContext<string>(TokenContext);
@@ -76,7 +68,6 @@ export default function BuyBox() {
         const sellPrice = getSellPrice();
         return currency(shares * sellPrice.value);
     };
-<<<<<<< Updated upstream
 
     // https://www.investopedia.com/ask/answers/how-do-you-calculate-percentage-gain-or-loss-investment/
     const getInvestmentPercentage = () => {
@@ -95,26 +86,6 @@ export default function BuyBox() {
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     
 
-=======
-
-    // https://www.investopedia.com/ask/answers/how-do-you-calculate-percentage-gain-or-loss-investment/
-    const getInvestmentPercentage = () => {
-        const end = getSellPrice().value;
-        const start = getBuyInPrice().value;
-        return ((end - start) / start) * 100;
-    };
-
-    const getInvestmentProfit = () => {
-        const end = getInvestmentTotal();
-        const start = getAmountInvested();
-        return end.subtract(start);
-    };
-    // FUNCTIONS ABOVE ^^ ARE DUPLICATE FROM StatBox, refactor to another file later
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
-    
-
->>>>>>> Stashed changes
     const updateStartDate: BaseKeyboardPickerProps['onChange'] = async (date) => {
         if (!!date) {
             updateActiveInvestment({
