@@ -3,7 +3,7 @@ import TextField from '@material-ui/core/TextField';
 import { render } from '@testing-library/react';
 import SymbolBox, { getOptionLabel, groupBy } from './SymbolBox';
 
-fdescribe('SymbolBox component', () => {
+describe('SymbolBox component', () => {
     const options = [
         {
             "currency":"USD",
