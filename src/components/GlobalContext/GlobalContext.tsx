@@ -23,7 +23,7 @@ export const GlobalContext: React.FC = ({children}) => {
 
     return <React.Fragment>
         <TokenContext.Provider value={TOKEN}>
-        <TradesContext.Provider value={tradesProviderValue}>
+            <TradesContext.Provider value={tradesProviderValue}>
                 <StockSymbolsContext.Provider value={filteredSymbols}>
                     <LiquidBalanceContext.Provider value={liquidBalanceProviderValue}>
                         <ActiveInvestmentContext.Provider value={activeInvestmentProviderValue}>
