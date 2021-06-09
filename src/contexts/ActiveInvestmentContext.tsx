@@ -30,7 +30,7 @@ export const initActiveInvestmentContext: ActiveInvestmentContextInterface = {
         from: minDate, // 1 year in the past
         to: moment(),  // current
         amount: initAmount,
-        candles: initCandles
+        candles: initCandles || []
     },
     updateActiveInvestment: () => {}
 };
