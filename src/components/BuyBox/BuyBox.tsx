@@ -183,25 +183,18 @@ export default function BuyBox() {
 
     const onClickHandler = async () => {
         try {
-            const stockProfile = stock
             const startDate = to
             const endDate = from
-            const buyInPrice = getBuyInPrice()
-            const sellPrice = getSellPrice()
-            const getInvestmentAmount = getAmountInvested()
-            const timestamp = moment() 
 
-            let trade: Trade;
-
-            trade = {
-                stock: stockProfile,
-                startDate: startDate,
-                endDate: endDate,
-                buyInPrice: buyInPrice,
-                sellPrice: sellPrice,
-                amount: getInvestmentAmount,
-                timestamp: timestamp
-            }
+            let trade: Trade = {
+                stock,
+                startDate,
+                endDate,
+                buyInPrice: getBuyInPrice(),
+                sellPrice: getSellPrice(),
+                amount: getAmountInvested(),
+                timestamp: moment(),
+            };
 
             updateTrades({
                 ...trades,
