@@ -247,7 +247,9 @@ export default function BuyBox() {
             // })
                 
 
-            
+            // updateTradeHistory();
+
+            // updatePortfolio();
             
 
 
@@ -332,7 +334,7 @@ export default function BuyBox() {
                 value={amount}
                 onChange={updateAmount}
             />
-            <Button variant="contained" onClick={onClickHandler}>Add Stock to Portfolio</Button>
+            <Button variant="contained" onClick={onClickHandler}>Buy</Button>
         </form>
     </React.Fragment>
 };

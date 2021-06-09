@@ -9,6 +9,7 @@ import StockChart from './components/StockChart/StockChart';
 import { ActiveInvestmentInterface, initActiveInvestmentContext, ActiveInvestmentContext } from './contexts/ActiveInvestmentContext';
 import { TokenContext } from './contexts/TokenContext';
 import { StockSymbolsContext, filteredSymbols } from './contexts/StockSymbolsContext';
+import { initPortfolioContext, PortfolioContext, PortfolioContextInterface, PortfolioInterface } from './contexts/PortfolioContext';
 
 function App() {
 
@@ -16,20 +17,25 @@ function App() {
   const [activeInvestment, updateActiveInvestment] = React.useState<ActiveInvestmentInterface>(initActiveInvestmentContext.activeInvestment);
   const activeInvestmentProviderValue = { activeInvestment, updateActiveInvestment };
 
+  const [ portfolio, updatePortfolio ] = React.useState<PortfolioInterface>(initPortfolioContext.portfolio);
+  const portfolioProviderValue = { portfolio, updatePortfolio };
+
   return (
     <TokenContext.Provider value={
       process.env.NODE_ENV === 'production' ? 
         process.env.REACT_APP_API_KEY! :
         process.env.REACT_APP_SANDBOX_KEY!
     }>
-      <StockSymbolsContext.Provider value={filteredSymbols}>
-        <ActiveInvestmentContext.Provider value={activeInvestmentProviderValue}>
-          <Header></Header>
-          <BuyBox></BuyBox>
-          <StatBox></StatBox>
-          <StockChart></StockChart>
-        </ActiveInvestmentContext.Provider>
-      </StockSymbolsContext.Provider>
+      <PortfolioContext.Provider value={portfolioProviderValue}>
+        <StockSymbolsContext.Provider value={filteredSymbols}>
+          <ActiveInvestmentContext.Provider value={activeInvestmentProviderValue}>
+            <Header></Header>
+            <BuyBox></BuyBox>
+            <StatBox></StatBox>
+            <StockChart></StockChart>
+          </ActiveInvestmentContext.Provider>
+        </StockSymbolsContext.Provider>
+      </PortfolioContext.Provider>
     </TokenContext.Provider>
 
   );

@@ -1,21 +1,18 @@
 import React from 'react';
-import { isEmptyStatement } from 'typescript';
-import PortfolioData from '../interfaces/PortfolioData';
-
+import PortfolioItem from '../interfaces/PortfolioData';
 
 export interface PortfolioInterface {
-    list: Array<PortfolioData>
+    items: PortfolioItem[];
 };
 
 export interface PortfolioContextInterface {
     portfolio: PortfolioInterface;
-    updatePortfolio: (portfolio: [PortfolioInterface]) => void;
+    updatePortfolio: (portfolio: PortfolioInterface) => void;
 };
-
 
 export const initPortfolioContext: PortfolioContextInterface = {
     portfolio: {
-        list: []
+        items: []
     },
     updatePortfolio: () => {}
 };
