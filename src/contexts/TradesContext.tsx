@@ -17,6 +17,10 @@ export const initTradesContext: TradesContextInterface = {
     updateTrades: () => {}
 };
 
+<<<<<<< Updated upstream
 export const TradesContext = React.createContext<TradesContextInterface>(initTradesContext);
 
 
+=======
+export const TradesContext = React.createContext<TradesContextInterface>(initTradesContext);
+>>>>>>> Stashed changes
