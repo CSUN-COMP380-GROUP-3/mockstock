@@ -1,7 +1,7 @@
-
-import React, { ChangeEvent } from 'react';
+import React, {useEffect} from 'react';
 import moment, { Moment } from 'moment';
 import { ActiveInvestmentContext } from '../../contexts/ActiveInvestmentContext';
+import { TradesContext } from '../../contexts/TradesContext';
 import SymbolBox from '../SymbolBox/SymbolBox';
 import DatePicker from '../DatePicker/DatePicker';
 import Input from '../Input/Input';
@@ -12,19 +12,72 @@ import querystring from 'querystring';
 import { TokenContext } from '../../contexts/TokenContext';
 import currency from 'currency.js';
 import CandleStickData, { CandleStickQuery } from '../../interfaces/CandleStickData';
+import Trade from '../../interfaces/Trade';
 
 export default function BuyBox() {
     const token = React.useContext<string>(TokenContext);
 
     const { activeInvestment, updateActiveInvestment } = React.useContext(ActiveInvestmentContext);
+    const { trades, updateTrades } = React.useContext(TradesContext);
+
+    // useEffect here just to test if trades context working properly
+    useEffect(() => {
+        if(trades.items.length > 0) {
+            console.log(trades.items)
+        }
+    })
 
     const { stock, to, from, amount, candles } = activeInvestment;
 
     const endpoint = 'https://finnhub.io/api/v1/stock/candle?';
 
     const [ oneDayCandle, updateOneDayCandle ] = React.useState<CandleStickData | undefined>(candles);
+    
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    // FUNCTIONS BELOW ARE DUPLICATE FROM StatBox, refactor to another file later
+    const getAmountInvested = () => {
+        return currency(amount);
+    };
 
-    const updateStartDate: BaseKeyboardPickerProps['onChange'] = (date) => {
+    const getBuyInPrice = () => { // we assume perfect market entry, meaning we buy at the lowest price at the start of our investment term
+        return currency(candles?.l[0]!);
+    };
+
+    const getSellPrice = () => { // we assume perfect exit, meaning we sell at the highest price at the end of our investment term
+        const length = candles?.h.length!;
+        return currency(candles?.h[length-1]!);
+    };
+
+    const getShares = () => {
+        const amountInvested = getAmountInvested().value;
+        const buyIn = getBuyInPrice().value;
+        return amountInvested / buyIn;
+    };
+
+    const getInvestmentTotal = () => { // number of shares sold at the final price
+        const shares = getShares();
+        const sellPrice = getSellPrice();
+        return currency(shares * sellPrice.value);
+    };
+
+    // https://www.investopedia.com/ask/answers/how-do-you-calculate-percentage-gain-or-loss-investment/
+    const getInvestmentPercentage = () => {
+        const end = getSellPrice().value;
+        const start = getBuyInPrice().value;
+        return ((end - start) / start) * 100;
+    };
+
+    const getInvestmentProfit = () => {
+        const end = getInvestmentTotal();
+        const start = getAmountInvested();
+        return end.subtract(start);
+    };
+    // FUNCTIONS ABOVE ^^ ARE DUPLICATE FROM StatBox, refactor to another file later
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    const updateStartDate: BaseKeyboardPickerProps['onChange'] = async (date) => {
         if (!!date) {
             updateActiveInvestment({
                 ...activeInvestment,
@@ -39,26 +92,52 @@ export default function BuyBox() {
                 resolution: 'D',
                 token,
             });  
+
+            const from = date as Moment
+            
+            const res = await fetchCandles({
+                symbol: stock.symbol,
+                to: to.unix(),
+                from: from.unix(),
+                resolution: 'D',
+                token,
+            });
+    
+            updateActiveInvestment({
+                ...activeInvestment,
+                candles: res.data,
+                from: date as Moment
+            });
         };      
     };
 
-    const updateEndDate: BaseKeyboardPickerProps['onChange'] = (date) => {
+    const updateEndDate: BaseKeyboardPickerProps['onChange'] = async (date) => {
         if (!!date) {
+            const res = await fetchCandles({
+                symbol: stock.symbol,
+                to: date.unix(),
+                from: from.unix(),
+                resolution: 'D',
+                token,
+            });
+    
             updateActiveInvestment({
                 ...activeInvestment,
-                to: date as Moment,
+                candles: res.data,
+                to: date as Moment
             });
+
         };
     };
 
-    const updateAmount = (event: ChangeEvent<HTMLInputElement>) => {
+    const updateAmount = (event: any) => {
         updateActiveInvestment({
             ...activeInvestment,
             amount: event.target.value
         });
     };
 
-    const updateSymbol = (event: any, value: any) => {
+    const updateSymbol = async (event: any, value: any) => {
         if (!!value) {
             updateActiveInvestment({
                 ...activeInvestment,
@@ -69,30 +148,46 @@ export default function BuyBox() {
             fetchAndUpdateOneDayCandles({
                 symbol: value.symbol,
                 from: from.unix(),
-                to: from.unix(),
+                to: to.unix(),
                 resolution: 'D',
                 token,
             });
-        };
-    };
 
-    const onClickHandler = async () => {
-        try {
             const res = await fetchCandles({
-                symbol: stock.symbol,
+                symbol: value.symbol,
                 to: to.unix(),
                 from: from.unix(),
                 resolution: 'D',
                 token,
             });
 
-            console.log(res.data);
-
             updateActiveInvestment({
                 ...activeInvestment,
+                stock: value,
                 candles: res.data,
             });
+        };
 
+        
+    };
+
+    const onClickHandler = async () => {
+        try {
+            let trade: Trade = {
+                stock,
+                startDate: from,
+                endDate: to,
+                buyInPrice: getBuyInPrice(),
+                sellPrice: getSellPrice(),
+                amount: getAmountInvested(),
+                timestamp: moment(),
+            };
+
+            updateTrades({
+                ...trades,
+                items: [trade, ...trades.items]
+            })
+ 
         } catch(error) {
             errorHandler(error);
         };
@@ -147,10 +242,10 @@ export default function BuyBox() {
         // after the inital data is loaded we take the first candle and use that for our calculation
         // we assume that we had perfect entry into the market that day and bought at the lowest price available
         if (!!oneDayCandle) {
-            const price = currency(oneDayCandle['l'][0]);
-            const shares = currency(amount).value / price.value;
+            const price = currency(oneDayCandle['l'][0]).value;
+            const shares = currency(amount).value / price;
 
-            return `${shares.toFixed(4)} shares @ ${price.format()}`;
+            return `${shares.toFixed(4).toString()} shares @ $${price.toString()}`;
         };
         return '';
     };
@@ -174,7 +269,7 @@ export default function BuyBox() {
                 value={amount}
                 onChange={updateAmount}
             />
-            <Button variant="contained" onClick={onClickHandler}>Invest</Button>
+            <Button variant="contained" onClick={onClickHandler}>Buy</Button>
         </form>
     </React.Fragment>
 };
