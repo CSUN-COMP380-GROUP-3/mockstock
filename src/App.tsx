@@ -9,7 +9,8 @@ import StockChart from './components/StockChart/StockChart';
 import { ActiveInvestmentInterface, initActiveInvestmentContext, ActiveInvestmentContext } from './contexts/ActiveInvestmentContext';
 import { TokenContext } from './contexts/TokenContext';
 import { StockSymbolsContext, filteredSymbols } from './contexts/StockSymbolsContext';
-import { initPortfolioContext, PortfolioContext, PortfolioContextInterface, PortfolioInterface } from './contexts/PortfolioContext';
+import { initTradesContext, TradesContext, TradesContextInterface, TradesInterface } from './contexts/TradesContext';
+
 
 function App() {
 
@@ -17,8 +18,8 @@ function App() {
   const [activeInvestment, updateActiveInvestment] = React.useState<ActiveInvestmentInterface>(initActiveInvestmentContext.activeInvestment);
   const activeInvestmentProviderValue = { activeInvestment, updateActiveInvestment };
 
-  const [ portfolio, updatePortfolio ] = React.useState<PortfolioInterface>(initPortfolioContext.portfolio);
-  const portfolioProviderValue = { portfolio, updatePortfolio };
+  const [ trades, updateTrades ] = React.useState<TradesInterface>(initTradesContext.trades);
+  const tradesProviderValue = { trades, updateTrades };
 
   return (
     <TokenContext.Provider value={
@@ -26,16 +27,16 @@ function App() {
         process.env.REACT_APP_API_KEY! :
         process.env.REACT_APP_SANDBOX_KEY!
     }>
-      <PortfolioContext.Provider value={portfolioProviderValue}>
-        <StockSymbolsContext.Provider value={filteredSymbols}>
-          <ActiveInvestmentContext.Provider value={activeInvestmentProviderValue}>
-            <Header></Header>
-            <BuyBox></BuyBox>
-            <StatBox></StatBox>
-            <StockChart></StockChart>
-          </ActiveInvestmentContext.Provider>
-        </StockSymbolsContext.Provider>
-      </PortfolioContext.Provider>
+      <TradesContext.Provider value={tradesProviderValue}>
+          <StockSymbolsContext.Provider value={filteredSymbols}>
+            <ActiveInvestmentContext.Provider value={activeInvestmentProviderValue}>
+              <Header></Header>
+              <BuyBox></BuyBox>
+              <StatBox></StatBox>
+              <StockChart></StockChart>
+            </ActiveInvestmentContext.Provider>
+          </StockSymbolsContext.Provider>
+      </TradesContext.Provider>
     </TokenContext.Provider>
 
   );

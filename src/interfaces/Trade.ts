@@ -9,7 +9,6 @@ export default interface Trade {
     endDate: Moment;
     buyInPrice: currency;
     sellPrice: currency;
-    shares: number;
     amount: currency;
     timestamp: Moment;
 };
