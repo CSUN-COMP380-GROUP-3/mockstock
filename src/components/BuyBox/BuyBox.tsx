@@ -2,9 +2,6 @@ import React, {useEffect} from 'react';
 import moment, { Moment } from 'moment';
 import { ActiveInvestmentContext } from '../../contexts/ActiveInvestmentContext';
 import { TradesContext } from '../../contexts/TradesContext';
-
-
-
 import SymbolBox from '../SymbolBox/SymbolBox';
 import DatePicker from '../DatePicker/DatePicker';
 import Input from '../Input/Input';
@@ -16,11 +13,6 @@ import { TokenContext } from '../../contexts/TokenContext';
 import currency from 'currency.js';
 import CandleStickData, { CandleStickQuery } from '../../interfaces/CandleStickData';
 import Trade from '../../interfaces/Trade';
-
-const truncateDecimal = (percent: string, places?: number) => {
-    const decimalIndex = percent.indexOf('.') + 1;
-    return percent.slice(0, decimalIndex + (places || 2));
-};
 
 export default function BuyBox() {
     const token = React.useContext<string>(TokenContext);
@@ -40,10 +32,10 @@ export default function BuyBox() {
     const endpoint = 'https://finnhub.io/api/v1/stock/candle?';
 
     const [ oneDayCandle, updateOneDayCandle ] = React.useState<CandleStickData | undefined>(candles);
+    
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     // FUNCTIONS BELOW ARE DUPLICATE FROM StatBox, refactor to another file later
-
     const getAmountInvested = () => {
         return currency(amount);
     };
@@ -85,7 +77,6 @@ export default function BuyBox() {
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     
-
     const updateStartDate: BaseKeyboardPickerProps['onChange'] = async (date) => {
         if (!!date) {
             updateActiveInvestment({
@@ -104,7 +95,6 @@ export default function BuyBox() {
 
             const from = date as Moment
             
-
             const res = await fetchCandles({
                 symbol: stock.symbol,
                 to: to.unix(),
@@ -183,13 +173,10 @@ export default function BuyBox() {
 
     const onClickHandler = async () => {
         try {
-            const startDate = to
-            const endDate = from
-
             let trade: Trade = {
                 stock,
-                startDate,
-                endDate,
+                startDate: from,
+                endDate: to,
                 buyInPrice: getBuyInPrice(),
                 sellPrice: getSellPrice(),
                 amount: getAmountInvested(),
@@ -258,7 +245,7 @@ export default function BuyBox() {
             const price = currency(oneDayCandle['l'][0]).value;
             const shares = currency(amount).value / price;
 
-            return `${truncateDecimal(shares.toString(), 4)} shares @ $${price.toString()}`;
+            return `${shares.toFixed(4).toString()} shares @ $${price.toString()}`;
         };
         return '';
     };
