@@ -9,10 +9,10 @@ export default function WatchList() {
     const isInit = React.useRef(false);
     const { watchList, updateWatchList } = React.useContext(WatchListContext);
     
-    const cleanUp = () => { // need to think of a way to close this socket
-        socket.close();
-        console.log('closing socket');
-    };
+    // const cleanUp = () => { // need to think of a way to close this socket
+    //     socket.close();
+    //     console.log('closing socket');
+    // };
 
 
     React.useEffect(() => {
