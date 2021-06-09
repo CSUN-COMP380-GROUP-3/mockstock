@@ -19,7 +19,7 @@ fdescribe('SymbolBox component', () => {
     const variant = 'outlined';
 
     it('renders correctly', () => {
-        const { queryByTestId, queryByLabelText, getByText} = render(
+        const { queryByTestId, queryByLabelText } = render(
             <SymbolBox
                 options={options}
                 renderInput={(params) => <TextField {...params} variant={variant} label={label}/>}

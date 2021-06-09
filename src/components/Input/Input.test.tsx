@@ -3,14 +3,15 @@ import { render } from '@testing-library/react';
 import Input, { InputProps } from './Input';
 
 describe('Input component', () => {
-    const props: InputProps = { id: 'test', label: 'test' };
+    const props: InputProps = { id: 'test', label: 'test', value: 'test' };
 
     it('renders correctly', () => {
-        const { queryByTestId, queryByLabelText } = render(<Input {...props}/>);
+        const { queryByTestId, queryByLabelText, queryByDisplayValue } = render(<Input {...props}/>);
 
         const component = queryByTestId('input-test');
         expect(component).toBeTruthy();
         expect(queryByLabelText('test')).toBeTruthy();
+        expect(queryByDisplayValue('test')).toBeTruthy();
     });
 
     it('renders adornments', () => {
