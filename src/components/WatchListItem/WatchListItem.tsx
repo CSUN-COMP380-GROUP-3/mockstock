@@ -36,8 +36,8 @@ export default function WatchListItem(props: WatchListItemProps) {
         <Card data-testid="watchlistitem" style={style} className={root}>
             <Typography variant="h6" className="symbol">{data.symbol}</Typography>
             <div className="details">
-                <Typography variant="h6" className="dollar">$100.00</Typography>
-                <Typography variant="subtitle2" className="percent">(10.01%)</Typography>
+                <Typography variant="h6" className="dollar" data-testid="watchlistitem-dollar">{!!data.price ? data.price.format() : '$-'}</Typography>
+                <Typography variant="subtitle2" className="percent" data-testid="watchlistitem-percent">(-%)</Typography>
             </div>
         </Card>
     );
