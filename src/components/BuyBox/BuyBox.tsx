@@ -60,22 +60,6 @@ export default function BuyBox() {
         const sellPrice = getSellPrice();
         return currency(shares * sellPrice.value);
     };
-
-    // https://www.investopedia.com/ask/answers/how-do-you-calculate-percentage-gain-or-loss-investment/
-    const getInvestmentPercentage = () => {
-        const end = getSellPrice().value;
-        const start = getBuyInPrice().value;
-        return ((end - start) / start) * 100;
-    };
-
-    const getInvestmentProfit = () => {
-        const end = getInvestmentTotal();
-        const start = getAmountInvested();
-        return end.subtract(start);
-    };
-    // FUNCTIONS ABOVE ^^ ARE DUPLICATE FROM StatBox, refactor to another file later
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
     
     const updateStartDate: BaseKeyboardPickerProps['onChange'] = async (date) => {
         if (!!date) {
