@@ -16,10 +16,10 @@ export default function WatchListItem(props: WatchListItemProps) {
             justifyContent: 'space-between',
             alignItems: 'center',
             '& .symbol': {
-                marginLeft: '0.5rem'
+                marginLeft: '1rem'
             },
             '& .details': {
-                marginRight: '0.5rem',
+                marginRight: '1rem',
                 '& .dollar': {
                     textAlign: 'right',
                 },
@@ -37,7 +37,7 @@ export default function WatchListItem(props: WatchListItemProps) {
             <Typography variant="h6" className="symbol">{data.symbol}</Typography>
             <div className="details">
                 <Typography variant="h6" className="dollar">$100.00</Typography>
-                <Typography variant="subtitle2" className="percent">(100.00%)</Typography>
+                <Typography variant="subtitle2" className="percent">(10.01%)</Typography>
             </div>
         </Card>
     );
