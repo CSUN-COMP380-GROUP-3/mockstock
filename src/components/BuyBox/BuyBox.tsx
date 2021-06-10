@@ -33,9 +33,6 @@ export default function BuyBox() {
 
     const [ oneDayCandle, updateOneDayCandle ] = React.useState<CandleStickData | undefined>(candles);
     
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
-    // FUNCTIONS BELOW ARE DUPLICATE FROM StatBox, refactor to another file later
     const getAmountInvested = () => {
         return currency(amount);
     };
@@ -48,34 +45,6 @@ export default function BuyBox() {
         const length = candles?.h.length!;
         return currency(candles?.h[length-1]!);
     };
-
-    const getShares = () => {
-        const amountInvested = getAmountInvested().value;
-        const buyIn = getBuyInPrice().value;
-        return amountInvested / buyIn;
-    };
-
-    const getInvestmentTotal = () => { // number of shares sold at the final price
-        const shares = getShares();
-        const sellPrice = getSellPrice();
-        return currency(shares * sellPrice.value);
-    };
-
-    // https://www.investopedia.com/ask/answers/how-do-you-calculate-percentage-gain-or-loss-investment/
-    const getInvestmentPercentage = () => {
-        const end = getSellPrice().value;
-        const start = getBuyInPrice().value;
-        return ((end - start) / start) * 100;
-    };
-
-    const getInvestmentProfit = () => {
-        const end = getInvestmentTotal();
-        const start = getAmountInvested();
-        return end.subtract(start);
-    };
-    // FUNCTIONS ABOVE ^^ ARE DUPLICATE FROM StatBox, refactor to another file later
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
     
     const updateStartDate: BaseKeyboardPickerProps['onChange'] = async (date) => {
         if (!!date) {

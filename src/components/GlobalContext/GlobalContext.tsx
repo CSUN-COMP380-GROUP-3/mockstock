@@ -5,7 +5,7 @@ import { StockSymbolsContext, filteredSymbols } from '../../contexts/StockSymbol
 import { initLiquidBalanceContext, LiquidBalanceContext, LiquidBalanceInterface } from '../../contexts/LiquidBalanceContext';
 import { initActiveInvestmentContext, ActiveInvestmentContext, ActiveInvestmentInterface } from '../../contexts/ActiveInvestmentContext';
 import { initWatchListContext, WatchListContext, WatchListInterface } from '../../contexts/WatchListContext';
-import { initTradesContext, TradesContext, TradesContextInterface, TradesInterface } from '../../contexts/TradesContext';
+import { initTradesContext, TradesContext, TradesInterface } from '../../contexts/TradesContext';
 
 
 export const GlobalContext: React.FC = ({children}) => {

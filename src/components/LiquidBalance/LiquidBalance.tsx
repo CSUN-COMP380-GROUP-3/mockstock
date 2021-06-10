@@ -1,5 +1,7 @@
 import React from 'react';
 import currency from 'currency.js';
+import Typography from '@material-ui/core/Typography';
+import { makeStyles } from '@material-ui/core/styles';
 
 import { LiquidBalanceContext } from '../../contexts/LiquidBalanceContext';
 
@@ -26,13 +28,57 @@ export default function LiquidBalance() {
 
     const getProfit = () => curr.subtract(prev);
 
+    const getSign = () => getProfit().value > 0 ? '+' : '';
+
+    const useStyles = makeStyles(() => {
+        const profitValue = getProfit().value;
+        return {
+            root: {
+                display: 'flex',
+                justifyContent: 'space-between',
+                width: '450px',
+                '& .label': {
+                    display: 'flex',
+                    alignItems: 'center',
+                    textAlign: 'left',
+                },
+                '& .amount': {
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    textAlign: 'right',
+                    '& .dollar': { },
+                    '& .details': {
+                        color: profitValue === 0 ? undefined : profitValue > 0 ? 'green' : 'red',  
+                        display: 'flex',
+                        justifyContent: 'space-evenly',
+                        '& .profit': {
+                            marginRight: '0.25rem',
+                        }
+                    }
+                }
+            }
+    
+        }
+    });
+    
+    const { root } = useStyles();
     // input and button are only used to test the increase and decrease in balance value
     return (
         <React.Fragment>
-            <h1 data-testid="liquidbalance">LiquidBalance</h1>
-            <h2 data-testid="liquidbalance-cash">{curr.format()}</h2>
-            <h3 data-testid="liquidbalance-profit">{getProfit().format()}</h3>
-            <h3 data-testid="liquidbalance-percent">{getPercent().toString()}%</h3>
+
+            <div data-testid="liquidbalance" className={root}>
+                <Typography variant="h3" className="label">Cash</Typography>
+                <div className="amount">
+                    <Typography variant="h4" data-testid="liquidbalance-cash" className="dollar">{curr.format()}</Typography>
+                    <div className="details">
+                        <Typography variant="subtitle2" data-testid="liquidbalance-profit" className="profit">{getSign()}{getProfit().format()}</Typography>
+                        <Typography variant="subtitle2" data-testid="liquidbalance-percent">({getPercent().toString()}%)</Typography>
+                    </div>
+                </div>
+            </div>
+
             <input 
                 type="number" 
                 id="test-lb" 
