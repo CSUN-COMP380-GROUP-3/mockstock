@@ -46,15 +46,20 @@ export default function LiquidBalance() {
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'center',
-                    alignItems: 'center',
+                    alignItems: 'flex-end',
                     textAlign: 'right',
-                    '& .dollar': { },
+                    '& .dollar': { 
+                        textAlign: 'right',
+                    },
                     '& .details': {
                         color: profitValue === 0 ? undefined : profitValue > 0 ? 'green' : 'red',  
                         display: 'flex',
                         justifyContent: 'space-evenly',
                         '& .profit': {
                             marginRight: '0.25rem',
+                        },
+                        '& .percent': {
+                            textAlign: 'right',
                         }
                     }
                 }
@@ -74,7 +79,7 @@ export default function LiquidBalance() {
                     <Typography variant="h4" data-testid="liquidbalance-cash" className="dollar">{curr.format()}</Typography>
                     <div className="details">
                         <Typography variant="subtitle2" data-testid="liquidbalance-profit" className="profit">{getSign()}{getProfit().format()}</Typography>
-                        <Typography variant="subtitle2" data-testid="liquidbalance-percent">({getPercent().toString()}%)</Typography>
+                        <Typography variant="subtitle2" data-testid="liquidbalance-percent" className="percent">({getPercent().toString()}%)</Typography>
                     </div>
                 </div>
             </div>

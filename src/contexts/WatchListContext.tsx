@@ -6,10 +6,12 @@ import WebSocketData from '../interfaces/WebSocketData';
 
 export interface WatchListInterface {
     stocks: {
-        [key: string]: (StockSymbolData & Partial<WebSocketData>)
+        [key: string]: WatchListData,
     },
     lastUpdated: Moment;
 };
+
+export type WatchListData = (StockSymbolData & Partial<WebSocketData>);
 
 export interface WatchListContextInterface {
     watchList: WatchListInterface;
