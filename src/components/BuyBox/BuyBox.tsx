@@ -33,9 +33,6 @@ export default function BuyBox() {
 
     const [ oneDayCandle, updateOneDayCandle ] = React.useState<CandleStickData | undefined>(candles);
     
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
-    // FUNCTIONS BELOW ARE DUPLICATE FROM StatBox, refactor to another file later
     const getAmountInvested = () => {
         return currency(amount);
     };
@@ -53,12 +50,6 @@ export default function BuyBox() {
         const amountInvested = getAmountInvested().value;
         const buyIn = getBuyInPrice().value;
         return amountInvested / buyIn;
-    };
-
-    const getInvestmentTotal = () => { // number of shares sold at the final price
-        const shares = getShares();
-        const sellPrice = getSellPrice();
-        return currency(shares * sellPrice.value);
     };
     
     const updateStartDate: BaseKeyboardPickerProps['onChange'] = async (date) => {
