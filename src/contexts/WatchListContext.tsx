@@ -6,10 +6,12 @@ import WebSocketData from '../interfaces/WebSocketData';
 
 export interface WatchListInterface {
     stocks: {
-        [key: string]: (StockSymbolData & Partial<WebSocketData>)
+        [key: string]: WatchListData,
     },
     lastUpdated: Moment;
 };
+
+export type WatchListData = (StockSymbolData & Partial<WebSocketData>);
 
 export interface WatchListContextInterface {
     watchList: WatchListInterface;
@@ -20,7 +22,13 @@ export const initWatchListContext: WatchListContextInterface = {
     watchList: {
         stocks: {
             "GME": filteredSymbols.find(stock => stock.symbol === 'GME')!,
-            "AMC": filteredSymbols.find(stock => stock.symbol === 'AMC')!
+            "AMC": filteredSymbols.find(stock => stock.symbol === 'AMC')!,
+            "BB": filteredSymbols.find(stock => stock.symbol === 'BB')!,
+            "AAPL": filteredSymbols.find(stock => stock.symbol === 'AAPL')!,
+            "TSLA": filteredSymbols.find(stock => stock.symbol === 'TSLA')!,
+            "AMD": filteredSymbols.find(stock => stock.symbol === 'AMD')!,
+            "INTC": filteredSymbols.find(stock => stock.symbol === 'INTC')!,
+            
         },
         lastUpdated: moment(),
     },
