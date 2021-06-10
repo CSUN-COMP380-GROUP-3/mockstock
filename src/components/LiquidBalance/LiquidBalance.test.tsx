@@ -46,8 +46,8 @@ describe('LiquidBalance component', () => {
         it('shows percent value', () => {
             const { queryByTestId } = renderResult;
             const content = queryByTestId('liquidbalance-percent')?.textContent;
-            expect(content).toEqual('0.00%');
-            expect(content?.endsWith('%')).toBeTruthy();
+            expect(content).toEqual('(0.00%)');
+            expect(content?.endsWith('%)')).toBeTruthy();
         });
 
         it('shows profit value', () => {
