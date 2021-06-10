@@ -45,12 +45,6 @@ export default function BuyBox() {
         const length = candles?.h.length!;
         return currency(candles?.h[length-1]!);
     };
-
-    const getShares = () => {
-        const amountInvested = getAmountInvested().value;
-        const buyIn = getBuyInPrice().value;
-        return amountInvested / buyIn;
-    };
     
     const updateStartDate: BaseKeyboardPickerProps['onChange'] = async (date) => {
         if (!!date) {
