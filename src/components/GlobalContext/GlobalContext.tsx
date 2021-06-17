@@ -3,18 +3,18 @@ import React from 'react';
 import { TokenContext, TOKEN } from '../../contexts/TokenContext';
 import { StockSymbolsContext, filteredSymbols } from '../../contexts/StockSymbolsContext';
 import { initLiquidBalanceContext, LiquidBalanceContext, LiquidBalanceInterface } from '../../contexts/LiquidBalanceContext';
-import { initActiveInvestmentContext, ActiveInvestmentContext, ActiveInvestmentInterface } from '../../contexts/ActiveInvestmentContext';
 import { initWatchListContext, WatchListContext, WatchListInterface } from '../../contexts/WatchListContext';
 import { initTradesContext, TradesContext, TradesInterface } from '../../contexts/TradesContext';
+import { ActiveStockContext, ActiveStockInterface, initActiveStockContext } from '../../contexts/ActiveStockContext';
 
 
 export const GlobalContext: React.FC = ({children}) => {
     const [liquidBalance, updateLiquidBalance] = React.useState<LiquidBalanceInterface>(initLiquidBalanceContext.liquidBalance);
     const liquidBalanceProviderValue = { liquidBalance, updateLiquidBalance };
 
-    const [activeInvestment, updateActiveInvestment] = React.useState<ActiveInvestmentInterface>(initActiveInvestmentContext.activeInvestment);
-    const activeInvestmentProviderValue = { activeInvestment, updateActiveInvestment };
-  
+    const [activeStock, updateActiveStock] = React.useState<ActiveStockInterface>(initActiveStockContext.activeStock);
+    const activeStockProviderValue = { activeStock, updateActiveStock };
+
     const [ watchList, updateWatchList ] = React.useState<WatchListInterface>(initWatchListContext.watchList);
     const watchListProviderValue = { watchList, updateWatchList };
 
@@ -26,11 +26,11 @@ export const GlobalContext: React.FC = ({children}) => {
             <TradesContext.Provider value={tradesProviderValue}>
                 <StockSymbolsContext.Provider value={filteredSymbols}>
                     <LiquidBalanceContext.Provider value={liquidBalanceProviderValue}>
-                        <ActiveInvestmentContext.Provider value={activeInvestmentProviderValue}>
+                        <ActiveStockContext.Provider value={activeStockProviderValue}>
                             <WatchListContext.Provider value={watchListProviderValue}>
                                 {children}
                             </WatchListContext.Provider>
-                        </ActiveInvestmentContext.Provider>
+                        </ActiveStockContext.Provider>
                     </LiquidBalanceContext.Provider>
                 </StockSymbolsContext.Provider>
             </TradesContext.Provider>

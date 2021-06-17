@@ -1,10 +1,10 @@
 import React from 'react';
-import { ActiveInvestmentContext } from '../../contexts/ActiveInvestmentContext';
+import { ActiveStockContext } from '../../contexts/ActiveStockContext';
 import ReactApexChart from "react-apexcharts";
 
 export default function StockChart() {
-    const { activeInvestment } = React.useContext(ActiveInvestmentContext);
-    const { candles } = activeInvestment;
+    const { activeStock } = React.useContext(ActiveStockContext);
+    const { candles } = activeStock;
 
     const data = []
     if(candles) {
@@ -70,6 +70,3 @@ export default function StockChart() {
         </div>
     )    
 };
-
-// NOT SURE WHAT TO DO WITH THIS CODE BELOW, CAME WITH ApexChart
-// const domContainer = document.querySelector('#app');
