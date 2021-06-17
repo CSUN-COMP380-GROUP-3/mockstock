@@ -5,10 +5,9 @@ import { Moment } from 'moment';
 // related to buying or selling
 export default interface Trade {
     stock: StockSymbolData;
-    startDate: Moment;
-    endDate: Moment;
-    buyInPrice: currency;
-    sellPrice: currency;
+    date: Moment;
+    price: currency;
     amount: currency;
+    isBuy: boolean;
     timestamp: Moment;
 };
