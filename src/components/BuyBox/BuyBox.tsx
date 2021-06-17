@@ -1,10 +1,9 @@
 import React, {useEffect} from 'react';
 import moment, { Moment } from 'moment';
-import { ActiveInvestmentContext } from '../../contexts/ActiveInvestmentContext';
+import { ActiveStockContext } from '../../contexts/ActiveStockContext';
 import { TradesContext } from '../../contexts/TradesContext';
 import SymbolBox from '../SymbolBox/SymbolBox';
 import DatePicker from '../DatePicker/DatePicker';
-import Input from '../Input/Input';
 import Button from '@material-ui/core/Button';
 import { BaseKeyboardPickerProps } from '@material-ui/pickers/_shared/hooks/useKeyboardPickerState';
 import axios from 'axios';
@@ -17,7 +16,7 @@ import Trade from '../../interfaces/Trade';
 export default function BuyBox() {
     const token = React.useContext<string>(TokenContext);
 
-    const { activeInvestment, updateActiveInvestment } = React.useContext(ActiveInvestmentContext);
+    const { activeStock, updateActiveStock } = React.useContext(ActiveStockContext);
     const { trades, updateTrades } = React.useContext(TradesContext);
 
     // useEffect here just to test if trades context working properly
@@ -27,15 +26,11 @@ export default function BuyBox() {
         }
     })
 
-    const { stock, to, from, amount, candles } = activeInvestment;
+    const { stock, to, from, candles } = activeStock;
 
     const endpoint = 'https://finnhub.io/api/v1/stock/candle?';
 
     const [ oneDayCandle, updateOneDayCandle ] = React.useState<CandleStickData | undefined>(candles);
-    
-    const getAmountInvested = () => {
-        return currency(amount);
-    };
 
     const getBuyInPrice = () => { // we assume perfect market entry, meaning we buy at the lowest price at the start of our investment term
         return currency(candles?.l[0]!);
@@ -48,8 +43,8 @@ export default function BuyBox() {
     
     const updateStartDate: BaseKeyboardPickerProps['onChange'] = async (date) => {
         if (!!date) {
-            updateActiveInvestment({
-                ...activeInvestment,
+            updateActiveStock({
+                ...activeStock,
                 from: date as Moment,
             });
     
@@ -72,8 +67,8 @@ export default function BuyBox() {
                 token,
             });
     
-            updateActiveInvestment({
-                ...activeInvestment,
+            updateActiveStock({
+                ...activeStock,
                 candles: res.data,
                 from: date as Moment
             });
@@ -90,8 +85,8 @@ export default function BuyBox() {
                 token,
             });
     
-            updateActiveInvestment({
-                ...activeInvestment,
+            updateActiveStock({
+                ...activeStock,
                 candles: res.data,
                 to: date as Moment
             });
@@ -99,17 +94,10 @@ export default function BuyBox() {
         };
     };
 
-    const updateAmount = (event: any) => {
-        updateActiveInvestment({
-            ...activeInvestment,
-            amount: event.target.value
-        });
-    };
-
     const updateSymbol = async (event: any, value: any) => {
         if (!!value) {
-            updateActiveInvestment({
-                ...activeInvestment,
+            updateActiveStock({
+                ...activeStock,
                 stock: value,
             });
 
@@ -130,8 +118,8 @@ export default function BuyBox() {
                 token,
             });
 
-            updateActiveInvestment({
-                ...activeInvestment,
+            updateActiveStock({
+                ...activeStock,
                 stock: value,
                 candles: res.data,
             });
@@ -148,7 +136,7 @@ export default function BuyBox() {
                 endDate: to,
                 buyInPrice: getBuyInPrice(),
                 sellPrice: getSellPrice(),
-                amount: getAmountInvested(),
+                amount: currency(0),
                 timestamp: moment(),
             };
 
@@ -207,37 +195,12 @@ export default function BuyBox() {
         console.error(error);
     };
 
-    const getShareEstimate = () => {
-        // after the inital data is loaded we take the first candle and use that for our calculation
-        // we assume that we had perfect entry into the market that day and bought at the lowest price available
-        if (!!oneDayCandle) {
-            const price = currency(oneDayCandle['l'][0]).value;
-            const shares = currency(amount).value / price;
-
-            return `${shares.toFixed(4).toString()} shares @ $${price.toString()}`;
-        };
-        return '';
-    };
-
     return <React.Fragment>
         <h2>BuyBox</h2>
         <form>
             <SymbolBox value={stock} onChange={updateSymbol}/>
             <DatePicker id="startDate" label="Start Date" value={from} onChange={updateStartDate}/>
             <DatePicker id="endDate" label="End Date" value={to} onChange={updateEndDate}/>
-            <Input 
-                id="amount" 
-                label="Amount" 
-                variant="standard"
-                inputProps={{
-                    type: 'number',
-                    min: '0'
-                }}
-                helperText={getShareEstimate()}
-                adornment="$"
-                value={amount}
-                onChange={updateAmount}
-            />
             <Button variant="contained" onClick={onClickHandler}>Buy</Button>
         </form>
     </React.Fragment>
