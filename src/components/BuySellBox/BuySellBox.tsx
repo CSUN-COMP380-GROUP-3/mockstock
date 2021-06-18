@@ -261,7 +261,8 @@ export default function InputSlider() {
                         />
                     </Grid>
                 </Grid>
-                <Button variant="contained" onClick={onClick}>BUY</Button>
+                <Button disabled={liquidBalance.curr.intValue < 1} variant="contained" onClick={onClick}>BUY</Button>
+                
             </form>
         </div>
     );
