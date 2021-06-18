@@ -35,7 +35,7 @@ function App() {
           </Grid>
         </Grid>
         <Grid item xs={4} className="side-bar">
-          <Grid container spacing={2}>
+          <Grid container spacing={2} direction="column">
             <Grid item>
               <LiquidBalance/>
             </Grid>
