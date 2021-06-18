@@ -129,6 +129,7 @@ export default function InputSlider() {
                 buyDate: minDate,
                 stock: activeInvestment.stock
             })
+<<<<<<< HEAD
 
 
             // CHECK IS STOCK IS ALREADY IN PORTFOLIO
@@ -191,6 +192,8 @@ export default function InputSlider() {
             
 
             
+=======
+>>>>>>> f5bae76 (fixed slide bar manual input not working on buyBox)
  
         } catch(error) {
             errorHandler(error);
@@ -215,6 +218,9 @@ export default function InputSlider() {
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setValue(event.target.value === '' ? '' : Number(event.target.value).toFixed(2));
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> f5bae76 (fixed slide bar manual input not working on buyBox)
         // console.log(event.target)
         // setValue(event.target.value === '' ? '' : Number(event.target.value));
 
@@ -224,8 +230,11 @@ export default function InputSlider() {
             ...buyInfo,
             buyAmount: currency(g)
         })
+<<<<<<< HEAD
 =======
 >>>>>>> 0a75b02 (got slider to have decimals for money when buying)
+=======
+>>>>>>> f5bae76 (fixed slide bar manual input not working on buyBox)
     };
 
     const handleBlur = () => {
@@ -312,10 +321,14 @@ export default function InputSlider() {
                             aria-labelledby="input-slider"
                             max={curr.value}
 <<<<<<< HEAD
+<<<<<<< HEAD
                             step={0.01}
 =======
                             step={.01}
 >>>>>>> 0a75b02 (got slider to have decimals for money when buying)
+=======
+                            step={0.01}
+>>>>>>> f5bae76 (fixed slide bar manual input not working on buyBox)
                         />
                     </Grid>
                     <Grid item>
@@ -326,10 +339,14 @@ export default function InputSlider() {
                         onBlur={handleBlur}
                         inputProps={{
 <<<<<<< HEAD
+<<<<<<< HEAD
                             step: 0.01,
 =======
                             step: .01,
 >>>>>>> 0a75b02 (got slider to have decimals for money when buying)
+=======
+                            step: 0.01,
+>>>>>>> f5bae76 (fixed slide bar manual input not working on buyBox)
                             min: 0,
                             max: curr.value,
                             type: 'number',
