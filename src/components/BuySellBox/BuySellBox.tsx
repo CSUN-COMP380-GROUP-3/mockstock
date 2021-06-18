@@ -214,6 +214,7 @@ export default function InputSlider() {
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setValue(event.target.value === '' ? '' : Number(event.target.value).toFixed(2));
+<<<<<<< HEAD
         // console.log(event.target)
         // setValue(event.target.value === '' ? '' : Number(event.target.value));
 
@@ -223,6 +224,8 @@ export default function InputSlider() {
             ...buyInfo,
             buyAmount: currency(g)
         })
+=======
+>>>>>>> 0a75b02 (got slider to have decimals for money when buying)
     };
 
     const handleBlur = () => {
@@ -308,7 +311,11 @@ export default function InputSlider() {
                             onChange={handleSliderChange}
                             aria-labelledby="input-slider"
                             max={curr.value}
+<<<<<<< HEAD
                             step={0.01}
+=======
+                            step={.01}
+>>>>>>> 0a75b02 (got slider to have decimals for money when buying)
                         />
                     </Grid>
                     <Grid item>
@@ -318,7 +325,11 @@ export default function InputSlider() {
                         onChange={handleInputChange}
                         onBlur={handleBlur}
                         inputProps={{
+<<<<<<< HEAD
                             step: 0.01,
+=======
+                            step: .01,
+>>>>>>> 0a75b02 (got slider to have decimals for money when buying)
                             min: 0,
                             max: curr.value,
                             type: 'number',
