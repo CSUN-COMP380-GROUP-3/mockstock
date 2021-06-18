@@ -22,8 +22,7 @@ import { minDate } from '../../components/DatePicker/DatePicker';
 
 import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
 import { LiquidBalanceContext } from '../../contexts/LiquidBalanceContext';
-import { ActiveInvestmentContext } from '../../contexts/ActiveInvestmentContext';
-import { act } from 'react-dom/test-utils';
+// import { ActiveInvestmentContext } from '../../contexts/ActiveInvestmentContext';
 
 
 
