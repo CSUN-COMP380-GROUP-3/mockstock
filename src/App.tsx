@@ -23,17 +23,29 @@ function App() {
 
   return (
     <GlobalContext>
-      <Grid container spacing={0}>
+      <Grid container alignItems="stretch" spacing={0}>
         <Grid item xs={8} className="main-content">
-          <Header></Header>
-          <StockChart></StockChart>
+          <Grid item>
+            <Header/>
+          </Grid>
+          <Grid item>
+            <StockChart/>
+          </Grid>
         </Grid>
         <Grid item xs={4} className="side-bar">
-          <LiquidBalance></LiquidBalance>
-          <WatchListDataContext.Provider value={watchListDataContextProviderValue}>
-            <WatchList></WatchList>
-          </WatchListDataContext.Provider>
-          <BuyBox></BuyBox>
+          <Grid container spacing={2}>
+            <Grid item>
+              <LiquidBalance/>
+            </Grid>
+            <Grid item>
+              <WatchListDataContext.Provider value={watchListDataContextProviderValue}>
+                <WatchList/>
+              </WatchListDataContext.Provider>
+            </Grid>
+            <Grid item>
+              <BuyBox/>
+            </Grid>
+          </Grid>
         </Grid>
       </Grid>
     </GlobalContext>
