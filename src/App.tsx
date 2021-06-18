@@ -3,6 +3,7 @@ import './App.css';
 
 import BuyBox from './components/BuyBox/BuyBox';
 import BuySellBox from './components/BuySellBox/BuySellBox';
+
 import Header from './components/Header/Header';
 import StockChart from './components/StockChart/StockChart';
 import LiquidBalance from './components/LiquidBalance/LiquidBalance';
