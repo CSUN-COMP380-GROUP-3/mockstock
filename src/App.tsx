@@ -1,5 +1,6 @@
 import React from 'react';
 import './App.css';
+import Grid from '@material-ui/core/Grid';
 
 import BuyBox from './components/BuyBox/BuyBox';
 import BuySellBox from './components/BuySellBox/BuySellBox';
@@ -22,16 +23,19 @@ function App() {
 
   return (
     <GlobalContext>
-      <Header></Header>
-      <BuyBox></BuyBox>
-      <StockChart></StockChart>
-      <LiquidBalance></LiquidBalance>
-      <SellBox></SellBox>
-      <WatchListDataContext.Provider value={watchListDataContextProviderValue}>
-        <WatchList></WatchList>
-      </WatchListDataContext.Provider>
-      <Portfolio></Portfolio>
-      <BuySellBox></BuySellBox>
+      <Grid container spacing={0}>
+        <Grid item xs={8} className="main-content">
+          <Header></Header>
+          <StockChart></StockChart>
+        </Grid>
+        <Grid item xs={4} className="side-bar">
+          <LiquidBalance></LiquidBalance>
+          <WatchListDataContext.Provider value={watchListDataContextProviderValue}>
+            <WatchList></WatchList>
+          </WatchListDataContext.Provider>
+          <BuyBox></BuyBox>
+        </Grid>
+      </Grid>
     </GlobalContext>
   );
 }
