@@ -6,6 +6,7 @@ import Typography from '@material-ui/core/Typography';
 import { LiquidBalanceContext } from '../../contexts/LiquidBalanceContext';
 
 import "./LiquidBalance.css";
+import Grid from '@material-ui/core/Grid';
 
 export default function LiquidBalance() {
 
@@ -36,18 +37,25 @@ export default function LiquidBalance() {
   return (
     <React.Fragment>
 
-      <div data-testid="liquidbalance" className="root">
-        <Typography variant="h3" className="label">Cash</Typography>
-        <div className="amount">
+      {/* <div data-testid="liquidbalance" className="root"> */}
+      <Grid data-testid="liquidbalance" className="root" container direction="row" justify="space-between">
+        <Grid item>
+          <Typography variant="h5" className="label">Funds Available</Typography>
+        </Grid>
+        <Grid item>
+          <Typography variant="h5" data-testid="liquidbalance-cash" className="dollar">{curr.format()}</Typography>
+        </Grid>
+      </Grid>
+      {/* <div className="amount">
           <Typography variant="h4" data-testid="liquidbalance-cash" className="dollar">{curr.format()}</Typography>
           <div className="details" style={{ color: getProfit().value === 0 ? undefined : getProfit().value > 0 ? 'green' : 'red' }}>
             <Typography variant="subtitle2" data-testid="liquidbalance-profit" className="profit">{getSign()}{getProfit().format()}</Typography>
             <Typography variant="subtitle2" data-testid="liquidbalance-percent" className="percent">({getPercent().toString()}%)</Typography>
           </div>
-        </div>
-      </div>
+        </div> */}
+      {/* </div> */}
 
-      <input
+      {/* <input
         type="number"
         id="test-lb"
         value={testValue}
@@ -57,7 +65,7 @@ export default function LiquidBalance() {
         id="test-button"
         onClick={clickHandler}
       >Add
-      </button>
+      </button> */}
     </React.Fragment>
   );
 };
