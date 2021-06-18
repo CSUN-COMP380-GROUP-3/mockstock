@@ -18,3 +18,4 @@ export const initTradesContext: TradesContextInterface = {
 };
 
 export const TradesContext = React.createContext<TradesContextInterface>(initTradesContext);
+
