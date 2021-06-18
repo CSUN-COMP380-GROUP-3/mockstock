@@ -13,15 +13,27 @@ import { GlobalContext } from './components/GlobalContext/GlobalContext';
 function App() {
   return (
     <GlobalContext>
-      <Grid container spacing={0}>
+      <Grid container alignItems="stretch" spacing={0}>
         <Grid item xs={8} className="main-content">
-          <Header></Header>
-          <StockChart></StockChart>
+          <Grid item>
+            <Header></Header>
+          </Grid>
+          <Grid item>
+            <StockChart></StockChart>
+          </Grid>
         </Grid>
         <Grid item xs={4} className="side-bar">
-          <LiquidBalance></LiquidBalance>
-          <WatchList></WatchList>
-          <BuyBox></BuyBox>
+          <Grid container spacing={2}>
+            <Grid item>
+              <LiquidBalance></LiquidBalance>
+            </Grid>
+            <Grid item>
+              <WatchList></WatchList>
+            </Grid>
+            <Grid item>
+              <BuyBox></BuyBox>
+            </Grid>
+          </Grid>
         </Grid>
       </Grid>
     </GlobalContext>
