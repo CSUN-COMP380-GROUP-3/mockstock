@@ -134,7 +134,8 @@ export default function InputSlider() {
                 curr: currency(liquidBalance.curr.value - buyAmount.value)
             })
 
-            setValue(!hold2 ? '' : Number(hold2))
+            // setValue(!hold2 ? '' : Number(hold2))
+            setValue(Number(0))
  
         } catch(error) {
             errorHandler(error);
