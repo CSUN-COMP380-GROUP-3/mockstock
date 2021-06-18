@@ -219,8 +219,10 @@ export default function BuyBox() {
     //     return '';
     // };
 
+    
+
     return <React.Fragment>
-        <h2>BuyBox</h2>
+        <h2>{!!activeInvestment.stock ? activeInvestment.stock.symbol : null}</h2>
         <form>
             <SymbolBox value={stock} onChange={updateSymbol}/>
             <DatePicker id="startDate" label="Start Date" value={from} onChange={updateStartDate}/>
