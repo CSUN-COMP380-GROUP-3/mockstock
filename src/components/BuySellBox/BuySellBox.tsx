@@ -134,6 +134,12 @@ export default function InputSlider() {
             })
 
             setValue(Number(0))
+
+            setBuyInfo({
+                buyAmount: currency(0),
+                buyDate: minDate,
+                stock: activeInvestment.stock
+            })
  
         } catch(error) {
             errorHandler(error);
@@ -157,6 +163,15 @@ export default function InputSlider() {
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setValue(event.target.value === '' ? '' : Number(event.target.value).toFixed(2));
+        // console.log(event.target)
+        // setValue(event.target.value === '' ? '' : Number(event.target.value));
+
+        var g = Number(event.target.value).toFixed(2).toString()
+
+        setBuyInfo({
+            ...buyInfo,
+            buyAmount: currency(g)
+        })
     };
 
     const handleBlur = () => {
@@ -242,7 +257,7 @@ export default function InputSlider() {
                             onChange={handleSliderChange}
                             aria-labelledby="input-slider"
                             max={curr.value}
-                            step={.01}
+                            step={0.01}
                         />
                     </Grid>
                     <Grid item>
@@ -252,7 +267,7 @@ export default function InputSlider() {
                         onChange={handleInputChange}
                         onBlur={handleBlur}
                         inputProps={{
-                            step: .01,
+                            step: 0.01,
                             min: 0,
                             max: curr.value,
                             type: 'number',
