@@ -142,24 +142,24 @@ export default function BuyBox() {
     };
 
     // const onClickHandler = async () => {
-    //     try {
-    //         let trade: Trade = {
-    //             stock,
-    //             date: from,
-    //             price: getBuyInPrice(),
-    //             amount: getAmountInvested(),
-    //             isBuy: true,
-    //             timestamp: moment(),
-    //         };
+        // try {
+        //     let trade: Trade = {
+        //         stock,
+        //         date: from,
+        //         price: getBuyInPrice(),
+        //         amount: getAmountInvested(),
+        //         isBuy: true,
+        //         timestamp: moment(),
+        //     };
 
-    //         updateTrades({
-    //             ...trades,
-    //             items: [trade, ...trades.items]
-    //         })
+        //     updateTrades({
+        //         ...trades,
+        //         items: [trade, ...trades.items]
+        //     })
  
-    //     } catch(error) {
-    //         errorHandler(error);
-    //     };
+        // } catch(error) {
+        //     errorHandler(error);
+        // };
     // };
 
     // there is an issue with this, if the start date is not a trading day then we must get the next available trading day
