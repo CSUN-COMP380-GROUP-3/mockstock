@@ -5,7 +5,6 @@ import moment, { Moment } from 'moment';
 import Typography from '@material-ui/core/Typography';
 import Slider from '@material-ui/core/Slider';
 import Input from '@material-ui/core/Input';
-import VolumeUp from '@material-ui/icons/VolumeUp';
 import Button from '@material-ui/core/Button';
 import currency from 'currency.js';
 import CandleStickData, { CandleStickQuery } from '../../interfaces/CandleStickData';
@@ -35,7 +34,7 @@ const useStyles = makeStyles({
     width: 250,
   },
   input: {
-    width: 80,
+    width: 95,
   },
 });
 
@@ -134,7 +133,6 @@ export default function InputSlider() {
                 curr: currency(liquidBalance.curr.value - buyAmount.value)
             })
 
-            // setValue(!hold2 ? '' : Number(hold2))
             setValue(Number(0))
  
         } catch(error) {
@@ -158,7 +156,7 @@ export default function InputSlider() {
     };
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setValue(event.target.value === '' ? '' : Number(event.target.value));
+        setValue(event.target.value === '' ? '' : Number(event.target.value).toFixed(2));
     };
 
     const handleBlur = () => {
@@ -240,10 +238,11 @@ export default function InputSlider() {
                     </Grid>
                     <Grid item xs>
                         <Slider
-                        value={typeof value === 'number' ? value : 0}
-                        onChange={handleSliderChange}
-                        aria-labelledby="input-slider"
-                        max={curr.value}
+                            value={typeof value === 'number' ? value : 0}
+                            onChange={handleSliderChange}
+                            aria-labelledby="input-slider"
+                            max={curr.value}
+                            step={.01}
                         />
                     </Grid>
                     <Grid item>
@@ -253,7 +252,7 @@ export default function InputSlider() {
                         onChange={handleInputChange}
                         onBlur={handleBlur}
                         inputProps={{
-                            step: 1,
+                            step: .01,
                             min: 0,
                             max: curr.value,
                             type: 'number',
