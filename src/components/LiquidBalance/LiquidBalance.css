@@ -1,12 +1,13 @@
 .root {
-  display: 'flex';
-  justify-content: space-between;
-  width: '450px';
+  /* display: 'flex'; */
+  /* justify-content: space-between; */
+  /* width: '450px'; */
+  color: white;
 }
 
 .label {
-  display: 'flex';
-  align-items: 'center';
+  /* display: 'flex';
+  align-items: 'center'; */
   text-align: 'left';
 }
 
@@ -15,16 +16,16 @@
   flex-direction: 'column';
   justify-content: 'center';
   align-items: flex-end;
-  text-align: 'right',
+  text-align: 'right';
 }
 
 .dollar {
-  text-align: 'right',
+  text-align: 'right';
 }
 
 .details {
   display: 'flex';
-  justifyContent: 'space-evenly';
+  justify-content: 'space-evenly';
 }
 
 .profit {
