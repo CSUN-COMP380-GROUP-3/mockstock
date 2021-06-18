@@ -24,12 +24,14 @@ function App() {
   return (
     <GlobalContext>
       <Grid container alignItems="stretch" spacing={0}>
-        <Grid item xs={8} className="main-content">
-          <Grid item>
-            <Header/>
-          </Grid>
-          <Grid item>
-            <StockChart/>
+        <Grid item xs={8}>
+          <Grid container className="main-content" direction="column" spacing={2}>
+            <Grid item>
+              <Header/>
+            </Grid>
+            <Grid item>
+              <StockChart/>
+            </Grid>
           </Grid>
         </Grid>
         <Grid item xs={4} className="side-bar">
