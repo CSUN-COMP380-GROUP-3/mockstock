@@ -151,8 +151,25 @@ export default function BuyBox() {
         console.error(error);
     };
 
+<<<<<<< HEAD
+=======
+    // const getShareEstimate = () => {
+    //     // after the inital data is loaded we take the first candle and use that for our calculation
+    //     // we assume that we had perfect entry into the market that day and bought at the lowest price available
+    //     if (!!oneDayCandle) {
+    //         const price = currency(oneDayCandle['l'][0]).value;
+    //         const shares = currency(amount).value / price;
+
+    //         return `${shares.toFixed(4).toString()} shares @ $${price.toString()}`;
+    //     };
+    //     return '';
+    // };
+
+    
+
+>>>>>>> 40eda84 (minor changes to layout)
     return <React.Fragment>
-        <h2>BuyBox</h2>
+        <h2>{!!activeInvestment.stock ? activeInvestment.stock.symbol : null}</h2>
         <form>
             <DatePicker id="startDate" label="Start Date" value={from} onChange={updateStartDate}/>
             <DatePicker id="endDate" label="End Date" value={to} onChange={updateEndDate}/>
