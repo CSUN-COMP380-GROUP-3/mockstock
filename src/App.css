@@ -1,0 +1,9 @@
+.main-content {
+  background: var(--dark);
+  padding: 60px;
+}
+
+.side-bar {
+  background: var(--light-dark);
+  padding: 30px;
+}

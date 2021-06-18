@@ -1,0 +1,14 @@
+html {
+  background: var(--dark);
+
+
+  --dark: #323232;
+  --less-dark: #595959;
+  --light: #e2e2e0;
+  --red: #ff1000;
+  --green: #09EE10;
+}
+
+body {
+  margin: 0px;
+}
