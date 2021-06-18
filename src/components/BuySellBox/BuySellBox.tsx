@@ -338,8 +338,13 @@ export default function InputSlider() {
                         />
                     </Grid>
                 </Grid>
+<<<<<<< HEAD
                 <Button disabled={liquidBalance.curr.intValue < 1 || value === 0} variant="contained" onClick={onClick}>BUY</Button>
             
+=======
+                <Button disabled={liquidBalance.curr.intValue < 1} variant="contained" onClick={onClick}>BUY</Button>
+                
+>>>>>>> 2c5b6bc (buy Button turns off when out of funds)
             </form>
         </div>
     );
