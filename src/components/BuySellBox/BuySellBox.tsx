@@ -220,7 +220,7 @@ export default function InputSlider() {
         <div className={classes.root}>
             <form>
                 <Typography id="input-slider" gutterBottom>
-                    BUY
+                    BUY {!!activeInvestment.stock ? activeInvestment.stock.symbol : null}
                 </Typography>
                 <DatePicker id="buyDate" label="Buy Date" value={buyDate} onChange={updateBuyDate}/>
                 <Grid container spacing={2} alignItems="center">
