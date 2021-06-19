@@ -6,6 +6,8 @@ import { initLiquidBalanceContext, LiquidBalanceContext, LiquidBalanceInterface 
 import { initActiveInvestmentContext, ActiveInvestmentContext, ActiveInvestmentInterface } from '../../contexts/ActiveInvestmentContext';
 import { initWatchListContext, WatchListContext, WatchListInterface } from '../../contexts/WatchListContext';
 import { initTradesContext, TradesContext, TradesInterface } from '../../contexts/TradesContext';
+import { initPortfolioContext, PortfolioContext, PortfolioInterface } from '../../contexts/PortfolioContext';
+
 
 
 export const GlobalContext: React.FC = ({children}) => {
@@ -21,6 +23,9 @@ export const GlobalContext: React.FC = ({children}) => {
     const [ trades, updateTrades ] = React.useState<TradesInterface>(initTradesContext.trades);
     const tradesProviderValue = { trades, updateTrades };
 
+    const [ stocks, updateStocks ] = React.useState<PortfolioInterface>(initPortfolioContext.stocks);
+    const stocksProviderValue = { stocks, updateStocks };
+
     return <React.Fragment>
         <TokenContext.Provider value={TOKEN}>
             <TradesContext.Provider value={tradesProviderValue}>
@@ -28,7 +33,9 @@ export const GlobalContext: React.FC = ({children}) => {
                     <LiquidBalanceContext.Provider value={liquidBalanceProviderValue}>
                         <ActiveInvestmentContext.Provider value={activeInvestmentProviderValue}>
                             <WatchListContext.Provider value={watchListProviderValue}>
-                                {children}
+                                <PortfolioContext.Provider value={stocksProviderValue} >
+                                    {children}
+                                </PortfolioContext.Provider>
                             </WatchListContext.Provider>
                         </ActiveInvestmentContext.Provider>
                     </LiquidBalanceContext.Provider>
