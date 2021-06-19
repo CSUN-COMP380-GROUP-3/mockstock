@@ -7,6 +7,9 @@ import { useTheme, makeStyles } from '@material-ui/core/styles';
 import { VariableSizeList, ListChildComponentProps } from 'react-window';
 import StockSymbolData from '../../interfaces/StockSymbolData';
 import { filteredSymbols } from '../../contexts/StockSymbolsContext';
+import { ActiveStockContext } from '../../contexts/ActiveStockContext';
+import { fetchCandles, errorHandler } from '../utils';
+import { TokenContext } from '../../contexts/TokenContext';
 
 const LISTBOX_PADDING = 8; // px
 
@@ -108,8 +111,35 @@ export const groupBy = ({symbol}: StockSymbolData) => symbol[0];
 export interface SymbolBoxProps extends Partial<AutocompleteProps<StockSymbolData, false, false, false>> {};
 
 export default function SymbolBox(props: SymbolBoxProps) {
+    const token = React.useContext(TokenContext);
+    const { activeStock, updateActiveStock } = React.useContext(ActiveStockContext);
+
     const classes = useStyles();
-    const { onChange, value } = props;
+
+    const { stock, to, from } = activeStock;
+
+    // when the value of this changes then we need to update the active stock
+    const onChange = async (event: any, value: any) => {
+        // need to fetch the candles here too
+        try {
+            const res = await fetchCandles({
+                symbol: stock.symbol,
+                from: from.unix(),
+                to: to.unix(),
+                resolution: 'D',
+                token,
+            });
+
+            updateActiveStock({
+                ...activeStock,
+                stock: value,
+                candles: res.data,
+            });
+        } catch(error) {
+            errorHandler(error);
+        };
+    };
+
     return (
         <Autocomplete
             style={{ width: 400 }}
@@ -124,7 +154,7 @@ export default function SymbolBox(props: SymbolBoxProps) {
             onChange={onChange}
             autoSelect={true}
             autoHighlight={true}
-            value={value}
+            value={stock}
             data-testid="symbolbox"
         />
     );
