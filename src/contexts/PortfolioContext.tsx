@@ -2,19 +2,17 @@ import React from 'react';
 import Stock from '../interfaces/Stock';
 
 export interface PortfolioInterface {
-    items: Stock[];
+    [key: string]: Stock[],
 };
 
 export interface PortfolioContextInterface {
-    stocks: PortfolioInterface;
-    updateStocks: (stocks: PortfolioInterface) => void;
+    portfolio: PortfolioInterface;
+    updatePortfolio: (portfolio: PortfolioInterface) => void;
 };
 
 export const initPortfolioContext: PortfolioContextInterface = {
-    stocks: {
-        items: []
-    },
-    updateStocks: () => {}
+    portfolio: {},
+    updatePortfolio: () => {}
 };
 
 export const PortfolioContext = React.createContext<PortfolioContextInterface>(initPortfolioContext);
