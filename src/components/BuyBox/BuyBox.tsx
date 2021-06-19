@@ -1,7 +1,6 @@
 import React, {useEffect} from 'react';
 import moment, { Moment } from 'moment';
 import { ActiveStockContext } from '../../contexts/ActiveStockContext';
-import { TradesContext } from '../../contexts/TradesContext';
 import SymbolBox from '../SymbolBox/SymbolBox';
 import DatePicker from '../DatePicker/DatePicker';
 import Button from '@material-ui/core/Button';
@@ -11,20 +10,11 @@ import querystring from 'querystring';
 import { TokenContext } from '../../contexts/TokenContext';
 import currency from 'currency.js';
 import CandleStickData, { CandleStickQuery } from '../../interfaces/CandleStickData';
-import Trade from '../../interfaces/Trade';
 
 export default function BuyBox() {
     const token = React.useContext<string>(TokenContext);
 
     const { activeStock, updateActiveStock } = React.useContext(ActiveStockContext);
-    const { trades, updateTrades } = React.useContext(TradesContext);
-
-    // useEffect here just to test if trades context working properly
-    useEffect(() => {
-        if(trades.items.length > 0) {
-            console.log(trades.items)
-        }
-    })
 
     const { stock, to, from, candles } = activeStock;
 
@@ -129,25 +119,25 @@ export default function BuyBox() {
     };
 
     const onClickHandler = async () => {
-        try {
-            let trade: Trade = {
-                stock,
-                startDate: from,
-                endDate: to,
-                buyInPrice: getBuyInPrice(),
-                sellPrice: getSellPrice(),
-                amount: currency(0),
-                timestamp: moment(),
-            };
+        // try {
+        //     let trade: Trade = {
+        //         stock,
+        //         startDate: from,
+        //         endDate: to,
+        //         buyInPrice: getBuyInPrice(),
+        //         sellPrice: getSellPrice(),
+        //         amount: currency(0),
+        //         timestamp: moment(),
+        //     };
 
-            updateTrades({
-                ...trades,
-                items: [trade, ...trades.items]
-            })
+        //     updateTrades({
+        //         ...trades,
+        //         items: [trade, ...trades.items]
+        //     })
  
-        } catch(error) {
-            errorHandler(error);
-        };
+        // } catch(error) {
+        //     errorHandler(error);
+        // };
     };
 
     // there is an issue with this, if the start date is not a trading day then we must get the next available trading day
