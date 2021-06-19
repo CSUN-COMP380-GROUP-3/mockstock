@@ -1,197 +1,227 @@
-import React, {useEffect} from 'react';
-import moment, { Moment } from 'moment';
-import { ActiveStockContext } from '../../contexts/ActiveStockContext';
-import SymbolBox from '../SymbolBox/SymbolBox';
-import DatePicker from '../DatePicker/DatePicker';
+import React from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import Grid from '@material-ui/core/Grid';
+import moment from 'moment';
+import Typography from '@material-ui/core/Typography';
+import Slider from '@material-ui/core/Slider';
 import Button from '@material-ui/core/Button';
-import { BaseKeyboardPickerProps } from '@material-ui/pickers/_shared/hooks/useKeyboardPickerState';
-import axios from 'axios';
-import querystring from 'querystring';
-import { TokenContext } from '../../contexts/TokenContext';
 import currency from 'currency.js';
-import CandleStickData, { CandleStickQuery } from '../../interfaces/CandleStickData';
+import CandleStickData from '../../interfaces/CandleStickData';
+import { TokenContext } from '../../contexts/TokenContext';
+import Trade from '../../interfaces/Trade';
+import { TradesContext } from '../../contexts/TradesContext';
+import { PortfolioContext } from '../../contexts/PortfolioContext';
+import DatePicker, { maxDate } from '../DatePicker/DatePicker';
+import { BaseKeyboardPickerProps } from '@material-ui/pickers/_shared/hooks/useKeyboardPickerState';
+import { minDate } from '../../components/DatePicker/DatePicker';
+import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
+import { LiquidBalanceContext } from '../../contexts/LiquidBalanceContext';
+import { ActiveStockContext } from '../../contexts/ActiveStockContext';
+import { fetchCandles, errorHandler } from '../utils';
+import Input from '../Input/Input';
 
-export default function BuyBox() {
+const useStyles = makeStyles({
+  root: {
+    width: 250,
+  },
+  input: {
+    width: 95,
+  },
+});
+
+export interface BuyBoxForm extends Trade {
+    type: 'BUY',
+};
+
+export interface BuyBoxProps { };
+
+export default function BuyBox(props: BuyBoxProps) {
+    const classes = useStyles();
+
+    const isInit = React.useRef(false);
+
     const token = React.useContext<string>(TokenContext);
 
-    const { activeStock, updateActiveStock } = React.useContext(ActiveStockContext);
+    const { activeStock } = React.useContext(ActiveStockContext);
 
-    const { stock, to, from, candles } = activeStock;
+    const { stock } = activeStock;
 
-    const endpoint = 'https://finnhub.io/api/v1/stock/candle?';
+    const { liquidBalance, updateLiquidBalance } = React.useContext(LiquidBalanceContext);
+    const { curr } = liquidBalance;
 
-    const [ oneDayCandle, updateOneDayCandle ] = React.useState<CandleStickData | undefined>(candles);
+    const { trades, updateTrades } = React.useContext(TradesContext);
 
-    const getBuyInPrice = () => { // we assume perfect market entry, meaning we buy at the lowest price at the start of our investment term
-        return currency(candles?.l[0]!);
-    };
+    const { portfolio, updatePortfolio } = React.useContext(PortfolioContext);
 
-    const getSellPrice = () => { // we assume perfect exit, meaning we sell at the highest price at the end of our investment term
-        const length = candles?.h.length!;
-        return currency(candles?.h[length-1]!);
-    };
-    
-    const updateStartDate: BaseKeyboardPickerProps['onChange'] = async (date) => {
-        if (!!date) {
-            updateActiveStock({
-                ...activeStock,
-                from: date as Moment,
-            });
-    
-            // we fetch new candle data so estimated shares can be calculated
-            fetchAndUpdateOneDayCandles({
+    const [ form, updateForm ] = React.useState<BuyBoxForm>({
+        date: minDate, // this is the selected date of the buy
+        total: currency(0),
+        stock,
+        timestamp: moment(),
+        type: 'BUY'
+    });
+
+    const { date } = form;
+
+    // this state controls the amount user wants to spend
+    const [ buyAmount, updateBuyAmount ] = React.useState(0);
+
+    // this state controls the oneDayCandle aka where we will extract the selling price from
+    const [ oneDayCandle, updateOneDayCandle ] = React.useState<CandleStickData>();
+
+    React.useEffect(() => {
+        if (!isInit.current) {
+            fetchCandles({
                 symbol: stock.symbol,
                 from: date.unix(),
                 to: date.unix(),
                 resolution: 'D',
                 token,
-            });  
-
-            const from = date as Moment
-            
-            const res = await fetchCandles({
-                symbol: stock.symbol,
-                to: to.unix(),
-                from: from.unix(),
-                resolution: 'D',
-                token,
-            });
-    
-            updateActiveStock({
-                ...activeStock,
-                candles: res.data,
-                from: date as Moment
-            });
-        };      
-    };
-
-    const updateEndDate: BaseKeyboardPickerProps['onChange'] = async (date) => {
-        if (!!date) {
-            const res = await fetchCandles({
-                symbol: stock.symbol,
-                to: date.unix(),
-                from: from.unix(),
-                resolution: 'D',
-                token,
-            });
-    
-            updateActiveStock({
-                ...activeStock,
-                candles: res.data,
-                to: date as Moment
-            });
-
+            })
+                .then(res => {
+                    if (res.data.s === 'ok') {
+                        console.log('init oneDayCandle');
+                        console.log(res.data);
+                        updateOneDayCandle(res.data);
+                    };
+                })
+                .catch(errorHandler)
+            isInit.current = true;
         };
-    };
+    });
 
-    const updateSymbol = async (event: any, value: any) => {
-        if (!!value) {
-            updateActiveStock({
-                ...activeStock,
-                stock: value,
-            });
-
-            // we fetch new candle data so estimated shares can be calculated
-            fetchAndUpdateOneDayCandles({
-                symbol: value.symbol,
-                from: from.unix(),
-                to: to.unix(),
-                resolution: 'D',
-                token,
-            });
-
-            const res = await fetchCandles({
-                symbol: value.symbol,
-                to: to.unix(),
-                from: from.unix(),
-                resolution: 'D',
-                token,
-            });
-
-            updateActiveStock({
-                ...activeStock,
-                stock: value,
-                candles: res.data,
-            });
-        };
-
-        
-    };
-
-    const onClickHandler = async () => {
-        // try {
-        //     let trade: Trade = {
-        //         stock,
-        //         startDate: from,
-        //         endDate: to,
-        //         buyInPrice: getBuyInPrice(),
-        //         sellPrice: getSellPrice(),
-        //         amount: currency(0),
-        //         timestamp: moment(),
-        //     };
-
-        //     updateTrades({
-        //         ...trades,
-        //         items: [trade, ...trades.items]
-        //     })
- 
-        // } catch(error) {
-        //     errorHandler(error);
-        // };
-    };
-
-    // there is an issue with this, if the start date is not a trading day then we must get the next available trading day
-    const fetchAndUpdateOneDayCandles = async (query: CandleStickQuery) => {
+    const onChangeBuyDate: BaseKeyboardPickerProps['onChange'] = async (date) => {
         try {
-            const res = await fetchCandles(query);
-            
-
-            // we need to consider that the start date may be a weekend or non stock market holiday in which the markets are closed
-            // because we are limited to 30 api calls / second we will delay our calls by 100ms to ensure we do not get rate limited
-            if (res.data.s !== 'ok') {
-                console.log('no data available for current trading day, checking next weekday...');
-                // we need to call this function again but this time we need to get the next available weekday
-                const prevFrom = moment.unix(query.from);
-                const prevDay = prevFrom.day();
-                // if the day is a saturday we add 2 extra days, otherwise we increment the previous day by 1
-                const from = prevDay === 6 ?
-                    prevFrom.add(2, 'day') : 
-                    prevFrom.add(1, 'day');
-                
-                setTimeout(fetchAndUpdateOneDayCandles, 100, {
-                    ...query,
-                    from: from.unix(),
-                    to: from.unix(),
+            if (!!date) {
+                updateForm({
+                    ...form,
+                    date,
                 });
+
+                const res = await fetchCandles({
+                    symbol: stock.symbol,
+                    from: date.unix(),
+                    to: date.unix(),
+                    resolution: 'D',
+                    token,
+                });
+
+                if (res.data.s === 'no_data') {
+                    alert(`No trading data for ${date.toString()}`);
+                    updateOneDayCandle(undefined);
+                    return;
+                };
+
+                console.log(res.data);
+                updateOneDayCandle(res.data);
                 return;
             };
-            console.log(res.data);
-            updateOneDayCandle(res.data);
         } catch(error) {
             errorHandler(error);
         };
     };
 
-    const fetchCandles = (query: CandleStickQuery) => {
-        const urlParams = querystring.stringify(query as any);
-        console.log('fetching', urlParams);
-        return axios.get(endpoint + urlParams);
+    const onClick = () => {
+        const price = getPrice(); // price is the price of the stock at purchase time
+        const total = getTotal(); // total is the amount the user wants to spend
+        // from the two vars above we can do all the calculations we need
+        
+        const shares = getShares();
+
+        const trade: BuyBoxForm = {
+            ...form,
+            timestamp: moment(),
+            total,
+            price,
+        };
+
+        updateLiquidBalance({
+            curr: liquidBalance.curr.subtract(total),
+            prev: liquidBalance.prev,
+        });
+
+        updateTrades({
+            items: [trade, ...trades.items]
+        });
+
+        // add assets to the portfolio
+
     };
 
-    const errorHandler = (error: any) => { // generic error handler
-        if (error.response?.status === 401) {
-            console.log("Invalid token, please make sure it is set as react app environment variable");
+    const getPrice = (): currency => {
+        if (!!oneDayCandle) {
+            return currency(oneDayCandle.l[0]);
         };
-        console.error(error);
+        return currency(0);
     };
-    
-    return <React.Fragment>
-        <h2>{stock.symbol}</h2>
-        <form>
-            <SymbolBox value={stock} onChange={updateSymbol}/>
-            <DatePicker id="startDate" label="Start Date" value={from} onChange={updateStartDate}/>
-            <DatePicker id="endDate" label="End Date" value={to} onChange={updateEndDate}/>
-            <Button variant="contained" onClick={onClickHandler}>Buy</Button>
-        </form>
-    </React.Fragment>
+
+    const getTotal = () => {
+        return currency(buyAmount);
+    };
+
+    const getShares = () => {
+        // # of shares = amount spent / price of stock
+        return getTotal().divide(getPrice());
+    };
+
+    const isDisabled = () => {
+
+        return !oneDayCandle;
+    };
+
+    const onChangeInput = (event: any) => {
+        updateBuyAmount(currency(event.target.value).value);
+    };
+
+    const onChangeSlider: any = (event: React.ChangeEvent<{}>, value: number) => {
+        updateBuyAmount(value);
+    }; 
+
+    return (
+        <div data-testid="buybox" className={classes.root}>
+            <form>
+                <Typography id="input-slider" gutterBottom variant="h5">Buy {stock.symbol}</Typography>
+                <DatePicker
+                    id="buyDate"
+                    label="Buy Date"
+                    value={date}
+                    onChange={onChangeBuyDate}
+                    minDate={minDate}
+                    maxDate={maxDate}
+                />
+                <Grid container spacing={2} alignItems="center">
+                    <Grid item>
+                        <MonetizationOnIcon/>
+                    </Grid>
+                    <Grid item xs>
+                        <Slider
+                            value={buyAmount}
+                            onChange={onChangeSlider}
+                            max={curr.value}
+                        />
+                    </Grid>
+                    <Grid item>
+                        <Input
+                            className={classes.input}
+                            adornment="$"
+                            value={buyAmount}
+                            onChange={onChangeInput}
+                            inputProps={{
+                                type: 'number',
+                                min: 0,
+                                step: 0.01,
+                                max: curr.value,
+                            }}
+                        />
+                    </Grid>
+                </Grid>
+                <Button
+                    disabled={isDisabled()}
+                    variant="contained"
+                    onClick={onClick}
+                >Buy
+                </Button>
+            </form>
+        </div>
+    );
 };
