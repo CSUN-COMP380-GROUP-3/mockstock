@@ -5,10 +5,7 @@ import { StockSymbolsContext, filteredSymbols } from '../../contexts/StockSymbol
 import { initLiquidBalanceContext, LiquidBalanceContext, LiquidBalanceInterface } from '../../contexts/LiquidBalanceContext';
 import { initWatchListContext, WatchListContext, WatchListInterface } from '../../contexts/WatchListContext';
 import { initTradesContext, TradesContext, TradesInterface } from '../../contexts/TradesContext';
-<<<<<<< HEAD
 import { ActiveStockContext, ActiveStockInterface, initActiveStockContext } from '../../contexts/ActiveStockContext';
-=======
->>>>>>> 8c51156 (after buy stocks now added to portfolio)
 import { initPortfolioContext, PortfolioContext, PortfolioInterface } from '../../contexts/PortfolioContext';
 
 
@@ -26,8 +23,8 @@ export const GlobalContext: React.FC = ({children}) => {
     const [ trades, updateTrades ] = React.useState<TradesInterface>(initTradesContext.trades);
     const tradesProviderValue = { trades, updateTrades };
 
-    const [ portfolio, updatePortfolio ] = React.useState<PortfolioInterface>(initPortfolioContext.portfolio);
-    const stocksProviderValue = { portfolio, updatePortfolio };
+    const [ stocks, updateStocks ] = React.useState<PortfolioInterface>(initPortfolioContext.stocks);
+    const stocksProviderValue = { stocks, updateStocks };
 
     return <React.Fragment>
         <TokenContext.Provider value={TOKEN}>

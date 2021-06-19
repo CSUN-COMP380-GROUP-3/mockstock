@@ -121,26 +121,31 @@ export default function BuyBox(props: BuyBoxProps) {
         };
     };
 
-    const onClick = async () => {
-        // try {
-        //     let trade: Trade = {
-        //         stock,
-        //         startDate: from,
-        //         endDate: to,
-        //         buyInPrice: getBuyInPrice(),
-        //         sellPrice: getSellPrice(),
-        //         amount: currency(0),
-        //         timestamp: moment(),
-        //     };
+    const onClick = () => {
+        const price = getPrice(); // price is the price of the stock at purchase time
+        const total = getTotal(); // total is the amount the user wants to spend
+        // from the two vars above we can do all the calculations we need
+        
+        const shares = getShares();
 
-        //     updateTrades({
-        //         ...trades,
-        //         items: [trade, ...trades.items]
-        //     })
- 
-        // } catch(error) {
-        //     errorHandler(error);
-        // };
+        const trade: BuyBoxForm = {
+            ...form,
+            timestamp: moment(),
+            total,
+            price,
+        };
+
+        updateLiquidBalance({
+            curr: liquidBalance.curr.subtract(total),
+            prev: liquidBalance.prev,
+        });
+
+        updateTrades({
+            items: [trade, ...trades.items]
+        });
+
+        // add assets to the portfolio
+
     };
 
     const getPrice = (): currency => {
