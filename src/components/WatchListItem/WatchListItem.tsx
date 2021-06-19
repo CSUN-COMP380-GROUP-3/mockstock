@@ -1,13 +1,11 @@
-import React, { useEffect } from 'react';
-import Card, { CardProps } from '@material-ui/core/Card';
+import React from 'react';
+import { CardProps } from '@material-ui/core/Card';
 import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
 import currency from 'currency.js';
 import { fetchCandles, errorHandler } from '../utils';
 import { ActiveStockContext } from '../../contexts/ActiveStockContext';
 import { TokenContext } from '../../contexts/TokenContext';
-
-
+import "./WatchListItem.css";
 
 export interface WatchListItemProps extends CardProps {
     symbol: string;
@@ -21,28 +19,6 @@ export default function WatchListItem(props: WatchListItemProps) {
     const { activeStock, updateActiveStock } = React.useContext(ActiveStockContext);
 
     const { to, from, stock } = activeStock;
-
-    const useStyles = makeStyles({
-        root: {
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            '& .symbol': {
-                marginLeft: '1rem'
-            },
-            '& .details': {
-                marginRight: '1rem',
-                '& .dollar': {
-                    textAlign: 'right',
-                },
-                '& .percent': {
-                    textAlign: 'right',
-                }
-            }
-
-        }
-    });
-    const { root } = useStyles();
 
     const onClick = async () => {
         try {
@@ -72,12 +48,12 @@ export default function WatchListItem(props: WatchListItemProps) {
     };
 
     return (
-        <Card data-testid="watchlistitem" style={style} className={root} onClick={onClick}>
+        <div data-testid="watchlistitem" style={style} className="list-item" onClick={onClick}>
             <Typography variant="h6" className="symbol">{symbol}</Typography>
             <div className="details">
-                <Typography variant="h6" className="dollar" data-testid="watchlistitem-dollar">{!!price ? currency(price).format() : '$-'}</Typography>
                 <Typography variant="subtitle2" className="percent" data-testid="watchlistitem-percent">(-%)</Typography>
+                <Typography variant="h6" className="dollar" data-testid="watchlistitem-dollar">{!!price ? currency(price).format() : '$-'}</Typography>
             </div>
-        </Card>
+        </div>
     );
 };
