@@ -11,6 +11,7 @@ import SellBox from './components/SellBox/SellBox';
 
 import { GlobalContext } from './components/GlobalContext/GlobalContext';
 import { WatchListDataContext, WatchListDataInterface } from './contexts/WatchListDataContext';
+import PortfolioList from './components/Portfolio/Portfolio';
 
 function App() {
 
@@ -30,6 +31,9 @@ function App() {
             <Grid item>
               <StockChart/>
             </Grid>
+            <Grid item>
+              <PortfolioList></PortfolioList>
+            </Grid>
           </Grid>
         </Grid>
         <Grid item xs={4} className="side-bar">
@@ -44,6 +48,7 @@ function App() {
             </Grid>
             <Grid item>
               <BuyBox/>
+              <SellBox/>
             </Grid>
           </Grid>
         </Grid>

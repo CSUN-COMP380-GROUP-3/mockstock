@@ -1,8 +1,15 @@
 import React from 'react';
 import Stock from '../interfaces/Stock';
+import Trade from '../interfaces/Trade';
 
+/**
+ * {
+ *  "GME": [{}, {}],
+ *  "AMC": [{}, {}],
+ * }
+ */
 export interface PortfolioInterface {
-    [key: string]: Stock[],
+    [key: string]: Trade[],
 };
 
 export interface PortfolioContextInterface {

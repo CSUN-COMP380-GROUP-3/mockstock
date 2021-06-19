@@ -10,27 +10,19 @@ import PortfolioItem from '../PortfolioItem/PortfolioItem';
 import { makeStyles } from '@material-ui/core/styles';
 
 export default function PortfolioList() {
-    const isInit = React.useRef(false);
-    const { portfolio, updatePortfolio } = React.useContext(PortfolioContext);
-    
-    // function renderRow(props: ListChildComponentProps) {
-    //     const { index, style } = props;
-        
-    //     return (
-    //         <WatchListItem key={index} style={style} value={watchList[index]}/>
-    //     );
-    // };
-    React.useEffect(() => {
-    },[PortfolioContext]);
+    const { portfolio } = React.useContext(PortfolioContext);
 
     const Row = (props: ListChildComponentProps) => {
         const { index, style } = props;
-        const data = Object.values(portfolio)[index];
-        return (
-            <PortfolioItem key={index} style={style} 
-            data={data}>
 
-            </PortfolioItem>
+        const data = Object.values(portfolio)[index];
+
+        return (
+            <PortfolioItem 
+                key={index} 
+                style={style} 
+                data={data}
+            />
         );
     };
 

@@ -22,6 +22,7 @@ import { minDate } from '../../components/DatePicker/DatePicker';
 
 import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
 import { LiquidBalanceContext } from '../../contexts/LiquidBalanceContext';
+import { ActiveStockContext } from '../../contexts/ActiveStockContext';
 // import { ActiveInvestmentContext } from '../../contexts/ActiveInvestmentContext';
 
 
@@ -46,13 +47,13 @@ export default function InputSlider() {
 
     const { liquidBalance, updateLiquidBalance } = React.useContext(LiquidBalanceContext);
     const { trades, updateTrades } = React.useContext(TradesContext);
-    const { stocks, updateStocks } = React.useContext(PortfolioContext);
+    const { portfolio, updatePortfolio } = React.useContext(PortfolioContext);
 
 
 
-    const { activeInvestment, updateActiveInvestment } = React.useContext(ActiveInvestmentContext);
+    const { activeStock, updateActiveStock } = React.useContext(ActiveStockContext);
 
-    const [ oneDayCandle, updateOneDayCandle ] = React.useState<CandleStickData | undefined>(activeInvestment.candles);
+    const [ oneDayCandle, updateOneDayCandle ] = React.useState<CandleStickData | undefined>(activeStock.candles);
 
 
 
@@ -61,7 +62,7 @@ export default function InputSlider() {
     const [ buyInfo, setBuyInfo ] = useState({
         buyAmount: currency(0),
         buyDate: minDate,
-        stock: activeInvestment.stock
+        stock: activeStock.stock
     })
 
     const { buyAmount, buyDate, stock } = buyInfo
@@ -69,10 +70,10 @@ export default function InputSlider() {
     useEffect(() => {
         setBuyInfo({
             ...buyInfo,
-            stock: activeInvestment.stock
+            stock: activeStock.stock
         })
         fetchAndUpdateOneDayCandles({
-            symbol: activeInvestment.stock.symbol,
+            symbol: activeStock.stock.symbol,
             from: buyDate.unix(),
             to: buyDate.unix(),
             resolution: 'D',
@@ -80,9 +81,9 @@ export default function InputSlider() {
         }); 
         console.log(trades)
         console.log("hi")
-        console.log(stocks)
+        // console.log(stocks)
         console.log("bye")
-    }, [activeInvestment.stock, liquidBalance.curr])
+    }, [activeStock.stock, liquidBalance.curr])
 
 
     const onClick = async () => {
@@ -93,12 +94,14 @@ export default function InputSlider() {
         try {
             let buyAmnt 
             let trade: Trade = {
-                stock: activeInvestment.stock,
+                stock: activeStock.stock,
                 date: buyDate,
                 price: currency(hold),
-                amount: buyAmount,
-                isBuy: true,
+                // amount: buyAmount,
+                // isBuy: true,
+                type: 'BUY',
                 timestamp: moment(),
+                total: buyAmount,
             };
 
             buyAmnt = Number(buyAmount)
@@ -127,61 +130,61 @@ export default function InputSlider() {
             setBuyInfo({
                 buyAmount: currency(0),
                 buyDate: minDate,
-                stock: activeInvestment.stock
+                stock: activeStock.stock
             })
 
 
             // CHECK IS STOCK IS ALREADY IN PORTFOLIO
-            let i = 0
-            let here = false
-            let prevStock = null
-            for(i; i < stocks.items.length; i++) {
-                if(stocks.items[i].stock.symbol === activeInvestment.stock.symbol) {
-                    console.log("we got a match")
-                    prevStock = stocks.items[i]
-                    here = true
-                }
-            }
-            // CALCULATE STOCK AVG PRICE
-            let stock: Stock = {
-                stock: activeInvestment.stock,
-                price: currency(hold),
-                shares: shares,
-                timestamp: moment(),
-            };
+            // let i = 0
+            // let here = false
+            // let prevStock = null
+            // for(i; i < stocks.items.length; i++) {
+            //     if(stocks.items[i].stock.symbol === activeStock.stock.symbol) {
+            //         console.log("we got a match")
+            //         prevStock = stocks.items[i]
+            //         here = true
+            //     }
+            // }
+            // // CALCULATE STOCK AVG PRICE
+            // let stock: Stock = {
+            //     stock: activeStock.stock,
+            //     price: currency(hold),
+            //     shares: currency(shares),
+            //     // timestamp: moment(),
+            // };
 
-            let tsb
-            let tab
-            let spa 
-            if(here === true) {
-                console.log(prevStock)
-                if(prevStock && prevStock.shares && prevStock.price) {
-                    tsb = prevStock.shares + shares
-                    console.log(prevStock.shares, prevStock.price.value)
-                    console.log(shares, hold)
-                    let first = prevStock.shares*prevStock.price.value
-                    let second = shares*Number(hold)
-                    console.log(first, second)
-                    tab = first + second
-                    spa = tab / tsb
-                    console.log(tsb, tab, spa)
-                    console.log(spa)
+            // let tsb
+            // let tab
+            // let spa 
+            // if(here === true) {
+            //     console.log(prevStock)
+            //     if(prevStock && prevStock.shares && prevStock.price) {
+            //         tsb = prevStock.shares + shares
+            //         console.log(prevStock.shares, prevStock.price.value)
+            //         console.log(shares, hold)
+            //         let first = prevStock.shares*prevStock.price.value
+            //         let second = shares*Number(hold)
+            //         console.log(first, second)
+            //         tab = first + second
+            //         spa = tab / tsb
+            //         console.log(tsb, tab, spa)
+            //         console.log(spa)
 
-                    stock.shares = tsb
-                    stock.price = currency(spa)
+            //         stock.shares = tsb
+            //         stock.price = currency(spa)
 
-                    updateStocks( {
-                        ...stocks,
-                        items: stocks.items.map(a => 
-                            a.stock.symbol === activeInvestment.stock.symbol ? stock : a)
-                    })
-                }
-            }  else {
-                updateStocks({
-                    ...stocks,
-                    items: [stock, ...stocks.items]
-                })
-            }
+            //         updatePortfolio( {
+            //             ...stocks,
+            //             items: stocks.items.map(a => 
+            //                 a.stock.symbol === activeStock.stock.symbol ? stock : a)
+            //         })
+            //     }
+            // }  else {
+            //     updatePortfolio({
+            //         ...stocks,
+            //         items: [stock, ...stocks.items]
+            //     })
+            // }
 
             
            
@@ -295,7 +298,7 @@ export default function InputSlider() {
         <div className={classes.root}>
             <form>
                 <Typography id="input-slider" gutterBottom>
-                    BUY {!!activeInvestment.stock ? activeInvestment.stock.symbol : null}
+                    BUY {!!activeStock.stock ? activeStock.stock.symbol : null}
                 </Typography>
                 <DatePicker id="buyDate" label="Buy Date" value={buyDate} onChange={updateBuyDate}/>
                 <Grid container spacing={2} alignItems="center">

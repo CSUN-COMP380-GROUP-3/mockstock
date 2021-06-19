@@ -19,6 +19,7 @@ import { LiquidBalanceContext } from '../../contexts/LiquidBalanceContext';
 import { ActiveStockContext } from '../../contexts/ActiveStockContext';
 import { fetchCandles, errorHandler } from '../utils';
 import Input from '../Input/Input';
+import Stock from '../../interfaces/Stock';
 
 const useStyles = makeStyles({
   root: {
@@ -126,7 +127,7 @@ export default function BuyBox(props: BuyBoxProps) {
         const total = getTotal(); // total is the amount the user wants to spend
         // from the two vars above we can do all the calculations we need
         
-        const shares = getShares();
+        // const shares = getShares();
 
         const trade: BuyBoxForm = {
             ...form,
@@ -144,8 +145,10 @@ export default function BuyBox(props: BuyBoxProps) {
             items: [trade, ...trades.items]
         });
 
-        // add assets to the portfolio
-
+        let newPortfolio = {...portfolio};
+        let oldTrades = newPortfolio[stock.symbol] || [];
+        newPortfolio[stock.symbol] = [trade, ...oldTrades];
+        updatePortfolio(newPortfolio);
     };
 
     const getPrice = (): currency => {

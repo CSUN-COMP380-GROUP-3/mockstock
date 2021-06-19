@@ -23,8 +23,8 @@ export const GlobalContext: React.FC = ({children}) => {
     const [ trades, updateTrades ] = React.useState<TradesInterface>(initTradesContext.trades);
     const tradesProviderValue = { trades, updateTrades };
 
-    const [ stocks, updateStocks ] = React.useState<PortfolioInterface>(initPortfolioContext.stocks);
-    const stocksProviderValue = { stocks, updateStocks };
+    const [ portfolio, updatePortfolio ] = React.useState<PortfolioInterface>(initPortfolioContext.portfolio);
+    const stocksProviderValue = { portfolio, updatePortfolio };
 
     return <React.Fragment>
         <TokenContext.Provider value={TOKEN}>

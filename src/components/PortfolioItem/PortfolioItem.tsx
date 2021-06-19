@@ -8,76 +8,33 @@ import { TokenContext } from '../../contexts/TokenContext';
 import axios from 'axios';
 import moment, { Moment } from 'moment';
 import querystring from 'querystring';
-
-
-const endpoint = 'https://finnhub.io/api/v1/stock/candle?';
-
-
+import { fetchCandles, errorHandler } from '../utils';
+import Trade from '../../interfaces/Trade';
+import currency from 'currency.js';
 
 export interface PortfolioListItemProps extends CardProps {
-    data: any;
+    data: Trade[];
+};
+
+export interface ProcessedData {
+    total$Buys: currency;
+    total$Sells: currency;
+    totalBuyShares: currency;
+    totalSellShares: currency;
 };
 
 export default function PortfolioListItem(props: PortfolioListItemProps) {
     const token = React.useContext<string>(TokenContext);
-
     
 
     const { activeStock, updateActiveStock } = React.useContext(ActiveStockContext);
 
-    const { stock, to, from, candles } = activeStock;
-
-    const [ oneDayCandle, updateOneDayCandle ] = React.useState<CandleStickData | undefined>(candles);
-
-
-     // there is an issue with this, if the start date is not a trading day then we must get the next available trading day
-     const fetchAndUpdateOneDayCandles = async (query: CandleStickQuery) => {
-        try {
-            const res = await fetchCandles(query);
-            
-
-            // we need to consider that the start date may be a weekend or non stock market holiday in which the markets are closed
-            // because we are limited to 30 api calls / second we will delay our calls by 100ms to ensure we do not get rate limited
-            if (res.data.s !== 'ok') {
-                console.log('no data available for current trading day, checking next weekday...');
-                // we need to call this function again but this time we need to get the next available weekday
-                const prevFrom = moment.unix(query.from);
-                const prevDay = prevFrom.day();
-                // if the day is a saturday we add 2 extra days, otherwise we increment the previous day by 1
-                const from = prevDay === 6 ?
-                    prevFrom.add(2, 'day') : 
-                    prevFrom.add(1, 'day');
-                
-                setTimeout(fetchAndUpdateOneDayCandles, 100, {
-                    ...query,
-                    from: from.unix(),
-                    to: from.unix(),
-                });
-                return;
-            };
-            console.log(res.data);
-            updateOneDayCandle(res.data);
-        } catch(error) {
-            errorHandler(error);
-        };
-    };
-
-    const fetchCandles = (query: CandleStickQuery) => {
-        const urlParams = querystring.stringify(query as any);
-        console.log('fetching', urlParams);
-        return axios.get(endpoint + urlParams);
-    };
-
-    const errorHandler = (error: any) => { // generic error handler
-        if (error.response?.status === 401) {
-            console.log("Invalid token, please make sure it is set as react app environment variable");
-        };
-        console.error(error);
-    };
+    const { to, from } = activeStock;
     
-
-
     const { style, data } = props;
+    const stock = data[0].stock;
+    const { symbol } = stock;
+
     const useStyles = makeStyles({
         root: {
             display: 'flex',
@@ -101,34 +58,73 @@ export default function PortfolioListItem(props: PortfolioListItemProps) {
     const { root } = useStyles();
 
     const onClick = async () => {
-        console.log('clicked')
-        console.log(data.shares)
+        try {
+            const res = await fetchCandles({
+                symbol,
+                to: to.unix(),
+                from: from.unix(),
+                resolution: 'D',
+                token,
+            });
+    
+            updateActiveStock({
+                ...activeStock,
+                candles: res.data,
+                stock,
+            });
 
-        const res = await fetchCandles({
-            symbol: data.stock.symbol,
-            to: to.unix(),
-            from: from.unix(),
-            resolution: 'D',
-            token,
-        });
-
-        updateActiveStock({
-            ...activeStock,
-            candles: res.data,
-            stock: data.stock
-        });
+        } catch(error) {
+            errorHandler(error);
+        };
     };
 
-    return (
-        <Card data-testid="watchlistitem" style={style} className={root} onClick={onClick}>
-            <Typography variant="h6" className="symbol">{data.stock.symbol}</Typography>
-            <div className="details" >
-                {/* <Typography variant="h6" className="dollar" data-testid="watchlistitem-dollar">{!!data.price ? data.price.format() : '$-'}</Typography>
-                <Typography variant="subtitle2" className="percent" data-testid="watchlistitem-percent">(-%)</Typography> */}
-                <Typography variant="subtitle2" className="percent" data-testid="watchlistitem-percent">{!!data.price.value ? data.price.value : null}</Typography>
-                <Typography variant="subtitle2" className="percent" data-testid="watchlistitem-percent">{!!data.shares ? data.shares : null}</Typography>
+    const processTrades = () => {
+        return data
+            .reduce((acc, curr) => {
+                const { total$Buys, total$Sells, totalBuyShares, totalSellShares } = acc;
+                const { type, price, total } = curr;
+                const newData: ProcessedData = {
+                    total$Buys,
+                    total$Sells,
+                    totalBuyShares,
+                    totalSellShares,
+                };
+                const shares = total.divide(price!);
+                if (type === 'BUY') {
+                    newData.total$Buys = total$Buys.add(total);
+                    newData.totalBuyShares = totalBuyShares.add(shares);
+                } else {
+                    // SELL
+                    newData.total$Sells = total$Sells.add(total);
+                    newData.totalSellShares = totalSellShares.add(shares);
+                };
+                return newData;
+            }, {
+                total$Buys: currency(0),
+                total$Sells: currency(0),
+                totalBuyShares: currency(0),
+                totalSellShares: currency(0),
+            } as ProcessedData);
+    };
 
+    // (total$Buys - total$Sells) / (totalBuyShares - totalSellShares) // cost basis
+    
+    const { total$Buys, total$Sells, totalBuyShares, totalSellShares } = processTrades();
+    const totalShares = totalBuyShares.subtract(totalSellShares);
+    const costBasis = ( total$Buys.subtract(total$Sells) )
+        .divide(totalShares);
+    
+    console.log(`cost basis ${costBasis}`);
+    const comp = totalShares.value === 0 ?
+         <div></div> : 
+         <Card data-testid="watchlistitem" style={style} className={root} onClick={onClick}>
+            <Typography variant="h6" className="symbol">{symbol}</Typography>
+            <div className="details" >
+                {/* <Typography variant="subtitle2" className="dollar" data-testid="portfolioitem-dollar">{(total$Buys.subtract(total$Sells)).toString()}</Typography> */}
+                <Typography variant="subtitle2" className="cost" data-testid="portfolioitem-cost">{costBasis.toString()}</Typography>
+                <Typography variant="subtitle2" className="shares" data-testid="portfolioitem-shares">{totalShares.format({precision: 4, symbol: ''})}</Typography>
             </div>
         </Card>
-    );
+
+    return comp;
 };
