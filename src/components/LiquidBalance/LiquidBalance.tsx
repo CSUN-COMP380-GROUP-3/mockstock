@@ -38,7 +38,7 @@ export default function LiquidBalance() {
     <React.Fragment>
 
       {/* <div data-testid="liquidbalance" className="root"> */}
-      <Grid data-testid="liquidbalance" className="root" container direction="row" justify="space-between">
+      <Grid data-testid="liquidbalance" className="liquid-balance" container direction="row" justify="space-between">
         <Grid item>
           <Typography variant="h5" className="label">Funds Available</Typography>
         </Grid>

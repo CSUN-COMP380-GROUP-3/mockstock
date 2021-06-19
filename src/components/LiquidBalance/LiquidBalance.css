@@ -1,11 +1,11 @@
-.root {
+.liquid-balance {
   /* display: 'flex'; */
   /* justify-content: space-between; */
   /* width: '450px'; */
   color: white;
 }
 
-.label {
+.liquid-balance.label {
   /* display: 'flex';
   align-items: 'center'; */
   text-align: 'left';
@@ -19,8 +19,9 @@
   text-align: 'right';
 }
 
-.dollar {
+.liquid-balance.dollar {
   text-align: 'right';
+  color: white;
 }
 
 .details {
