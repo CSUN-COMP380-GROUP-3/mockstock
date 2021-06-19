@@ -11,7 +11,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 export default function PortfolioList() {
     const isInit = React.useRef(false);
-    const { stocks, updateStocks } = React.useContext(PortfolioContext);
+    const { portfolio, updatePortfolio } = React.useContext(PortfolioContext);
     
     // function renderRow(props: ListChildComponentProps) {
     //     const { index, style } = props;
@@ -25,7 +25,7 @@ export default function PortfolioList() {
 
     const Row = (props: ListChildComponentProps) => {
         const { index, style } = props;
-        const data = Object.values(stocks.items)[index];
+        const data = Object.values(portfolio)[index];
         return (
             <PortfolioItem key={index} style={style} 
             data={data}>
@@ -46,7 +46,7 @@ export default function PortfolioList() {
         <Card data-testid="portfoliolist" className={classes.root}>
             <CardHeader title="Portfolio"></CardHeader>
             <CardContent>
-                <FixedSizeList height={400} width={400} itemSize={80} itemCount={Object.keys(stocks.items).length}>
+                <FixedSizeList height={400} width={400} itemSize={80} itemCount={Object.keys(portfolio).length}>
                     {Row}
                 </FixedSizeList>
             </CardContent>

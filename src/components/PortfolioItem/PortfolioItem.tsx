@@ -2,8 +2,7 @@ import React, { useEffect } from 'react';
 import Card, { CardProps } from '@material-ui/core/Card';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
-import { WatchListData } from '../../contexts/WatchListContext';
-import { ActiveInvestmentContext } from '../../contexts/ActiveInvestmentContext';
+import { ActiveStockContext } from '../../contexts/ActiveStockContext';
 import CandleStickData, { CandleStickQuery } from '../../interfaces/CandleStickData';
 import { TokenContext } from '../../contexts/TokenContext';
 import axios from 'axios';
@@ -24,9 +23,9 @@ export default function PortfolioListItem(props: PortfolioListItemProps) {
 
     
 
-    const { activeInvestment, updateActiveInvestment } = React.useContext(ActiveInvestmentContext);
+    const { activeStock, updateActiveStock } = React.useContext(ActiveStockContext);
 
-    const { stock, to, from, candles } = activeInvestment;
+    const { stock, to, from, candles } = activeStock;
 
     const [ oneDayCandle, updateOneDayCandle ] = React.useState<CandleStickData | undefined>(candles);
 
@@ -113,8 +112,8 @@ export default function PortfolioListItem(props: PortfolioListItemProps) {
             token,
         });
 
-        updateActiveInvestment({
-            ...activeInvestment,
+        updateActiveStock({
+            ...activeStock,
             candles: res.data,
             stock: data.stock
         });
