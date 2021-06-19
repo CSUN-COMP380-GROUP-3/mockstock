@@ -6,12 +6,12 @@
   width: 100%;
 }
 
-.symbol {
+.list-item>.symbol {
   margin-left: 1rem;
   color: black;
 }
 
-.details {
+.list-item>.details {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
@@ -20,13 +20,13 @@
   color: black;
 }
 
-.percent {
+.details>.percent {
   text-align: right;
   color: black;
   padding-right: 20px;
 }
 
-.dollar {
+.details>.dollar {
   text-align: right;
   color: black;
 }
