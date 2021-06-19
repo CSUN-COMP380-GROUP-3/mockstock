@@ -1,0 +1,32 @@
+.list-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.list-item>.symbol {
+  margin-left: 1rem;
+  color: black;
+}
+
+.list-item>.details {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  margin-right: 1rem;
+  color: black;
+}
+
+.details>.percent {
+  text-align: right;
+  color: black;
+  padding-right: 20px;
+}
+
+.details>.dollar {
+  text-align: right;
+  color: black;
+}

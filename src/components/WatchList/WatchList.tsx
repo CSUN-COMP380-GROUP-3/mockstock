@@ -5,10 +5,14 @@ import { WebSocketRawData } from '../../interfaces/WebSocketData';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
-import { FixedSizeList, ListChildComponentProps } from 'react-window';
 import WatchListItem from '../WatchListItem/WatchListItem';
-import { makeStyles } from '@material-ui/core/styles';
 import { WatchListDataContext, WatchListDataInterface } from '../../contexts/WatchListDataContext';
+import "./WatchList.css";
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import { FixedSizeList, ListChildComponentProps } from 'react-window';
+import { makeStyles } from '@material-ui/core/styles';
+
 
 export default function WatchList() {
     const watchListDataCache = React.useRef<WatchListDataInterface>({});
@@ -58,16 +62,14 @@ export default function WatchList() {
         );
     };
 
-    const useStyles = makeStyles({
-        root: {
-            height: '100%',
-        }
-    });
-
-    const classes = useStyles();
-
+    // we use the fix size list because we want to render the contents of the watchlist with virtualization
+    // because the watchlist item is essentially rerendered everytime there is a new price it is more performant this way
+    // the drawback being that we have to hard set some of the dimensions
+    // if you want to style the individual watchlist items you can either style it directly in the return block or
+    //   you can add css styling to the WatchListItem
+    
     return <React.Fragment>
-        <Card data-testid="watchlist" className={classes.root}>
+        <Card data-testid="watchlist">
             <CardHeader title="Watchlist"></CardHeader>
             <CardContent>
                 <FixedSizeList height={400} width={400} itemSize={80} itemCount={watchList.stockSymbols.length}>
@@ -76,4 +78,20 @@ export default function WatchList() {
             </CardContent>
         </Card>
     </React.Fragment>;
+
+  // return <React.Fragment>
+  //   <Card data-testid="watchlist">
+  //     <CardHeader title="Watchlist"></CardHeader>
+  //     <CardContent className="watch-list">
+  //       <List>
+  //         {Object.keys(watchList.stocks).map((symbol, index) => {
+  //           return (<ListItem key={index}>
+  //             <WatchListItem data={watchList.stocks[symbol]}></WatchListItem>
+  //           </ListItem>);
+  //         })}
+  //       </List>
+  //     </CardContent>
+  //   </Card>
+  // </React.Fragment>;
+
 };
