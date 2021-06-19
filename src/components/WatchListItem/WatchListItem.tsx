@@ -3,7 +3,7 @@ import Card, { CardProps } from '@material-ui/core/Card';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import currency from 'currency.js';
-import { fetchCandles, errorHandler } from '../SellBox/utils';
+import { fetchCandles, errorHandler } from '../utils';
 import { ActiveStockContext } from '../../contexts/ActiveStockContext';
 import { TokenContext } from '../../contexts/TokenContext';
 

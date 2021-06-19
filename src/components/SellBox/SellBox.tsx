@@ -10,7 +10,7 @@ import Trade from '../../interfaces/Trade';
 import currency from 'currency.js';
 import Slider from '../Slider/Slider';
 import Input from '../Input/Input';
-import { fetchCandles, errorHandler } from './utils';
+import { fetchCandles, errorHandler } from '../utils';
 import CandleStickData from '../../interfaces/CandleStickData';
 import { TokenContext } from '../../contexts/TokenContext';
 import { TradesContext } from '../../contexts/TradesContext';
