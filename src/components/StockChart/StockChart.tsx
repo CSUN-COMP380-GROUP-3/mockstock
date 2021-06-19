@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { ActiveInvestmentContext } from '../../contexts/ActiveInvestmentContext';
 import ReactApexChart from "react-apexcharts";
 
@@ -6,37 +6,62 @@ export default function StockChart() {
     const { activeInvestment } = React.useContext(ActiveInvestmentContext);
     const { candles } = activeInvestment;
 
-    const data = []
-    if(candles) {
-        var i
-        for(i = 0; i < candles["t"].length; i++) {
-            const x = new Date(candles["t"][i] * 1000)
-            const y0 = candles["o"][i]
-            const y1 = candles["h"][i]
-            const y2 = candles["l"][i]
-            const y3 = candles["c"][i]
+    const [ chart, setChart] = useState<any>({
+        series1: []
+    })
 
-            const y = []
-            y.push(y0)
-            y.push(y1)
-            y.push(y2)
-            y.push(y3)
+    const { series1 } = chart
 
-            const ob = {
-                x: x,
-                y: y
+
+    // var series: Object[]
+    useEffect(() =>  {
+        console.log("in")
+        if(candles !== undefined) {
+            console.log("in in")
+            const data = []
+            var i
+            for(i = 0; i < candles["t"].length; i++) {
+                const x = new Date(candles["t"][i] * 1000)
+                const y0 = candles["o"][i]
+                const y1 = candles["h"][i]
+                const y2 = candles["l"][i]
+                const y3 = candles["c"][i]
+    
+                const y = []
+                y.push(y0)
+                y.push(y1)
+                y.push(y2)
+                y.push(y3)
+    
+                const ob = {
+                    x: x,
+                    y: y
+                }
+                    
+                data.push(ob)
             }
-                
-            data.push(ob)
+            const obk = {
+                data: data
+            }
+
+            var arr = []
+            arr.push(obk)
+            
+            // series1.push(obk)
+            setChart({
+                ...chart,
+                series1: arr
+            })
+            // console.log(series1)
         }
-    }
+    
+        
+    },[candles,activeInvestment])
 
-    const obk = {
-        data: data
-    }
+    
+    
 
-    var series = []
-    series.push(obk)
+    
 
     return (
         <div id="chart">
@@ -65,7 +90,7 @@ export default function StockChart() {
                         }
                     }
                 }  
-                series={series} type="candlestick" height={350} 
+                series={series1} type="candlestick" height={350} 
             />
         </div>
     )    

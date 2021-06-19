@@ -109,19 +109,19 @@ export default function BuyBox() {
 
     const updateSymbol = async (event: any, value: any) => {
         if (!!value) {
-            updateActiveInvestment({
-                ...activeInvestment,
-                stock: value,
-            });
+            // updateActiveInvestment({
+            //     ...activeInvestment,
+            //     stock: value,
+            // });
 
             // we fetch new candle data so estimated shares can be calculated
-            fetchAndUpdateOneDayCandles({
-                symbol: value.symbol,
-                from: from.unix(),
-                to: to.unix(),
-                resolution: 'D',
-                token,
-            });
+            // fetchAndUpdateOneDayCandles({
+            //     symbol: value.symbol,
+            //     from: from.unix(),
+            //     to: to.unix(),
+            //     resolution: 'D',
+            //     token,
+            // });
 
             const res = await fetchCandles({
                 symbol: value.symbol,
