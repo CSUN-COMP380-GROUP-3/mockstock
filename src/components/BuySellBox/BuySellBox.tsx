@@ -130,6 +130,9 @@ export default function InputSlider() {
                 stock: activeInvestment.stock
             })
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 8c51156 (after buy stocks now added to portfolio)
 
 
             // CHECK IS STOCK IS ALREADY IN PORTFOLIO
@@ -192,8 +195,11 @@ export default function InputSlider() {
             
 
             
+<<<<<<< HEAD
 =======
 >>>>>>> f5bae76 (fixed slide bar manual input not working on buyBox)
+=======
+>>>>>>> 8c51156 (after buy stocks now added to portfolio)
  
         } catch(error) {
             errorHandler(error);
@@ -356,12 +362,17 @@ export default function InputSlider() {
                     </Grid>
                 </Grid>
 <<<<<<< HEAD
+<<<<<<< HEAD
                 <Button disabled={liquidBalance.curr.intValue < 1 || value === 0} variant="contained" onClick={onClick}>BUY</Button>
             
 =======
                 <Button disabled={liquidBalance.curr.intValue < 1} variant="contained" onClick={onClick}>BUY</Button>
                 
 >>>>>>> 2c5b6bc (buy Button turns off when out of funds)
+=======
+                <Button disabled={liquidBalance.curr.intValue < 1 || value === 0} variant="contained" onClick={onClick}>BUY</Button>
+            
+>>>>>>> 8c51156 (after buy stocks now added to portfolio)
             </form>
         </div>
     );
