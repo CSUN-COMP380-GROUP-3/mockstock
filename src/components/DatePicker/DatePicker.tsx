@@ -7,6 +7,7 @@ import moment from 'moment';
 export type DatePickerProps = KeyboardDatePickerProps;
 
 export const minDate = moment().subtract(1, 'year');
+export const maxDate = moment().subtract(1, 'day');
 
 export default function DatePicker(props: DatePickerProps) {
     return (

@@ -1,61 +1,60 @@
 import React from 'react';
 import { WatchListContext } from '../../contexts/WatchListContext';
 import socket, { subscribe } from './websocket';
-import currency from 'currency.js';
 import { WebSocketRawData } from '../../interfaces/WebSocketData';
-import moment from 'moment';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
 import WatchListItem from '../WatchListItem/WatchListItem';
 import { makeStyles } from '@material-ui/core/styles';
+import { WatchListDataContext, WatchListDataInterface } from '../../contexts/WatchListDataContext';
 
 export default function WatchList() {
-    const isInit = React.useRef(false);
+    const watchListDataCache = React.useRef<WatchListDataInterface>({});
+
     const { watchList, updateWatchList } = React.useContext(WatchListContext);
     
     // const cleanUp = () => { // need to think of a way to close this socket
-    //     socket.close();
-    //     console.log('closing socket');
+        
     // };
+    
+    const { watchListData, updateWatchListData } = React.useContext(WatchListDataContext);
 
+    function messageHandler({data}: any) {
+        if (!!data && typeof data === 'string') {
+            const dataObj: WebSocketRawData = JSON.parse(data);
+            let newWatchListData = { ...watchListDataCache.current };
+            dataObj.data?.forEach(({s, p}) => {
+                newWatchListData[s] = p;
+            });
+            watchListDataCache.current = {...newWatchListData};
+            updateWatchListData(watchListDataCache.current);
+        };
+    };
 
     React.useEffect(() => {
-        if (!isInit.current) {
-            console.log('adding listeners to socket');
+        if (socket.OPEN) {
             socket.addEventListener('open', () => {
-                socket.addEventListener('message', ({data}) => {
-                    if (!!data && typeof data === 'string') {
-                        const dataObj: WebSocketRawData = JSON.parse(data);
-                        dataObj['data']?.forEach(({s, p, t}) => {
-                            let newWatchList = {...watchList};
-                            newWatchList.stocks[s]['price'] = currency(p);
-                            newWatchList.lastUpdated = moment(t);
-                            updateWatchList(newWatchList);
-                        });
-                    };
-                });
-    
-                Object.keys(watchList.stocks).forEach(subscribe);
+                console.log('socket is open');
+                socket.addEventListener('message', messageHandler);
+                watchList.stockSymbols.forEach(subscribe);
             });
         };
-        isInit.current = true;
-    });
+    }, [socket.OPEN]);
 
-    // function renderRow(props: ListChildComponentProps) {
-    //     const { index, style } = props;
-        
-    //     return (
-    //         <WatchListItem key={index} style={style} value={watchList[index]}/>
-    //     );
-    // };
 
     const Row = (props: ListChildComponentProps) => {
         const { index, style } = props;
-        const data = Object.values(watchList.stocks)[index];
+        const symbol = watchList.stockSymbols[index];
+        const price = watchListData[symbol];
         return (
-            <WatchListItem key={index} style={style} data={data}></WatchListItem>
+            <WatchListItem 
+                key={index} 
+                style={style} 
+                symbol={symbol}
+                price={price}
+            />
         );
     };
 
@@ -71,7 +70,7 @@ export default function WatchList() {
         <Card data-testid="watchlist" className={classes.root}>
             <CardHeader title="Watchlist"></CardHeader>
             <CardContent>
-                <FixedSizeList height={400} width={400} itemSize={80} itemCount={Object.keys(watchList.stocks).length}>
+                <FixedSizeList height={400} width={400} itemSize={80} itemCount={watchList.stockSymbols.length}>
                     {Row}
                 </FixedSizeList>
             </CardContent>

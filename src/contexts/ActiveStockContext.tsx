@@ -4,7 +4,7 @@ import StockSymbolData from '../interfaces/StockSymbolData';
 import CandleStickData from '../interfaces/CandleStickData';
 import initCandles from '../initCandles.json';
 import { filteredSymbols } from './StockSymbolsContext';
-import { minDate } from '../components/DatePicker/DatePicker';
+import { maxDate, minDate } from '../components/DatePicker/DatePicker';
 
 // ActiveStock is mainly consumed by the GraphBox
 // When the ActiveStock context changes then the GraphBox would need to be updated with new information
@@ -29,7 +29,7 @@ export const initActiveStockContext: ActiveStockContextInterface = {
     activeStock: {
         stock: filteredSymbols.find(s => s.symbol === initSymbol) || filteredSymbols[0],
         from: minDate,
-        to: moment(),
+        to: maxDate,
         candles: initCandles || []
     },
     updateActiveStock: () => {}

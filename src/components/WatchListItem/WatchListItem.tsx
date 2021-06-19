@@ -2,14 +2,15 @@ import React from 'react';
 import Card, { CardProps } from '@material-ui/core/Card';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
-import { WatchListData } from '../../contexts/WatchListContext';
+import currency from 'currency.js';
 
 export interface WatchListItemProps extends CardProps {
-    data: WatchListData;
+    symbol: string;
+    price: number;
 };
 
 export default function WatchListItem(props: WatchListItemProps) {
-    const { style, data } = props;
+    const { style, symbol, price } = props;
     const useStyles = makeStyles({
         root: {
             display: 'flex',
@@ -34,9 +35,9 @@ export default function WatchListItem(props: WatchListItemProps) {
 
     return (
         <Card data-testid="watchlistitem" style={style} className={root}>
-            <Typography variant="h6" className="symbol">{data.symbol}</Typography>
+            <Typography variant="h6" className="symbol">{symbol}</Typography>
             <div className="details">
-                <Typography variant="h6" className="dollar" data-testid="watchlistitem-dollar">{!!data.price ? data.price.format() : '$-'}</Typography>
+                <Typography variant="h6" className="dollar" data-testid="watchlistitem-dollar">{!!price ? currency(price).format() : '$-'}</Typography>
                 <Typography variant="subtitle2" className="percent" data-testid="watchlistitem-percent">(-%)</Typography>
             </div>
         </Card>
