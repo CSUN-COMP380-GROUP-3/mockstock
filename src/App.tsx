@@ -13,7 +13,7 @@ import { GlobalContext } from './components/GlobalContext/GlobalContext';
 function App() {
   return (
     <GlobalContext>
-      <Grid container alignItems="stretch" spacing={0}>
+      <Grid container alignItems="stretch" spacing={0} className="all-content">
         <Grid item xs={8}>
           <Grid container className="main-content" direction="column" spacing={2}>
             <Grid item>
