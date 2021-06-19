@@ -20,14 +20,15 @@ export interface SellBoxForm extends Trade {
 };
 
 export interface SellBoxProps {
-
 };
 
 export default function SellBox() {
     const isInit = React.useRef(false);
 
     const token = React.useContext<string>(TokenContext);
+
     const { activeStock } = React.useContext(ActiveStockContext);
+
     const { stock } = activeStock;
 
     const { liquidBalance, updateLiquidBalance } = React.useContext(LiquidBalanceContext);
@@ -136,6 +137,7 @@ export default function SellBox() {
             items: [trade, ...trades.items]
         });
 
+        // remove assets from portfolio
     };
 
     const getPrice = (): currency => {
