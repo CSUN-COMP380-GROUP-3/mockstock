@@ -122,19 +122,21 @@ export default function SymbolBox(props: SymbolBoxProps) {
     const onChange = async (event: any, value: any) => {
         // need to fetch the candles here too
         try {
-            const res = await fetchCandles({
-                symbol: stock.symbol,
-                from: from.unix(),
-                to: to.unix(),
-                resolution: 'D',
-                token,
-            });
-
-            updateActiveStock({
-                ...activeStock,
-                stock: value,
-                candles: res.data,
-            });
+            if (!!value) {
+                const res = await fetchCandles({
+                    symbol: stock.symbol,
+                    from: from.unix(),
+                    to: to.unix(),
+                    resolution: 'D',
+                    token,
+                });
+    
+                updateActiveStock({
+                    ...activeStock,
+                    stock: value,
+                    candles: res.data,
+                });
+            }
         } catch(error) {
             errorHandler(error);
         };

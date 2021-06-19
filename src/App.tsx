@@ -10,6 +10,7 @@ import LiquidBalance from './components/LiquidBalance/LiquidBalance';
 import WatchList from './components/WatchList/WatchList';
 import SellBox from './components/SellBox/SellBox';
 import Portfolio from './components/Portfolio/Portfolio';
+import SymbolBox from './components/SymbolBox/SymbolBox';
 
 import { GlobalContext } from './components/GlobalContext/GlobalContext';
 import { WatchListDataContext, WatchListDataInterface } from './contexts/WatchListDataContext';
