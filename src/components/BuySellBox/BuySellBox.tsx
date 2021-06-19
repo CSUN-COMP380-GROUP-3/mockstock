@@ -13,14 +13,12 @@ import axios from 'axios';
 import { TokenContext } from '../../contexts/TokenContext';
 import Trade from '../../interfaces/Trade';
 import { TradesContext } from '../../contexts/TradesContext';
-
-
-
+import { PortfolioContext } from '../../contexts/PortfolioContext';
+import Stock from '../../interfaces/Stock';
 
 import DatePicker from '../DatePicker/DatePicker';
 import { BaseKeyboardPickerProps } from '@material-ui/pickers/_shared/hooks/useKeyboardPickerState';
 import { minDate } from '../../components/DatePicker/DatePicker';
-
 
 import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
 import { LiquidBalanceContext } from '../../contexts/LiquidBalanceContext';
@@ -49,6 +47,8 @@ export default function InputSlider() {
 
     const { liquidBalance, updateLiquidBalance } = React.useContext(LiquidBalanceContext);
     const { trades, updateTrades } = React.useContext(TradesContext);
+    const { stocks, updateStocks } = React.useContext(PortfolioContext);
+
 
 
     const { activeInvestment, updateActiveInvestment } = React.useContext(ActiveInvestmentContext);
@@ -80,39 +80,21 @@ export default function InputSlider() {
             token,
         }); 
         console.log(trades)
+        console.log("hi")
+        console.log(stocks)
+        console.log("bye")
     }, [activeInvestment.stock, liquidBalance.curr])
 
 
     const onClick = async () => {
-        // console.log('hi')
-        // console.log(buyDate)
-        // console.log(buyAmount)
-        // console.log(stock)
-        // console.log(buyDate.toDate())
-        // GET FULL YEAR CANDLES, THEN SEARCH BY DATE
-        
-        // const res = await fetchCandles({
-        //     symbol: stock.symbol,
-        //     to: moment().unix(),
-        //     from: minDate.unix(),
-        //     resolution: 'D',
-        //     token,
-        // });
-        // fetchAndUpdateOneDayCandles({
-        //     symbol: stock.symbol,
-        //     from: buyDate.unix(),
-        //     to: buyDate.unix(),
-        //     resolution: 'D',
-        //     token,
-        // });  
         let hold = ''
         if(!!oneDayCandle) {
-            // console.log(oneDayCandle["c"][0])
             hold = oneDayCandle["c"][0].toString()
         }
         try {
+            let buyAmnt 
             let trade: Trade = {
-                stock,
+                stock: activeInvestment.stock,
                 date: buyDate,
                 price: currency(hold),
                 amount: buyAmount,
@@ -120,10 +102,18 @@ export default function InputSlider() {
                 timestamp: moment(),
             };
 
+            buyAmnt = Number(buyAmount)
+
             updateTrades({
                 ...trades,
                 items: [trade, ...trades.items]
             })
+
+            let shares = Number(buyAmount) / Number(hold)
+
+            console.log(shares)
+
+
 
             let hold2 = currency(liquidBalance.curr.value - buyAmount.value)
 
@@ -140,6 +130,68 @@ export default function InputSlider() {
                 buyDate: minDate,
                 stock: activeInvestment.stock
             })
+
+
+            // CHECK IS STOCK IS ALREADY IN PORTFOLIO
+            let i = 0
+            let here = false
+            let prevStock = null
+            for(i; i < stocks.items.length; i++) {
+                if(stocks.items[i].stock.symbol === activeInvestment.stock.symbol) {
+                    console.log("we got a match")
+                    prevStock = stocks.items[i]
+                    here = true
+                }
+            }
+            // CALCULATE STOCK AVG PRICE
+            let stock: Stock = {
+                stock: activeInvestment.stock,
+                price: currency(hold),
+                shares: shares,
+                timestamp: moment(),
+            };
+
+            let tsb
+            let tab
+            let spa 
+            if(here === true) {
+                console.log(prevStock)
+                if(prevStock && prevStock.shares && prevStock.price) {
+                    tsb = prevStock.shares + shares
+                    console.log(prevStock.shares, prevStock.price.value)
+                    console.log(shares, hold)
+                    let first = prevStock.shares*prevStock.price.value
+                    let second = shares*Number(hold)
+                    console.log(first, second)
+                    tab = first + second
+                    spa = tab / tsb
+                    console.log(tsb, tab, spa)
+                    console.log(spa)
+
+                    stock.shares = tsb
+                    stock.price = currency(spa)
+
+                    updateStocks( {
+                        ...stocks,
+                        items: stocks.items.map(a => 
+                            a.stock.symbol === activeInvestment.stock.symbol ? stock : a)
+                    })
+                }
+            }  else {
+                updateStocks({
+                    ...stocks,
+                    items: [stock, ...stocks.items]
+                })
+            }
+
+            
+           
+
+            
+            
+            
+
+            
  
         } catch(error) {
             errorHandler(error);
@@ -276,8 +328,8 @@ export default function InputSlider() {
                         />
                     </Grid>
                 </Grid>
-                <Button disabled={liquidBalance.curr.intValue < 1} variant="contained" onClick={onClick}>BUY</Button>
-                
+                <Button disabled={liquidBalance.curr.intValue < 1 || value === 0} variant="contained" onClick={onClick}>BUY</Button>
+            
             </form>
         </div>
     );
