@@ -84,40 +84,6 @@ export default function BuyBox() {
         };
     };
 
-    const updateSymbol = async (event: any, value: any) => {
-        if (!!value) {
-            updateActiveStock({
-                ...activeStock,
-                stock: value,
-            });
-
-            // we fetch new candle data so estimated shares can be calculated
-            fetchAndUpdateOneDayCandles({
-                symbol: value.symbol,
-                from: from.unix(),
-                to: to.unix(),
-                resolution: 'D',
-                token,
-            });
-
-            const res = await fetchCandles({
-                symbol: value.symbol,
-                to: to.unix(),
-                from: from.unix(),
-                resolution: 'D',
-                token,
-            });
-
-            updateActiveStock({
-                ...activeStock,
-                stock: value,
-                candles: res.data,
-            });
-        };
-
-        
-    };
-
     const onClickHandler = async () => {
         // try {
         //     let trade: Trade = {
@@ -188,7 +154,6 @@ export default function BuyBox() {
     return <React.Fragment>
         <h2>BuyBox</h2>
         <form>
-            <SymbolBox value={stock} onChange={updateSymbol}/>
             <DatePicker id="startDate" label="Start Date" value={from} onChange={updateStartDate}/>
             <DatePicker id="endDate" label="End Date" value={to} onChange={updateEndDate}/>
             <Button variant="contained" onClick={onClickHandler}>Buy</Button>
