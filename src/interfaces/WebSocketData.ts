@@ -1,9 +1,3 @@
-import currency from 'currency.js';
-
-export default interface WebSocketData {
-    price: currency;
-};
-
 export interface WebSocketRawData {
     type: string;
     data: {
