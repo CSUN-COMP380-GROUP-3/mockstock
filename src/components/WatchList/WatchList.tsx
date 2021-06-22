@@ -1,6 +1,6 @@
 import React from 'react';
-import { WatchListContext } from '../../contexts/WatchListContext';
-import socket, { subscribe } from '../websocket';
+import { subscribe, WatchListContext } from '../../contexts/WatchListContext';
+import socket from '../websocket';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';

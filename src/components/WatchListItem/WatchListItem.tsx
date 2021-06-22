@@ -5,17 +5,16 @@ import currency from 'currency.js';
 import { fetchCandles, errorHandler } from '../utils';
 import { ActiveStockContext } from '../../contexts/ActiveStockContext';
 import { TokenContext } from '../../contexts/TokenContext';
-import "./WatchListItem.css";
 import { Listener } from '../../interfaces/WebSocketData';
-import { listen, stopListen } from '../websocket';
 import socket from '../websocket';
+import { listen, stopListen } from '../../contexts/WatchListContext';
+import "./WatchListItem.css";
 
 export interface WatchListItemProps extends CardProps {
     symbol: string;
 };
 
 export default function WatchListItem(props: WatchListItemProps) {
-    // const { style, symbol, price } = props;
     const { symbol, style } = props;
     const token = React.useContext(TokenContext);
 
