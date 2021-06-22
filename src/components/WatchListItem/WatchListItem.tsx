@@ -12,18 +12,18 @@ import socket from '../websocket';
 
 export interface WatchListItemProps extends CardProps {
     symbol: string;
-    price: number;
 };
 
 export default function WatchListItem(props: WatchListItemProps) {
-    const { style, symbol, price } = props;
+    // const { style, symbol, price } = props;
+    const { symbol, style } = props;
     const token = React.useContext(TokenContext);
 
     const { activeStock, updateActiveStock } = React.useContext(ActiveStockContext);
 
     const { to, from, stock } = activeStock;
 
-    const [displayPrice, setDisplayPrice] = React.useState(price);
+    const [displayPrice, setDisplayPrice] = React.useState<number>();
 
     const onClick = async () => {
         try {
@@ -63,9 +63,11 @@ export default function WatchListItem(props: WatchListItemProps) {
     };
 
     React.useEffect(() => {
+        console.log("USE EFFECT FOR ITEM HAS BEEN CALLED");
         if (socket.OPEN) {
             listen(symbol, updatePrice);
             return () => {
+                console.log("ITEM HAS BEEN UNDRAWN");
                 stopListen(symbol, updatePrice);
             }
         };
@@ -76,7 +78,7 @@ export default function WatchListItem(props: WatchListItemProps) {
             <Typography variant="h6" className="symbol">{symbol}</Typography>
             <div className="details">
                 <Typography variant="subtitle2" className="percent" data-testid="watchlistitem-percent">(-%)</Typography>
-                <Typography variant="h6" className="dollar" data-testid="watchlistitem-dollar">{!!price ? currency(price).format() : '$-'}</Typography>
+                <Typography variant="h6" className="dollar" data-testid="watchlistitem-dollar">{!!displayPrice ? currency(displayPrice).format() : '$-'}</Typography>
             </div>
         </div>
     );

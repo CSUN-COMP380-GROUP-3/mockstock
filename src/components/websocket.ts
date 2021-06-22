@@ -12,7 +12,7 @@ export default socket;
  */
 const symbolTracker: {
     [stockSymbol: string]: {
-        // TODO: Remove current price and who whole deleting records thing. Just have it be an array of listners
+        // TODO: Remove current price and the whole deleting records thing. Just have it be an array of listners
         currentPrice: number,
         listeners: [Listener]
     }
@@ -75,6 +75,7 @@ export const unsubscribe = (symbol: string) => {
  * @param newListener The listener that will be called when Finnhub responds with new price data.
  */
 export const listen = (symbol: string, newListener: Listener) => {
+    // console.log(`listen called for ${symbol}`);
     if (symbolTracker[symbol] === undefined) {
         symbolTracker[symbol] = {
             currentPrice: 0,
@@ -91,6 +92,7 @@ export const listen = (symbol: string, newListener: Listener) => {
  * @param oldListener The listener that is to be removed.
  */
 export const stopListen = (symbol: string, oldListener: Listener) => {
+    // console.log(`stop listen called for ${symbol}`);
     if (symbolTracker[symbol] === undefined) {
         console.error("System attempted to unsubscribe from a symbol that was not already subscribed to");
     } else {
