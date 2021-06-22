@@ -21,9 +21,7 @@ export const initWatchListContext: WatchListContextInterface = {
             'TSLA',
         ]
     },
-    updateWatchList: (newWatchList: WatchListInterface) => {
-        initWatchListContext.watchList = newWatchList;
-    }
+    updateWatchList: () => { },
 };
 
 export const WatchListContext = React.createContext<WatchListContextInterface>(initWatchListContext);
