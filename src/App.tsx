@@ -3,17 +3,15 @@ import './App.css';
 import Grid from '@material-ui/core/Grid';
 
 import BuyBox from './components/BuyBox/BuyBox';
-import BuySellBox from './components/BuySellBox/BuySellBox';
 import Header from './components/Header/Header';
 import StockChart from './components/StockChart/StockChart';
 import LiquidBalance from './components/LiquidBalance/LiquidBalance';
 import WatchList from './components/WatchList/WatchList';
 import SellBox from './components/SellBox/SellBox';
-import Portfolio from './components/Portfolio/Portfolio';
-import SymbolBox from './components/SymbolBox/SymbolBox';
 
 import { GlobalContext } from './components/GlobalContext/GlobalContext';
 import { WatchListDataContext, WatchListDataInterface } from './contexts/WatchListDataContext';
+import PortfolioList from './components/Portfolio/Portfolio';
 
 function App() {
 
@@ -33,6 +31,9 @@ function App() {
             <Grid item>
               <StockChart/>
             </Grid>
+            <Grid item>
+              <PortfolioList></PortfolioList>
+            </Grid>
           </Grid>
         </Grid>
         <Grid item xs={4} className="side-bar">
@@ -47,6 +48,7 @@ function App() {
             </Grid>
             <Grid item>
               <BuyBox/>
+              <SellBox/>
             </Grid>
           </Grid>
         </Grid>
