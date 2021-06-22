@@ -18,30 +18,29 @@ export default function WatchList() {
     const watchListDataCache = React.useRef<WatchListDataInterface>({});
 
     const { watchList, updateWatchList } = React.useContext(WatchListContext);
-    
+
     // const cleanUp = () => { // need to think of a way to close this socket
-        
+
     // };
-    
+
     const { watchListData, updateWatchListData } = React.useContext(WatchListDataContext);
 
-    function messageHandler({data}: any) {
-        if (!!data && typeof data === 'string') {
-            const dataObj: WebSocketRawData = JSON.parse(data);
-            let newWatchListData = { ...watchListDataCache.current };
-            dataObj.data?.forEach(({s, p}) => {
-                newWatchListData[s] = p;
-            });
-            watchListDataCache.current = {...newWatchListData};
-            updateWatchListData(watchListDataCache.current);
-        };
-    };
+    // function messageHandler({data}: any) {
+    //     if (!!data && typeof data === 'string') {
+    //         const dataObj: WebSocketRawData = JSON.parse(data);
+    //         let newWatchListData = { ...watchListDataCache.current };
+    //         dataObj.data?.forEach(({s, p}) => {
+    //             newWatchListData[s] = p;
+    //         });
+    //         watchListDataCache.current = {...newWatchListData};
+    //         updateWatchListData(watchListDataCache.current);
+    //     };
+    // };
 
     React.useEffect(() => {
         if (socket.OPEN) {
             socket.addEventListener('open', () => {
                 console.log('socket is open');
-                socket.addEventListener('message', messageHandler);
                 watchList.stockSymbols.forEach(subscribe);
             });
         };
@@ -53,9 +52,9 @@ export default function WatchList() {
         const symbol = watchList.stockSymbols[index];
         const price = watchListData[symbol];
         return (
-            <WatchListItem 
-                key={index} 
-                style={style} 
+            <WatchListItem
+                key={index}
+                style={style}
                 symbol={symbol}
                 price={price}
             />
@@ -67,7 +66,7 @@ export default function WatchList() {
     // the drawback being that we have to hard set some of the dimensions
     // if you want to style the individual watchlist items you can either style it directly in the return block or
     //   you can add css styling to the WatchListItem
-    
+
     return <React.Fragment>
         <Card data-testid="watchlist">
             <CardHeader title="Watchlist"></CardHeader>
@@ -79,19 +78,19 @@ export default function WatchList() {
         </Card>
     </React.Fragment>;
 
-  // return <React.Fragment>
-  //   <Card data-testid="watchlist">
-  //     <CardHeader title="Watchlist"></CardHeader>
-  //     <CardContent className="watch-list">
-  //       <List>
-  //         {Object.keys(watchList.stocks).map((symbol, index) => {
-  //           return (<ListItem key={index}>
-  //             <WatchListItem data={watchList.stocks[symbol]}></WatchListItem>
-  //           </ListItem>);
-  //         })}
-  //       </List>
-  //     </CardContent>
-  //   </Card>
-  // </React.Fragment>;
+    // return <React.Fragment>
+    //   <Card data-testid="watchlist">
+    //     <CardHeader title="Watchlist"></CardHeader>
+    //     <CardContent className="watch-list">
+    //       <List>
+    //         {Object.keys(watchList.stocks).map((symbol, index) => {
+    //           return (<ListItem key={index}>
+    //             <WatchListItem data={watchList.stocks[symbol]}></WatchListItem>
+    //           </ListItem>);
+    //         })}
+    //       </List>
+    //     </CardContent>
+    //   </Card>
+    // </React.Fragment>;
 
 };

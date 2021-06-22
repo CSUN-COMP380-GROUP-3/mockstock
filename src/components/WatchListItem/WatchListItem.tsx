@@ -6,6 +6,9 @@ import { fetchCandles, errorHandler } from '../utils';
 import { ActiveStockContext } from '../../contexts/ActiveStockContext';
 import { TokenContext } from '../../contexts/TokenContext';
 import "./WatchListItem.css";
+import { Listener } from '../../interfaces/WebSocketData';
+import { listen, stopListen } from '../websocket';
+import socket from '../websocket';
 
 export interface WatchListItemProps extends CardProps {
     symbol: string;
@@ -15,10 +18,12 @@ export interface WatchListItemProps extends CardProps {
 export default function WatchListItem(props: WatchListItemProps) {
     const { style, symbol, price } = props;
     const token = React.useContext(TokenContext);
-    
+
     const { activeStock, updateActiveStock } = React.useContext(ActiveStockContext);
 
     const { to, from, stock } = activeStock;
+
+    const [displayPrice, setDisplayPrice] = React.useState(price);
 
     const onClick = async () => {
         try {
@@ -38,14 +43,33 @@ export default function WatchListItem(props: WatchListItemProps) {
                 //     candles: res.data,
                 // });
             };
-            
 
-        } catch(error) {
+
+        } catch (error) {
             errorHandler(error);
         };
 
         console.log(`${symbol} clicked from watchlist`);
     };
+
+    const updatePrice: Listener = (
+        symbolName: string,
+        price: number,
+        timestamp: number,
+        volume: number,
+        tradeConditions: string[]
+    ) => {
+        setDisplayPrice(price);
+    };
+
+    React.useEffect(() => {
+        if (socket.OPEN) {
+            listen(symbol, updatePrice);
+            return () => {
+                stopListen(symbol, updatePrice);
+            }
+        };
+    }, [socket.OPEN]);
 
     return (
         <div data-testid="watchlistitem" style={style} className="list-item" onClick={onClick}>
