@@ -1,6 +1,5 @@
 import React from 'react';
-import { subscribe, WatchListContext } from '../../contexts/WatchListContext';
-import socket from '../websocket';
+import { WatchListContext, WatchListContextInterface } from '../../contexts/WatchListContext';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
@@ -11,32 +10,21 @@ import ListItem from '@material-ui/core/ListItem';
 
 export default function WatchList() {
 
-    const { watchList, updateWatchList } = React.useContext(WatchListContext);
+    const { watchList, updateWatchList } = React.useContext<WatchListContextInterface>(WatchListContext);
 
     // const cleanUp = () => { // TODO: need to think of a way to close this socket
 
     // };
 
-    /**
-     * Once we detect that the websocket is open and working, we subscribe to each symbol in the WatchListContext
-     */
-    React.useEffect(() => {
-        if (socket.OPEN) {
-            socket.addEventListener('open', () => {
-                console.log('socket is open');
-                watchList.stockSymbols.forEach(subscribe);
-            });
-        };
-    }, [socket.OPEN]);
-
     return <React.Fragment>
         <Card data-testid="watchlist">
-            <CardHeader title="Watchlist"></CardHeader>
+            <CardHeader title="Watchlist">
+            </CardHeader>
             <CardContent className="watch-list">
                 <List>
-                    {Object.keys(watchList.stockSymbols).map((symbol, index) => {
-                        return (<ListItem key={index}>
-                            <WatchListItem symbol={watchList.stockSymbols[index]}></WatchListItem>
+                    {Object.entries(watchList).map(([symbol, value]) => {
+                        return (<ListItem key={symbol}>
+                            <WatchListItem symbol={symbol}></WatchListItem>
                         </ListItem>);
                     })}
                 </List>

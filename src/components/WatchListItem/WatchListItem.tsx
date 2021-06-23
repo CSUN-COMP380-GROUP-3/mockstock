@@ -6,9 +6,8 @@ import { fetchCandles, errorHandler } from '../utils';
 import { ActiveStockContext } from '../../contexts/ActiveStockContext';
 import { TokenContext } from '../../contexts/TokenContext';
 import { Listener } from '../../interfaces/WebSocketData';
-import socket from '../websocket';
-import { listen, stopListen } from '../../contexts/WatchListContext';
 import "./WatchListItem.css";
+import FinnHubTrade from '../websocket';
 
 export interface WatchListItemProps extends CardProps {
     symbol: string;
@@ -24,6 +23,10 @@ export default function WatchListItem(props: WatchListItemProps) {
 
     const [displayPrice, setDisplayPrice] = React.useState<number>();
 
+    /**
+     * Is called when user clicks on this component.
+     * Switches Active Context to the the Symbol that this item represents.
+     */
     const onClick = async () => {
         try {
             const res = await fetchCandles({
@@ -51,6 +54,14 @@ export default function WatchListItem(props: WatchListItemProps) {
         console.log(`${symbol} clicked from watchlist`);
     };
 
+    /**
+     * Updates the price state whenever the websocket calls it because of a message.
+     * @param symbolName 
+     * @param price 
+     * @param timestamp 
+     * @param volume 
+     * @param tradeConditions 
+     */
     const updatePrice: Listener = (
         symbolName: string,
         price: number,
@@ -61,16 +72,17 @@ export default function WatchListItem(props: WatchListItemProps) {
         setDisplayPrice(price);
     };
 
+    /**
+     * Is responsible for listening and unlistening to the websocket.
+     */
     React.useEffect(() => {
-        console.log("USE EFFECT FOR ITEM HAS BEEN CALLED");
-        if (socket.OPEN) {
-            listen(symbol, updatePrice);
+        if (FinnHubTrade.socket.OPEN) {
+            FinnHubTrade.listen(symbol, updatePrice);
             return () => {
-                console.log("ITEM HAS BEEN UNDRAWN");
-                stopListen(symbol, updatePrice);
+                FinnHubTrade.stopListen(symbol, updatePrice);
             }
         };
-    }, [socket.OPEN]);
+    }, [FinnHubTrade.socket.OPEN]);
 
     return (
         <div data-testid="watchlistitem" style={style} className="list-item" onClick={onClick}>
