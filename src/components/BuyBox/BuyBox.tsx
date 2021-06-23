@@ -141,9 +141,7 @@ export default function BuyBox(props: BuyBoxProps) {
             prev: liquidBalance.prev,
         });
 
-        updateTrades({
-            items: [trade, ...trades.items]
-        });
+        updateTrades([trade, ...trades]);
 
         let newPortfolio = {...portfolio};
         let oldTrades = newPortfolio[stock.symbol] || [];
