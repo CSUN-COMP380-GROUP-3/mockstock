@@ -12,15 +12,10 @@ import SellBox from './components/SellBox/SellBox';
 import Portfolio from './components/Portfolio/Portfolio';
 import SymbolBox from './components/SymbolBox/SymbolBox';
 
+
 import { GlobalContext } from './components/GlobalContext/GlobalContext';
-import { WatchListDataContext, WatchListDataInterface } from './contexts/WatchListDataContext';
 
 function App() {
-
-  const [ watchListData, updateWatchListData ] = React.useState<WatchListDataInterface>({});
-  const watchListDataContextProviderValue = { watchListData, updateWatchListData };
-
-  
 
   return (
     <GlobalContext>
@@ -28,25 +23,23 @@ function App() {
         <Grid item xs={8}>
           <Grid container className="main-content" direction="column" spacing={2}>
             <Grid item>
-              <Header/>
+              <Header />
             </Grid>
             <Grid item>
-              <StockChart/>
+              <StockChart />
             </Grid>
           </Grid>
         </Grid>
         <Grid item xs={4} className="side-bar">
           <Grid container spacing={2} direction="column">
             <Grid item>
-              <LiquidBalance/>
+              <LiquidBalance />
             </Grid>
             <Grid item>
-              <WatchListDataContext.Provider value={watchListDataContextProviderValue}>
-                <WatchList/>
-              </WatchListDataContext.Provider>
+              <WatchList />
             </Grid>
             <Grid item>
-              <BuyBox/>
+              <BuyBox />
             </Grid>
           </Grid>
         </Grid>
