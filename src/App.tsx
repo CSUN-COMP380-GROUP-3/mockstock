@@ -9,27 +9,25 @@ import LiquidBalance from './components/LiquidBalance/LiquidBalance';
 import WatchList from './components/WatchList/WatchList';
 import SellBox from './components/SellBox/SellBox';
 
+
 import { GlobalContext } from './components/GlobalContext/GlobalContext';
-import { WatchListDataContext, WatchListDataInterface } from './contexts/WatchListDataContext';
-import PortfolioList from './components/Portfolio/Portfolio';
+import StockInfo from './components/StockInfo/StockInfo';
 
 function App() {
-
-  const [ watchListData, updateWatchListData ] = React.useState<WatchListDataInterface>({});
-  const watchListDataContextProviderValue = { watchListData, updateWatchListData };
-
-  
 
   return (
     <GlobalContext>
       <Grid container alignItems="stretch" spacing={0} className="all-content">
         <Grid item xs={8}>
-          <Grid container className="main-content" direction="column" spacing={2}>
+          <Grid container className="main-content" direction="column" alignContent="stretch" spacing={2}>
             <Grid item>
-              <Header/>
+              <Header />
             </Grid>
             <Grid item>
-              <StockChart/>
+              <StockInfo />
+            </Grid>
+            <Grid item>
+              <StockChart />
             </Grid>
             <Grid item>
               <PortfolioList></PortfolioList>
@@ -39,12 +37,10 @@ function App() {
         <Grid item xs={4} className="side-bar">
           <Grid container spacing={2} direction="column">
             <Grid item>
-              <LiquidBalance/>
+              <LiquidBalance />
             </Grid>
             <Grid item>
-              <WatchListDataContext.Provider value={watchListDataContextProviderValue}>
-                <WatchList/>
-              </WatchListDataContext.Provider>
+              <WatchList />
             </Grid>
             <Grid item>
               <BuyBox/>
