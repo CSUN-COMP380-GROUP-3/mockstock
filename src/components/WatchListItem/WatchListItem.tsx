@@ -2,12 +2,11 @@ import React from 'react';
 import { CardProps } from '@material-ui/core/Card';
 import Typography from '@material-ui/core/Typography';
 import currency from 'currency.js';
-import { fetchCandles, errorHandler } from '../utils';
-import { ActiveStockContext } from '../../contexts/ActiveStockContext';
-import { TokenContext } from '../../contexts/TokenContext';
+import { ActiveStockContext, getStockInfoForFrom } from '../../contexts/ActiveStockContext';
 import { Listener } from '../../interfaces/WebSocketData';
 import "./WatchListItem.css";
 import FinnHubTrade from '../websocket';
+import { filteredSymbols } from '../../contexts/StockSymbolsContext';
 
 export interface WatchListItemProps extends CardProps {
     symbol: string;
@@ -15,7 +14,6 @@ export interface WatchListItemProps extends CardProps {
 
 export default function WatchListItem(props: WatchListItemProps) {
     const { symbol, style } = props;
-    const token = React.useContext(TokenContext);
 
     const { activeStock, updateActiveStock } = React.useContext(ActiveStockContext);
 
@@ -28,30 +26,10 @@ export default function WatchListItem(props: WatchListItemProps) {
      * Switches Active Context to the the Symbol that this item represents.
      */
     const onClick = async () => {
-        try {
-            const res = await fetchCandles({
-                symbol,
-                from: from.unix(),
-                to: to.unix(),
-                resolution: 'D',
-                token
-            });
-            if (!!res.data) {
-                console.log(res.data);
-                // updateActiveStock({
-                //     stock,
-                //     to,
-                //     from,
-                //     candles: res.data,
-                // });
-            };
-
-
-        } catch (error) {
-            errorHandler(error);
-        };
-
         console.log(`${symbol} clicked from watchlist`);
+        getStockInfoForFrom(filteredSymbols.find(s => s.symbol === symbol) || filteredSymbols[0], from, to).then((activeStockInfo) => {
+            updateActiveStock(activeStockInfo);
+        });
     };
 
     /**

@@ -6,6 +6,8 @@ import { QuoteQuery } from "../interfaces/QuoteData";
 export const FH_OHLC_ENDPOINT = 'https://finnhub.io/api/v1/stock/candle?';
 export const FH_Q_ENDPOINT = 'https://finnhub.io/api/v1/quote?';
 
+//TODO: Can combine the fetch calls into a generic "fetch" function, but probably unecessary?
+
 /**Fetches Candlestick information from FinnHub API */
 export function fetchCandles(query: CandleStickQuery) {
     const urlParams = querystring.stringify(query as any);
