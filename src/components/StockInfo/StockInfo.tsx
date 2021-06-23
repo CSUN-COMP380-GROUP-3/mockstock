@@ -17,6 +17,7 @@ export default function StockInfo() {
 
 	const { stock, to, from } = activeStock;
 
+	/**Depending on whether the active symbol is already within the watchlist, adds or removes the active symbol to the watchlist */
 	const manipWatchList = () => {
 		if (watchList[stock.symbol] === undefined) {
 			// item is not already in watchlist, time to add to WatchList
@@ -27,10 +28,16 @@ export default function StockInfo() {
 		}
 	}
 
+	/**
+	 * If the user is viewing this during off-hours, this ensures that the display price will always at least have the most current price.
+	 */
 	React.useEffect(() => {
 		setDisplayPrice(activeStock.quote.c);
 	}, []);
 
+	/**
+	 * Sets up a listener for the active symbol to retrieve live price data every time the active stock changes.
+	 */
 	React.useEffect(() => {
 		setDisplayPrice(activeStock.quote.c);
 		if (WS.socket.OPEN) {
@@ -59,10 +66,12 @@ export default function StockInfo() {
 		setDisplayPrice(price);
 	};
 
+	/**Computes price change from last day's closing price */
 	const changeFromYesterday = () => {
 		return activeStock.quote.pc - displayPrice;
 	}
 
+	/**Computes the percent change from last day's closing price */
 	const percentChangeFromYesterday = () => {
 		return changeFromYesterday() * 100 / activeStock.quote.pc;
 	}

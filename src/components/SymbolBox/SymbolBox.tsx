@@ -104,13 +104,14 @@ export default function SymbolBox(props: SymbolBoxProps) {
 
     const { stock, to, from } = activeStock;
 
-    // when the value of this changes then we need to update the active stock
-    const onChange = async (event: any, value: any) => {
+    /**Triggers when the user selects a symbol from the SymbolBox */
+    const onSelect = async (event: any, value: any) => {
         getStockInfoForFrom(value, from, to).then((activeStockInfo) => {
             updateActiveStock(activeStockInfo);
         });
     };
 
+    /**Initializes Active Stock Context with what ever initial symbol was loaded in Active Stock Context */
     React.useEffect(() => {
         getStockInfoForFrom(stock, from, to).then((activeStockInfo) => {
             updateActiveStock(activeStockInfo);
@@ -127,7 +128,7 @@ export default function SymbolBox(props: SymbolBoxProps) {
             groupBy={groupBy}
             renderInput={(params) => <TextField {...params} variant="outlined"></TextField>}
             getOptionLabel={getOptionLabel}
-            onChange={onChange}
+            onChange={onSelect}
             autoSelect={true}
             autoHighlight={true}
             value={stock}

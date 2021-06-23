@@ -1,3 +1,4 @@
+/**The expected API response from a Quote API call from FinnHub */
 export interface QuoteData {
   o: number; // Open price of the day
   h: number; // High price of the day
@@ -6,6 +7,7 @@ export interface QuoteData {
   pc: number; // Previous close price
 };
 
+/**The expected arguments for a Quote Query to FinnHub */
 export interface QuoteQuery {
   symbol: string;
   token: string;
