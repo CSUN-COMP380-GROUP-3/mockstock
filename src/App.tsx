@@ -12,6 +12,7 @@ import SellBox from './components/SellBox/SellBox';
 
 import { GlobalContext } from './components/GlobalContext/GlobalContext';
 import StockInfo from './components/StockInfo/StockInfo';
+import PortfolioList from './components/Portfolio/Portfolio';
 
 function App() {
 
