@@ -22,7 +22,7 @@ function App() {
     <GlobalContext>
       <Grid container alignItems="stretch" spacing={0} className="all-content">
         <Grid item xs={8}>
-          <Grid container className="main-content" direction="column" spacing={2}>
+          <Grid container className="main-content" direction="column" alignContent="stretch" spacing={2}>
             <Grid item>
               <Header />
             </Grid>

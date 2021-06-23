@@ -10,6 +10,7 @@ import { filteredSymbols } from '../../contexts/StockSymbolsContext';
 import { ActiveStockContext } from '../../contexts/ActiveStockContext';
 import { fetchCandles, errorHandler } from '../utils';
 import { TokenContext } from '../../contexts/TokenContext';
+import "./SymbolBox.css"
 
 const LISTBOX_PADDING = 8; // px
 
@@ -104,11 +105,11 @@ const renderGroup = (params: AutocompleteRenderGroupParams) => [
     params.children,
 ];
 
-export const getOptionLabel = ({symbol, description}: StockSymbolData) => `${symbol} - ${description}`;
+export const getOptionLabel = ({ symbol, description }: StockSymbolData) => `${symbol} - ${description}`;
 
-export const groupBy = ({symbol}: StockSymbolData) => symbol[0];
+export const groupBy = ({ symbol }: StockSymbolData) => symbol[0];
 
-export interface SymbolBoxProps extends Partial<AutocompleteProps<StockSymbolData, false, false, false>> {};
+export interface SymbolBoxProps extends Partial<AutocompleteProps<StockSymbolData, false, false, false>> { };
 
 export default function SymbolBox(props: SymbolBoxProps) {
     const token = React.useContext(TokenContext);
@@ -130,28 +131,28 @@ export default function SymbolBox(props: SymbolBoxProps) {
                     resolution: 'D',
                     token,
                 });
-    
+
                 updateActiveStock({
                     ...activeStock,
                     stock: value,
                     candles: res.data,
                 });
             }
-        } catch(error) {
+        } catch (error) {
             errorHandler(error);
         };
     };
 
     return (
         <Autocomplete
-            style={{ width: 400 }}
+            className="symbol-box"
             disableListWrap
             classes={classes}
             ListboxComponent={ListboxComponent as React.ComponentType<React.HTMLAttributes<HTMLElement>>}
             renderGroup={renderGroup}
             options={filteredSymbols}
             groupBy={groupBy}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Stock Symbol"></TextField>}
+            renderInput={(params) => <TextField {...params} variant="outlined"></TextField>}
             getOptionLabel={getOptionLabel}
             onChange={onChange}
             autoSelect={true}
