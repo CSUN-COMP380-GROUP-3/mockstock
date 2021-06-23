@@ -22,7 +22,6 @@ export default function DatePicker(props: DatePickerProps) {
                 }}
                 disableFuture={true}
                 disableToolbar={true}
-                minDate={minDate}
                 data-testid="datepicker"
             />
         </MuiPickersUtilsProvider>
