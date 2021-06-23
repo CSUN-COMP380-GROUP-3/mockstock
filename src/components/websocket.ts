@@ -22,6 +22,7 @@ module FinnHubTrade {
      */
     const listenerDispatch: {
         [stockSymbol: string]: {
+            dispatched: boolean,
             listeners: [Listener]
         }
     } = {};
@@ -43,13 +44,20 @@ module FinnHubTrade {
     function tradesHandler({ data }: any) {
         if (!!data && typeof data === 'string') {
             const dataObj: WebSocketRawData = JSON.parse(data);
-            dataObj.data?.forEach(({ s, p, t, v, c }) => {
-                if (listenerDispatch[s] !== undefined) {
+            // the response is reversed so that we hit the most recent trade first.
+            dataObj.data?.reverse().forEach(({ s, p, t, v, c }) => {
+                if (listenerDispatch[s] !== undefined && listenerDispatch[s].dispatched === false) {
                     // for each listener for this symbol, pass received data to each listener.
                     listenerDispatch[s].listeners.forEach((listener: Listener) => {
                         listener(s, p, t, v, c);
                     })
+                    // mark the symbol as dispatched so other trades (with the same symbol) are not sent to the listeners.
+                    listenerDispatch[s].dispatched = true;
                 }
+            })
+            // resets all symbol.dispatched to false
+            Object.keys(listenerDispatch).map((symbol) => {
+                listenerDispatch[symbol].dispatched = false;
             })
         };
     };
@@ -63,6 +71,7 @@ module FinnHubTrade {
         // console.log(`listen called for ${symbol}`);
         if (listenerDispatch[symbol] === undefined) {
             listenerDispatch[symbol] = {
+                dispatched: false,
                 listeners: [newListener]
             }
             websocketOpened.then(() => {
