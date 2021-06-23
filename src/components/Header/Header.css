@@ -1,12 +1,12 @@
 img {
-  height: 5rem;
+  height: 3.5rem;
 }
 
 .subtitle {
   position: relative;
   margin: 0;
-  margin-top: -1rem;
-  font-size: 1rem;
+  margin-top: -.8rem;
+  font-size: .8rem;
   width: 100%;
   text-align: center;
   font-weight: lighter;
@@ -14,5 +14,5 @@ img {
 }
 
 .symbol-box-container {
-  padding-left: 6rem;
+  padding-left: 4rem;
 }
