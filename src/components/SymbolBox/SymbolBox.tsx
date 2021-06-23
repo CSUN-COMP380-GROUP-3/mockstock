@@ -88,16 +88,6 @@ const ListboxComponent = React.forwardRef<HTMLDivElement>(function ListboxCompon
 
 });
 
-const useStyles = makeStyles({
-    listbox: {
-        boxSizing: 'border-box',
-        '& ul': {
-            padding: 0,
-            margin: 0
-        },
-    },
-});
-
 const renderGroup = (params: AutocompleteRenderGroupParams) => [
     <ListSubheader key={params.key} component="div">
         {params.group}
@@ -114,8 +104,6 @@ export interface SymbolBoxProps extends Partial<AutocompleteProps<StockSymbolDat
 export default function SymbolBox(props: SymbolBoxProps) {
     const token = React.useContext(TokenContext);
     const { activeStock, updateActiveStock } = React.useContext(ActiveStockContext);
-
-    const classes = useStyles();
 
     const { stock, to, from } = activeStock;
 
@@ -147,7 +135,6 @@ export default function SymbolBox(props: SymbolBoxProps) {
         <Autocomplete
             className="symbol-box"
             disableListWrap
-            classes={classes}
             ListboxComponent={ListboxComponent as React.ComponentType<React.HTMLAttributes<HTMLElement>>}
             renderGroup={renderGroup}
             options={filteredSymbols}
