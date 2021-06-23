@@ -27,13 +27,25 @@ export const initTradesContext: TradesContextInterface = {
         return this.filterBySymbol(symbol)
             .reduce((acc, { total, price, type }) => {
                 const shares = total.value / price!.value;
-                return acc += shares;
+                if (type === 'BUY') {
+                    acc += shares
+                } else {
+                    // SELL
+                    acc -= shares
+                };
+                return acc;
             }, 0);
     },
     getTotalAmountBySymbol: function(symbol?: string): currency {
         return this.filterBySymbol(symbol)
             .reduce((acc, { total, type }) => {
-                return acc.add(total);
+                if (type === 'BUY') {
+                    acc = acc.add(total);
+                } else {
+                    // SELL
+                    acc = acc.subtract(total);
+                };
+                return acc;
             }, currency(0));
     },
     getEarliestDateBySymbol: function(symbol?: string): Moment {
@@ -43,6 +55,7 @@ export const initTradesContext: TradesContextInterface = {
                     if (!!acc) {
                         acc = date.isBefore(acc) ? date : acc;
                     } else {
+                        // SELL
                         acc = date;
                     };
                 };
