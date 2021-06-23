@@ -1,6 +1,4 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
 import moment from 'moment';
 import Typography from '@material-ui/core/Typography';
 import Slider from '@material-ui/core/Slider';
@@ -14,21 +12,10 @@ import { PortfolioContext } from '../../contexts/PortfolioContext';
 import DatePicker, { maxDate } from '../DatePicker/DatePicker';
 import { BaseKeyboardPickerProps } from '@material-ui/pickers/_shared/hooks/useKeyboardPickerState';
 import { minDate } from '../../components/DatePicker/DatePicker';
-import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
 import { LiquidBalanceContext } from '../../contexts/LiquidBalanceContext';
 import { ActiveStockContext } from '../../contexts/ActiveStockContext';
 import { fetchCandles, errorHandler } from '../utils';
 import Input from '../Input/Input';
-import Stock from '../../interfaces/Stock';
-
-const useStyles = makeStyles({
-  root: {
-    width: 250,
-  },
-  input: {
-    width: 95,
-  },
-});
 
 export interface BuyBoxForm extends Trade {
     type: 'BUY',
@@ -36,8 +23,7 @@ export interface BuyBoxForm extends Trade {
 
 export interface BuyBoxProps { };
 
-export default function BuyBox(props: BuyBoxProps) {
-    const classes = useStyles();
+export default function BuyBox() {
 
     const isInit = React.useRef(false);
 
@@ -50,7 +36,7 @@ export default function BuyBox(props: BuyBoxProps) {
     const { liquidBalance, updateLiquidBalance } = React.useContext(LiquidBalanceContext);
     const { curr } = liquidBalance;
 
-    const { trades, updateTrades } = React.useContext(TradesContext);
+    const tradesContext = React.useContext(TradesContext);
 
     const { portfolio, updatePortfolio } = React.useContext(PortfolioContext);
 
@@ -141,7 +127,7 @@ export default function BuyBox(props: BuyBoxProps) {
             prev: liquidBalance.prev,
         });
 
-        updateTrades([trade, ...trades]);
+        tradesContext.updateTrades([trade, ...tradesContext.trades]);
 
         let newPortfolio = {...portfolio};
         let oldTrades = newPortfolio[stock.symbol] || [];
@@ -160,11 +146,6 @@ export default function BuyBox(props: BuyBoxProps) {
         return currency(buyAmount);
     };
 
-    const getShares = () => {
-        // # of shares = amount spent / price of stock
-        return getTotal().divide(getPrice());
-    };
-
     const isDisabled = () => {
 
         return !oneDayCandle;
@@ -178,51 +159,62 @@ export default function BuyBox(props: BuyBoxProps) {
         updateBuyAmount(value);
     }; 
 
+    const getMarks = (maxAmount: number) => curr.value === 0 ? [] : [
+        {
+            value: 0,
+            label: '0%',
+        },
+        {
+            value: maxAmount * 0.25,
+            label: '25%',
+        },
+        {
+            value: maxAmount * 0.5,
+            label: '50%',
+        },
+        {
+            value: maxAmount * 0.75,
+            label: '75%',
+        },
+        {
+            value: maxAmount,
+            label: '100%',
+        },
+    ];
+
     return (
-        <div data-testid="buybox" className={classes.root}>
-            <form>
-                <Typography id="input-slider" gutterBottom variant="h5">Buy {stock.symbol}</Typography>
-                <DatePicker
-                    id="buyDate"
-                    label="Buy Date"
-                    value={date}
-                    onChange={onChangeBuyDate}
-                    minDate={minDate}
-                    maxDate={maxDate}
-                />
-                <Grid container spacing={2} alignItems="center">
-                    <Grid item>
-                        <MonetizationOnIcon/>
-                    </Grid>
-                    <Grid item xs>
-                        <Slider
-                            value={buyAmount}
-                            onChange={onChangeSlider}
-                            max={curr.value}
-                        />
-                    </Grid>
-                    <Grid item>
-                        <Input
-                            className={classes.input}
-                            adornment="$"
-                            value={buyAmount}
-                            onChange={onChangeInput}
-                            inputProps={{
-                                type: 'number',
-                                min: 0,
-                                step: 0.01,
-                                max: curr.value,
-                            }}
-                        />
-                    </Grid>
-                </Grid>
-                <Button
-                    disabled={isDisabled()}
-                    variant="contained"
-                    onClick={onClick}
-                >Buy
-                </Button>
-            </form>
+        <div data-testid="buybox">
+            <Typography id="input-slider" gutterBottom variant="h5">Buy {stock.symbol}</Typography>
+            <DatePicker
+                id="buyDate"
+                label="Buy Date"
+                value={date}
+                onChange={onChangeBuyDate}
+                minDate={minDate}
+                maxDate={maxDate}
+            />
+            <Input
+                adornment="$"
+                value={buyAmount}
+                onChange={onChangeInput}
+                inputProps={{
+                    type: 'number',
+                    min: 0,
+                    step: 0.01,
+                    max: curr.value,
+                }}
+            />
+            <Slider
+                value={buyAmount}
+                onChange={onChangeSlider}
+                marks={getMarks(curr.value)}
+                max={curr.value}
+            />
+            <Button
+                disabled={isDisabled()}
+                onClick={onClick}
+            >Buy
+            </Button>
         </div>
     );
 };
