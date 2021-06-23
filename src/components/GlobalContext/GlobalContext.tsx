@@ -4,7 +4,7 @@ import { TokenContext, TOKEN } from '../../contexts/TokenContext';
 import { StockSymbolsContext, filteredSymbols } from '../../contexts/StockSymbolsContext';
 import { initLiquidBalanceContext, LiquidBalanceContext, LiquidBalanceInterface } from '../../contexts/LiquidBalanceContext';
 import { WatchListContext, WatchListTracker, WatchListInterface } from '../../contexts/WatchListContext';
-import { initTradesContext, TradesContext, TradesInterface } from '../../contexts/TradesContext';
+import { tradesProviderValue, TradesContext, TradesInterface } from '../../contexts/TradesContext';
 import { ActiveStockContext, ActiveStockInterface, initActiveStockContext } from '../../contexts/ActiveStockContext';
 import { initPortfolioContext, PortfolioContext, PortfolioInterface } from '../../contexts/PortfolioContext';
 
@@ -19,9 +19,10 @@ export const GlobalContext: React.FC = ({ children }) => {
 
     const [watchList, updateWatchList] = React.useState<WatchListInterface>(WatchListTracker.WatchList);
     const watchListProviderValue = { watchList, updateWatchList };
-
-    const [trades, updateTrades] = React.useState<TradesInterface>(initTradesContext.trades);
-    const tradesProviderValue = { trades, updateTrades };
+    
+    const [trades, updateTrades] = React.useState<TradesInterface>(tradesProviderValue.trades);
+    tradesProviderValue.trades = trades;
+    tradesProviderValue.updateTrades = updateTrades;
 
     const [ portfolio, updatePortfolio ] = React.useState<PortfolioInterface>(initPortfolioContext.portfolio);
     const stocksProviderValue = { portfolio, updatePortfolio };
