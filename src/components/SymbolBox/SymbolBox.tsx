@@ -7,8 +7,8 @@ import { useTheme, makeStyles } from '@material-ui/core/styles';
 import { VariableSizeList, ListChildComponentProps } from 'react-window';
 import StockSymbolData from '../../interfaces/StockSymbolData';
 import { filteredSymbols } from '../../contexts/StockSymbolsContext';
-import { ActiveStockContext } from '../../contexts/ActiveStockContext';
-import { fetchCandles, errorHandler } from '../utils';
+import { ActiveStockContext, initSymbol, getStockInfoForFrom } from '../../contexts/ActiveStockContext';
+import { fetchCandles, errorHandler, fetchQuote } from '../utils';
 import { TokenContext } from '../../contexts/TokenContext';
 import "./SymbolBox.css"
 
@@ -110,26 +110,42 @@ export default function SymbolBox(props: SymbolBoxProps) {
     // when the value of this changes then we need to update the active stock
     const onChange = async (event: any, value: any) => {
         // need to fetch the candles here too
-        try {
-            if (!!value) {
-                const res = await fetchCandles({
-                    symbol: stock.symbol,
-                    from: from.unix(),
-                    to: to.unix(),
-                    resolution: 'D',
-                    token,
-                });
+        // try {
+        //     if (!!value) {
+        //         const candleResponse = await fetchCandles({
+        //             symbol: stock.symbol,
+        //             from: from.unix(),
+        //             to: to.unix(),
+        //             resolution: 'D',
+        //             token,
+        //         });
 
-                updateActiveStock({
-                    ...activeStock,
-                    stock: value,
-                    candles: res.data,
-                });
-            }
-        } catch (error) {
-            errorHandler(error);
-        };
+        //         const quoteResponse = await fetchQuote({
+        //             symbol: stock.symbol,
+        //             token
+        //         });
+
+        //         updateActiveStock({
+        //             ...activeStock,
+        //             stock: value,
+        //             quote: quoteResponse.data,
+        //             candles: candleResponse.data,
+        //         });
+        //     }
+        // } catch (error) {
+        //     errorHandler(error);
+        // };
+
+        getStockInfoForFrom(value, from, to).then((activeStockInfo) => {
+            updateActiveStock(activeStockInfo);
+        });
     };
+
+    React.useEffect(() => {
+        getStockInfoForFrom(stock, from, to).then((activeStockInfo) => {
+            updateActiveStock(activeStockInfo);
+        });
+    }, [])
 
     return (
         <Autocomplete
