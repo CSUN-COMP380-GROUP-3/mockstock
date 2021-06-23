@@ -14,6 +14,7 @@ import SymbolBox from './components/SymbolBox/SymbolBox';
 
 
 import { GlobalContext } from './components/GlobalContext/GlobalContext';
+import StockInfo from './components/StockInfo/StockInfo';
 
 function App() {
 
@@ -24,6 +25,9 @@ function App() {
           <Grid container className="main-content" direction="column" spacing={2}>
             <Grid item>
               <Header />
+            </Grid>
+            <Grid item>
+              <StockInfo />
             </Grid>
             <Grid item>
               <StockChart />
