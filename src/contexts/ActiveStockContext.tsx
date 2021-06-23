@@ -19,8 +19,8 @@ export interface ActiveStockInterface {
     stock: StockSymbolData;
     from: Moment; // from and to are the date range of the candle data
     to: Moment;
-    quote?: QuoteData;
-    candles?: CandleStickData;
+    quote: QuoteData;
+    candles: CandleStickData;
 };
 
 export interface ActiveStockContextInterface {
@@ -66,8 +66,8 @@ export const initActiveStockContext: ActiveStockContextInterface = {
         stock: filteredSymbols.find(s => s.symbol === initSymbol) || filteredSymbols[0],
         from: minDate,
         to: maxDate,
-        quote: undefined,
-        candles: initCandles || []
+        quote: { o: 1, h: 1, l: 1, c: 1, pc: 1 },
+        candles: { c: [], h: [], l: [], o: [], s: "", v: [], t: [] }
     },
     updateActiveStock: () => { }
 };

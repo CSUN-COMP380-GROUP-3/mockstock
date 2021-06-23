@@ -1,9 +1,15 @@
-.stock-info {
+.active-stock-info {
   color: white;
 }
 
-.watchlist-button {
+.active-stock-name {}
+
+.active-watchlist-button {
   /* background: #ffffff00; */
   color: white;
   /* height: 100%; */
 }
+
+.active-stock-price {}
+
+.active-stock.percent-change {}

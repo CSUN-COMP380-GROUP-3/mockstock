@@ -106,33 +106,6 @@ export default function SymbolBox(props: SymbolBoxProps) {
 
     // when the value of this changes then we need to update the active stock
     const onChange = async (event: any, value: any) => {
-        // need to fetch the candles here too
-        // try {
-        //     if (!!value) {
-        //         const candleResponse = await fetchCandles({
-        //             symbol: stock.symbol,
-        //             from: from.unix(),
-        //             to: to.unix(),
-        //             resolution: 'D',
-        //             token,
-        //         });
-
-        //         const quoteResponse = await fetchQuote({
-        //             symbol: stock.symbol,
-        //             token
-        //         });
-
-        //         updateActiveStock({
-        //             ...activeStock,
-        //             stock: value,
-        //             quote: quoteResponse.data,
-        //             candles: candleResponse.data,
-        //         });
-        //     }
-        // } catch (error) {
-        //     errorHandler(error);
-        // };
-
         getStockInfoForFrom(value, from, to).then((activeStockInfo) => {
             updateActiveStock(activeStockInfo);
         });
