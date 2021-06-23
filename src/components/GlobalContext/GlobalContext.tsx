@@ -3,24 +3,24 @@ import React from 'react';
 import { TokenContext, TOKEN } from '../../contexts/TokenContext';
 import { StockSymbolsContext, filteredSymbols } from '../../contexts/StockSymbolsContext';
 import { initLiquidBalanceContext, LiquidBalanceContext, LiquidBalanceInterface } from '../../contexts/LiquidBalanceContext';
-import { initWatchListContext, WatchListContext, WatchListInterface } from '../../contexts/WatchListContext';
+import { WatchListContext, WatchListTracker, WatchListInterface } from '../../contexts/WatchListContext';
 import { initTradesContext, TradesContext, TradesInterface } from '../../contexts/TradesContext';
 import { ActiveStockContext, ActiveStockInterface, initActiveStockContext } from '../../contexts/ActiveStockContext';
 import { initPortfolioContext, PortfolioContext, PortfolioInterface } from '../../contexts/PortfolioContext';
 
 
 
-export const GlobalContext: React.FC = ({children}) => {
+export const GlobalContext: React.FC = ({ children }) => {
     const [liquidBalance, updateLiquidBalance] = React.useState<LiquidBalanceInterface>(initLiquidBalanceContext.liquidBalance);
     const liquidBalanceProviderValue = { liquidBalance, updateLiquidBalance };
 
     const [activeStock, updateActiveStock] = React.useState<ActiveStockInterface>(initActiveStockContext.activeStock);
     const activeStockProviderValue = { activeStock, updateActiveStock };
 
-    const [ watchList, updateWatchList ] = React.useState<WatchListInterface>(initWatchListContext.watchList);
+    const [watchList, updateWatchList] = React.useState<WatchListInterface>(WatchListTracker.WatchList);
     const watchListProviderValue = { watchList, updateWatchList };
 
-    const [ trades, updateTrades ] = React.useState<TradesInterface>(initTradesContext.trades);
+    const [trades, updateTrades] = React.useState<TradesInterface>(initTradesContext.trades);
     const tradesProviderValue = { trades, updateTrades };
 
     const [ portfolio, updatePortfolio ] = React.useState<PortfolioInterface>(initPortfolioContext.portfolio);

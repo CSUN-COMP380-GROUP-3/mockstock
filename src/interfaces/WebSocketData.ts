@@ -8,3 +8,11 @@ export interface WebSocketRawData {
         c: string[]; // trade conditions found here https://docs.google.com/spreadsheets/d/1PUxiSWPHSODbaTaoL2Vef6DgU-yFtlRGZf19oBb9Hp0/edit#gid=0
     }[]
 };
+
+export type Listener = (
+    symbolName: string,
+    price: number,
+    timestamp: number,
+    volume: number,
+    tradeConditions: string[]
+) => void;
