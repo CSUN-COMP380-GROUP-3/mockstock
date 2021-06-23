@@ -3,13 +3,11 @@ import TextField from '@material-ui/core/TextField';
 import Autocomplete, { AutocompleteProps, AutocompleteRenderGroupParams } from '@material-ui/lab/Autocomplete';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import ListSubheader from '@material-ui/core/ListSubheader';
-import { useTheme, makeStyles } from '@material-ui/core/styles';
+import { useTheme } from '@material-ui/core/styles';
 import { VariableSizeList, ListChildComponentProps } from 'react-window';
 import StockSymbolData from '../../interfaces/StockSymbolData';
 import { filteredSymbols } from '../../contexts/StockSymbolsContext';
-import { ActiveStockContext, initSymbol, getStockInfoForFrom } from '../../contexts/ActiveStockContext';
-import { fetchCandles, errorHandler, fetchQuote } from '../utils';
-import { TokenContext } from '../../contexts/TokenContext';
+import { ActiveStockContext, getStockInfoForFrom } from '../../contexts/ActiveStockContext';
 import "./SymbolBox.css"
 
 const LISTBOX_PADDING = 8; // px
@@ -102,7 +100,6 @@ export const groupBy = ({ symbol }: StockSymbolData) => symbol[0];
 export interface SymbolBoxProps extends Partial<AutocompleteProps<StockSymbolData, false, false, false>> { };
 
 export default function SymbolBox(props: SymbolBoxProps) {
-    const token = React.useContext(TokenContext);
     const { activeStock, updateActiveStock } = React.useContext(ActiveStockContext);
 
     const { stock, to, from } = activeStock;
