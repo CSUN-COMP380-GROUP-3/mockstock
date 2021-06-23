@@ -17,6 +17,11 @@ export interface TradesContextInterface {
     earliestDate: Moment;
 };
 
+/**
+ * TradesProviderValue is a class that wraps around the trades and updateTrades, both of which
+ * come from useState hook. The reasoning behind this wrapper is because the handling of the trades
+ * data should be the responsibility of the TradesContext and not the components.
+ */
 export class TradesProviderValue implements TradesContextInterface {
     trades: TradesInterface;
     updateTrades: (trades: TradesInterface) => void;
@@ -25,12 +30,22 @@ export class TradesProviderValue implements TradesContextInterface {
         this.updateTrades = () => {};
     };
 
+    /**
+     * Takes a unique stock by symbol and returns an array of Trades, filtered
+     * by the symbol
+     * @param symbol The stock's unique identifier
+     */
     filterBySymbol(symbol?: string) {
         if (!!symbol) {
             return this.trades.filter(({stock}) => stock.symbol === symbol);
         };
         return this.trades;
     };
+
+    /**
+     * Returns the total sum of all the trades filtered by symbol as a currency object
+     * @param symbol The stock's unique identifier
+     */
     getTotalAmountBySymbol(symbol?: string): currency {
         return this.filterBySymbol(symbol)
             .reduce((acc, { total, type }) => {
@@ -44,6 +59,11 @@ export class TradesProviderValue implements TradesContextInterface {
             }, currency(0));
     };
 
+    /**
+     * Returns the total number of shares filtered by symbol
+     * @param symbol The stock's unique identifier
+     * @returns 
+     */
     getTotalSharesBySymbol(symbol?: string): number {
         return this.filterBySymbol(symbol)
             .reduce((acc, { total, price, type }) => {
@@ -58,6 +78,10 @@ export class TradesProviderValue implements TradesContextInterface {
             }, 0);
     };
 
+    /**
+     * Returns the earliest trade, filtered by symbol as a Moment object
+     * @param symbol The stock's unique identifier
+     */
     getEarliestDateBySymbol(symbol?: string): Moment {
         return this.filterBySymbol(symbol)
             .reduce((acc, { date, type }) => {

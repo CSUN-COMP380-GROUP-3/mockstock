@@ -34,6 +34,10 @@ export default function SellBox() {
 
     const { liquidBalance, updateLiquidBalance } = React.useContext(LiquidBalanceContext);
 
+    /**
+     * Very important that we do not dereference this object as the internal 'this' keyword becomes undefined
+     * when you do const { trades, updateTrades } = TradesContext;
+     */
     const tradesContext = React.useContext(TradesContext);
 
     const { portfolio, updatePortfolio } = React.useContext(PortfolioContext);
