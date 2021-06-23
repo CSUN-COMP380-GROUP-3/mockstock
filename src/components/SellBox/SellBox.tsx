@@ -149,9 +149,7 @@ export default function SellBox() {
             prev: liquidBalance.prev,
         });
 
-        updateTrades({
-            items: [trade, ...trades.items]
-        });
+        updateTrades([trade, ...trades]);
 
         // remove assets from portfolio
         let newPortfolio = {...portfolio};
@@ -205,7 +203,7 @@ export default function SellBox() {
     ];
 
     const processTrades = () => {
-        return trades.items
+        return trades
             .filter(({stock}) => stock.symbol === activeStock.stock.symbol)
             .reduce((acc, curr) => {
                 const { totalBuyShares, totalSellShares, earliestDate } = acc;
