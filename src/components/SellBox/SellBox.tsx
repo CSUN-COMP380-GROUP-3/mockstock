@@ -3,7 +3,7 @@ import Typography from '@material-ui/core/Typography';
 import { ActiveStockContext } from '../../contexts/ActiveStockContext';
 import { LiquidBalanceContext } from '../../contexts/LiquidBalanceContext';
 import DatePicker, {minDate, maxDate} from '../DatePicker/DatePicker';
-import moment, { Moment } from 'moment';
+import moment from 'moment';
 import { BaseKeyboardPickerProps } from '@material-ui/pickers/_shared/hooks/useKeyboardPickerState';
 import { Button } from '@material-ui/core';
 import Trade from '../../interfaces/Trade';
@@ -23,12 +23,6 @@ export interface SellBoxForm extends Trade {
 export interface SellBoxProps {
 };
 
-interface ProcessedData {
-    totalBuyShares: currency;
-    totalSellShares: currency;
-    earliestDate?: Moment;
-};
-
 export default function SellBox() {
     const isInit = React.useRef(false);
 
@@ -40,13 +34,19 @@ export default function SellBox() {
 
     const { liquidBalance, updateLiquidBalance } = React.useContext(LiquidBalanceContext);
 
+    /**
+     * Very important that we do not dereference this object as the internal 'this' keyword becomes undefined
+     * when you do const { trades, updateTrades } = TradesContext;
+     */
     const tradesContext = React.useContext(TradesContext);
-    const { trades, updateTrades } = tradesContext;
 
     const { portfolio, updatePortfolio } = React.useContext(PortfolioContext);
 
+    const totalShares = tradesContext.getTotalSharesBySymbol(stock.symbol);
+    const earliestDate = tradesContext.getEarliestDateBySymbol(stock.symbol);
+
     const [ form, updateForm ] = React.useState<SellBoxForm>({
-        date: minDate, // because we cannot sell prior to time it was first purchased, the buy date should be the minimum date
+        date: earliestDate || minDate, // because we cannot sell prior to time it was first purchased, the buy date should be the minimum date
         total: currency(0),
         type: 'SELL',
         stock,
@@ -60,14 +60,12 @@ export default function SellBox() {
     // this state controls the oneDayCandle aka where we will extract the selling price from
     const [ oneDayCandle, updateOneDayCandle ] = React.useState<CandleStickData>();
 
-    const [ processedData, updateProcessedData ] = React.useState<ProcessedData>();
-
     React.useEffect(() => {
         if (!isInit.current) {
             fetchCandles({
                 symbol: stock.symbol,
-                from: date.unix(),
-                to: date.unix(),
+                from: date?.unix() || minDate.unix(),
+                to: date?.unix() || minDate.unix(),
                 resolution: 'D',
                 token,
             })
@@ -82,10 +80,6 @@ export default function SellBox() {
             isInit.current = true;
         };
     });
-
-    React.useEffect(() => {
-        updateProcessedData(processTrades());
-    }, [tradesContext]);
 
     const onChangeSellDate: BaseKeyboardPickerProps['onChange'] = async (date) => {
         // should be some form of validation here
@@ -149,9 +143,7 @@ export default function SellBox() {
             prev: liquidBalance.prev,
         });
 
-        updateTrades({
-            items: [trade, ...trades.items]
-        });
+        tradesContext.updateTrades([trade, ...tradesContext.trades]);
 
         // remove assets from portfolio
         let newPortfolio = {...portfolio};
@@ -204,47 +196,14 @@ export default function SellBox() {
         },
     ];
 
-    const processTrades = () => {
-        return trades.items
-            .filter(({stock}) => stock.symbol === activeStock.stock.symbol)
-            .reduce((acc, curr) => {
-                const { totalBuyShares, totalSellShares, earliestDate } = acc;
-                const { type, price, total, date } = curr;
-                const newData: ProcessedData = {
-                    totalBuyShares,
-                    totalSellShares,
-                    earliestDate,
-                };
-                const shares = total.divide(price!);
-                if (type === 'BUY') {
-                    newData.totalBuyShares = totalBuyShares.add(shares);
-                } else {
-                    // SELL
-                    newData.totalSellShares = totalSellShares.add(shares);
-                };
-
-                if (!!earliestDate) {
-                    newData.earliestDate = date.isBefore(earliestDate) ? date : earliestDate;
-                } else {
-                    // undef
-                    newData.earliestDate = date;
-                };
-                return newData;
-            }, {
-                totalBuyShares: currency(0),
-                totalSellShares: currency(0),
-                earliestDate: undefined,
-            } as ProcessedData);
-    };
-
-    const totalShares = processedData?.totalBuyShares.subtract(processedData?.totalSellShares || currency(0));
-
     const isDisabled = () => {
         // here we need to check and see if the stock is in the portfolio
         // we cannot sell an asset we do not own
         // should not be able to click if there is no oneDayCandle
         
-        return !oneDayCandle || !totalShares || (!!totalShares && totalShares.value <= 0);
+        // also cannot sell if the resulting trade would be less than 0;
+        const resultingTrade = totalShares - shareAmount;
+        return !oneDayCandle || totalShares <= 0 || resultingTrade < 0;
     };
     return (
         <div data-testid="sellbox">
@@ -254,7 +213,7 @@ export default function SellBox() {
                 label="Sell Date" 
                 value={date} 
                 onChange={onChangeSellDate}
-                minDate={!!processedData ? processedData.earliestDate : minDate}
+                minDate={!!earliestDate ? earliestDate : minDate}
                 maxDate={maxDate}
             />
             <Input 
@@ -264,7 +223,7 @@ export default function SellBox() {
                     type: 'number',
                     defaultValue: 0,
                     step: 1,
-                    max: totalShares?.value,
+                    max: totalShares,
                 }}
                 value={shareAmount}
                 onChange={onChangeInput}
@@ -272,8 +231,8 @@ export default function SellBox() {
             <Slider
                 value={shareAmount}
                 onChange={onChangeSlider}
-                marks={getMarks(totalShares?.value || 0)}
-                max={totalShares?.value}
+                marks={getMarks(totalShares)}
+                max={totalShares}
             />
             <Button
                 onClick={onClick} 
