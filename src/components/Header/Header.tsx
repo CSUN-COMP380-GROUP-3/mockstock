@@ -2,6 +2,7 @@ import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import './Header.css';
 import SymbolBox from '../SymbolBox/SymbolBox';
+import TradeHistory from '../TradeHistory/TradeHistory'
 
 export default function Header() {
 
@@ -14,6 +15,9 @@ export default function Header() {
       <Grid item className="symbol-box-container">
         <SymbolBox />
       </Grid>
-    </Grid>
+      <Grid item>
+        <TradeHistory />
+      </Grid>
+    </Grid>  
   </React.Fragment>;
 };
