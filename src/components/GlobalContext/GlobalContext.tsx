@@ -5,15 +5,16 @@ import { StockSymbolsContext, filteredSymbols } from '../../contexts/StockSymbol
 import { initLiquidBalanceContext, LiquidBalanceContext, LiquidBalanceInterface } from '../../contexts/LiquidBalanceContext';
 import { WatchListContext, WatchListTracker, WatchListInterface } from '../../contexts/WatchListContext';
 import { tradesProvider, TradesContext, TradesInterface } from '../../contexts/TradesContext';
-import { ActiveStockContext, ActiveStockInterface, initActiveStockContext } from '../../contexts/ActiveStockContext';
+import { activeStockProvider, ActiveStockContext, ActiveStockInterface } from '../../contexts/ActiveStockContext';
 import { portfolioProvider, PortfolioContext, PortfolioInterface } from '../../contexts/PortfolioContext';
 
 export const GlobalContext: React.FC = ({ children }) => {
     const [liquidBalance, updateLiquidBalance] = React.useState<LiquidBalanceInterface>(initLiquidBalanceContext.liquidBalance);
     const liquidBalanceProviderValue = { liquidBalance, updateLiquidBalance };
 
-    const [activeStock, updateActiveStock] = React.useState<ActiveStockInterface>(initActiveStockContext.activeStock);
-    const activeStockProviderValue = { activeStock, updateActiveStock };
+    const [activeStock, updateActiveStock] = React.useState<ActiveStockInterface>(activeStockProvider.activeStock);
+    activeStockProvider.activeStock = activeStock;
+    activeStockProvider.updateActiveStock = updateActiveStock;
 
     const [watchList, updateWatchList] = React.useState<WatchListInterface>(WatchListTracker.WatchList);
     const watchListProviderValue = { watchList, updateWatchList };
@@ -31,7 +32,7 @@ export const GlobalContext: React.FC = ({ children }) => {
             <TradesContext.Provider value={trades}>
                 <StockSymbolsContext.Provider value={filteredSymbols}>
                     <LiquidBalanceContext.Provider value={liquidBalanceProviderValue}>
-                        <ActiveStockContext.Provider value={activeStockProviderValue}>
+                        <ActiveStockContext.Provider value={activeStock}>
                             <WatchListContext.Provider value={watchListProviderValue}>
                                 <PortfolioContext.Provider value={portfolio}>
                                     {children}
