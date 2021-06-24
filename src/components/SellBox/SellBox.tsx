@@ -140,19 +140,18 @@ export default function SellBox() {
         <div data-testid="sellbox">
             <Typography variant="h5">Sell {stock.symbol}</Typography>
             <DatePicker 
-                id="sellDate" 
-                label="Sell Date" 
+                id="sellDate"
                 value={date} 
                 onChange={onChangeSellDate}
                 minDate={earliestDate || activeStockProvider.minDate || minDate}
                 maxDate={activeStockProvider.maxDate || maxDate}
+                disableWeekends={true}
             />
             <Input 
                 adornment="Shares:" 
                 id="amount" 
                 inputProps={{
                     type: 'number',
-                    defaultValue: 0,
                     step: 1,
                     max: totalShares,
                 }}

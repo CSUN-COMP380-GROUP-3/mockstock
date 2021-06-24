@@ -127,11 +127,11 @@ export default function BuyBox() {
             <Typography id="input-slider" gutterBottom variant="h5">Buy {stock.symbol}</Typography>
             <DatePicker
                 id="buyDate"
-                label="Buy Date"
                 value={date}
                 onChange={onChangeBuyDate}
                 minDate={activeStockProvider.minDate || minDate}
                 maxDate={activeStockProvider.maxDate || maxDate}
+                disableWeekends={true}
             />
             <Input
                 adornment="$"
