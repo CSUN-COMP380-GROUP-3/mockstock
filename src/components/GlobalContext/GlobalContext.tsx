@@ -4,7 +4,7 @@ import { TokenContext, TOKEN } from '../../contexts/TokenContext';
 import { StockSymbolsContext, filteredSymbols } from '../../contexts/StockSymbolsContext';
 import { initLiquidBalanceContext, LiquidBalanceContext, LiquidBalanceInterface } from '../../contexts/LiquidBalanceContext';
 import { WatchListContext, WatchListTracker, WatchListInterface } from '../../contexts/WatchListContext';
-import { tradesProviderValue, TradesContext, TradesInterface } from '../../contexts/TradesContext';
+import { tradesProvider, TradesContext, TradesInterface } from '../../contexts/TradesContext';
 import { ActiveStockContext, ActiveStockInterface, initActiveStockContext } from '../../contexts/ActiveStockContext';
 import { portfolioProvider, PortfolioContext, PortfolioInterface } from '../../contexts/PortfolioContext';
 
@@ -18,9 +18,9 @@ export const GlobalContext: React.FC = ({ children }) => {
     const [watchList, updateWatchList] = React.useState<WatchListInterface>(WatchListTracker.WatchList);
     const watchListProviderValue = { watchList, updateWatchList };
     
-    const [trades, updateTrades] = React.useState<TradesInterface>(tradesProviderValue.trades);
-    tradesProviderValue.trades = trades;
-    tradesProviderValue.updateTrades = updateTrades;
+    const [trades, updateTrades] = React.useState<TradesInterface>(tradesProvider.trades);
+    tradesProvider.trades = trades;
+    tradesProvider.updateTrades = updateTrades;
 
     const [portfolio, updatePortfolio] = React.useState<PortfolioInterface>(portfolioProvider.portfolio);
     portfolioProvider.portfolio = portfolio;
@@ -28,7 +28,7 @@ export const GlobalContext: React.FC = ({ children }) => {
 
     return <React.Fragment>
         <TokenContext.Provider value={TOKEN}>
-            <TradesContext.Provider value={tradesProviderValue}>
+            <TradesContext.Provider value={trades}>
                 <StockSymbolsContext.Provider value={filteredSymbols}>
                     <LiquidBalanceContext.Provider value={liquidBalanceProviderValue}>
                         <ActiveStockContext.Provider value={activeStockProviderValue}>
