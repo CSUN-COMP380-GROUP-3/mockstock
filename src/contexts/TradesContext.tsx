@@ -8,6 +8,7 @@ export type TradesInterface = Trade[];
 export interface TradesContextInterface {
     trades: TradesInterface;
     updateTrades: (trades: TradesInterface) => void;
+    addToTrades: (trade: Trade) => boolean;
     filterBySymbol: (symbol?: string) => Trade[];
     getTotalSharesBySymbol: (symbol?: string) => number;
     getTotalAmountBySymbol: (symbol?: string) => currency;
@@ -18,16 +19,30 @@ export interface TradesContextInterface {
 };
 
 /**
- * TradesProviderValue is a class that wraps around the trades and updateTrades, both of which
- * come from useState hook. The reasoning behind this wrapper is because the handling of the trades
- * data should be the responsibility of the TradesContext and not the components.
+ * TradesProvider is meant to be a wrapper around the trades state. When the global
+ * state is created its reference and update function are placed in the TradesProvider's
+ * trades and updateTrades properties, respectively. Doing so allows all the logic related
+ * to trades be handled within this exported instance on line 114.
  */
-export class TradesProviderValue implements TradesContextInterface {
+class TradesProvider implements TradesContextInterface {
     trades: TradesInterface;
     updateTrades: (trades: TradesInterface) => void;
     constructor() { 
         this.trades = [];
         this.updateTrades = () => {};
+    };
+
+    /**
+     * Makes a copy of the current trades, unshifts the trade unto copy
+     * and updates with the copy
+     * @param trade Trade to be added to trades object
+     * @returns 
+     */
+    addToTrades(trade: Trade): boolean {
+        const newTrades = [...this.trades];
+        newTrades.unshift(trade);
+        this.updateTrades(newTrades);
+        return true;
     };
 
     /**
@@ -110,9 +125,9 @@ export class TradesProviderValue implements TradesContextInterface {
     };
 };
 
-export const tradesProviderValue = new TradesProviderValue();
+export const tradesProvider = new TradesProvider();
 
 // TODO: initialize the trades from localStorage
 
-export const TradesContext = React.createContext<TradesContextInterface>(tradesProviderValue);
+export const TradesContext = React.createContext<TradesInterface>(tradesProvider.trades);
 

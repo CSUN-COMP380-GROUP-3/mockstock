@@ -13,8 +13,8 @@ import Input from '../Input/Input';
 import { fetchCandles, errorHandler } from '../utils';
 import CandleStickData from '../../interfaces/CandleStickData';
 import { TokenContext } from '../../contexts/TokenContext';
-import { TradesContext } from '../../contexts/TradesContext';
-import { PortfolioContext } from '../../contexts/PortfolioContext';
+import { tradesProvider } from '../../contexts/TradesContext';
+import { portfolioProvider } from '../../contexts/PortfolioContext';
 
 export interface SellBoxForm extends Trade {
     type: 'SELL';
@@ -34,16 +34,8 @@ export default function SellBox() {
 
     const { liquidBalance, updateLiquidBalance } = React.useContext(LiquidBalanceContext);
 
-    /**
-     * Very important that we do not dereference this object as the internal 'this' keyword becomes undefined
-     * when you do const { trades, updateTrades } = TradesContext;
-     */
-    const tradesContext = React.useContext(TradesContext);
-
-    const { portfolio, updatePortfolio } = React.useContext(PortfolioContext);
-
-    const totalShares = tradesContext.getTotalSharesBySymbol(stock.symbol);
-    const earliestDate = tradesContext.getEarliestDateBySymbol(stock.symbol);
+    const totalShares = tradesProvider.getTotalSharesBySymbol(stock.symbol);
+    const earliestDate = tradesProvider.getEarliestDateBySymbol(stock.symbol);
 
     const [ form, updateForm ] = React.useState<SellBoxForm>({
         date: earliestDate || minDate, // because we cannot sell prior to time it was first purchased, the buy date should be the minimum date
@@ -143,7 +135,8 @@ export default function SellBox() {
             prev: liquidBalance.prev,
         });
 
-        tradesContext.updateTrades([trade, ...tradesContext.trades]);
+        tradesProvider.addToTrades(trade);
+        portfolioProvider.addToPortfolio(trade);
     };
 
     const getPrice = (): currency => {
