@@ -1,13 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Card, { CardProps } from '@material-ui/core/Card';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import { ActiveStockContext } from '../../contexts/ActiveStockContext';
-import CandleStickData, { CandleStickQuery } from '../../interfaces/CandleStickData';
 import { TokenContext } from '../../contexts/TokenContext';
-import axios from 'axios';
-import moment, { Moment } from 'moment';
-import querystring from 'querystring';
 import { fetchCandles, errorHandler } from '../utils';
 import Trade from '../../interfaces/Trade';
 import currency from 'currency.js';
@@ -25,7 +21,6 @@ export interface ProcessedData {
 
 export default function PortfolioListItem(props: PortfolioListItemProps) {
     const token = React.useContext<string>(TokenContext);
-    
 
     const { activeStock, updateActiveStock } = React.useContext(ActiveStockContext);
 
