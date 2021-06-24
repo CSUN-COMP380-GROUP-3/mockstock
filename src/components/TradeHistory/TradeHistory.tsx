@@ -1,7 +1,6 @@
 import React from 'react';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
-import Trade from '../../interfaces/Trade';
 import { TradesContext } from '../../contexts/TradesContext';
 import TradeHistoryTable from '../TradeHistoryTable/TradeHistoryTable'
 
@@ -37,8 +36,6 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function TradeHistory() {
   // getModalStyle is not a pure function, we roll the style only on the first render
     const classes = useStyles();
-
-    const tradesContext = React.useContext(TradesContext);
 
     const [modalStyle] = React.useState(getModalStyle);
     const [open, setOpen] = React.useState(false);
