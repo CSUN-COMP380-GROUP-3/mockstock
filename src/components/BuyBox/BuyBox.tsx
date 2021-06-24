@@ -8,7 +8,7 @@ import CandleStickData from '../../interfaces/CandleStickData';
 import { TokenContext } from '../../contexts/TokenContext';
 import Trade from '../../interfaces/Trade';
 import { TradesContext } from '../../contexts/TradesContext';
-import { PortfolioContext } from '../../contexts/PortfolioContext';
+import { PortfolioContext, portfolioProvider } from '../../contexts/PortfolioContext';
 import DatePicker, { maxDate } from '../DatePicker/DatePicker';
 import { BaseKeyboardPickerProps } from '@material-ui/pickers/_shared/hooks/useKeyboardPickerState';
 import { minDate } from '../../components/DatePicker/DatePicker';
@@ -38,7 +38,7 @@ export default function BuyBox() {
 
     const tradesContext = React.useContext(TradesContext);
 
-    const { portfolio, updatePortfolio } = React.useContext(PortfolioContext);
+    const portfolio = React.useContext(PortfolioContext);
 
     const [ form, updateForm ] = React.useState<BuyBoxForm>({
         date: minDate, // this is the selected date of the buy
@@ -128,11 +128,8 @@ export default function BuyBox() {
         });
 
         tradesContext.updateTrades([trade, ...tradesContext.trades]);
-
-        let newPortfolio = {...portfolio};
-        let oldTrades = newPortfolio[stock.symbol] || [];
-        newPortfolio[stock.symbol] = [trade, ...oldTrades];
-        updatePortfolio(newPortfolio);
+        const newPortfolio = portfolioProvider.addToPortfolio(trade);
+        portfolioProvider.updatePortfolio(newPortfolio);
     };
 
     const getPrice = (): currency => {
