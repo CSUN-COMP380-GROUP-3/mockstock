@@ -1,7 +1,6 @@
 import React from 'react';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
-import { TradesContext } from '../../contexts/TradesContext';
 import TradeHistoryTable from '../TradeHistoryTable/TradeHistoryTable'
 
 
