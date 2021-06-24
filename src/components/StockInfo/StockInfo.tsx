@@ -11,11 +11,11 @@ import WS from '../websocket';
 export default function StockInfo() {
 
 	const { watchList, updateWatchList } = React.useContext<WatchListContextInterface>(WatchListContext);
-	const { activeStock, updateActiveStock } = React.useContext(ActiveStockContext);
+	const activeStock = React.useContext(ActiveStockContext);
 
 	const [displayPrice, setDisplayPrice] = React.useState<number>(1);
 
-	const { stock, to, from } = activeStock;
+	const { stock } = activeStock;
 
 	/**Depending on whether the active symbol is already within the watchlist, adds or removes the active symbol to the watchlist */
 	const manipWatchList = () => {

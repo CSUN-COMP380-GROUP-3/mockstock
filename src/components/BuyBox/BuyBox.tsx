@@ -4,17 +4,13 @@ import Typography from '@material-ui/core/Typography';
 import Slider from '@material-ui/core/Slider';
 import Button from '@material-ui/core/Button';
 import currency from 'currency.js';
-import CandleStickData from '../../interfaces/CandleStickData';
-import { TokenContext } from '../../contexts/TokenContext';
 import Trade from '../../interfaces/Trade';
 import { tradesProvider } from '../../contexts/TradesContext';
 import { portfolioProvider } from '../../contexts/PortfolioContext';
-import DatePicker, { maxDate } from '../DatePicker/DatePicker';
+import DatePicker, { maxDate, minDate } from '../DatePicker/DatePicker';
 import { BaseKeyboardPickerProps } from '@material-ui/pickers/_shared/hooks/useKeyboardPickerState';
-import { minDate } from '../../components/DatePicker/DatePicker';
 import { LiquidBalanceContext } from '../../contexts/LiquidBalanceContext';
-import { ActiveStockContext } from '../../contexts/ActiveStockContext';
-import { fetchCandles, errorHandler } from '../utils';
+import { ActiveStockContext, activeStockProvider } from '../../contexts/ActiveStockContext';
 import Input from '../Input/Input';
 
 export interface BuyBoxForm extends Trade {
@@ -24,20 +20,14 @@ export interface BuyBoxForm extends Trade {
 export interface BuyBoxProps { };
 
 export default function BuyBox() {
-
-    const isInit = React.useRef(false);
-
-    const token = React.useContext<string>(TokenContext);
-
-    const { activeStock } = React.useContext(ActiveStockContext);
-
+    const activeStock = React.useContext(ActiveStockContext);
     const { stock } = activeStock;
 
     const { liquidBalance, updateLiquidBalance } = React.useContext(LiquidBalanceContext);
     const { curr } = liquidBalance;
 
     const [ form, updateForm ] = React.useState<BuyBoxForm>({
-        date: minDate, // this is the selected date of the buy
+        date: activeStockProvider.minDate || minDate, // this is the selected date of the buy
         total: currency(0),
         stock,
         timestamp: moment(),
@@ -49,67 +39,29 @@ export default function BuyBox() {
     // this state controls the amount user wants to spend
     const [ buyAmount, updateBuyAmount ] = React.useState(0);
 
-    // this state controls the oneDayCandle aka where we will extract the selling price from
-    const [ oneDayCandle, updateOneDayCandle ] = React.useState<CandleStickData>();
+    // this state controls the candlestick index
+    const [ candlestickIndex, updateCandlestickIndex ] = React.useState(activeStockProvider.getIndexByTimestamp(date.unix()));
 
-    React.useEffect(() => {
-        if (!isInit.current) {
-            fetchCandles({
-                symbol: stock.symbol,
-                from: date.unix(),
-                to: date.unix(),
-                resolution: 'D',
-                token,
-            })
-                .then(res => {
-                    if (res.data.s === 'ok') {
-                        console.log('init oneDayCandle');
-                        console.log(res.data);
-                        updateOneDayCandle(res.data);
-                    };
-                })
-                .catch(errorHandler)
-            isInit.current = true;
-        };
-    });
-
-    const onChangeBuyDate: BaseKeyboardPickerProps['onChange'] = async (date) => {
-        try {
-            if (!!date) {
-                updateForm({
-                    ...form,
-                    date,
-                });
-
-                const res = await fetchCandles({
-                    symbol: stock.symbol,
-                    from: date.unix(),
-                    to: date.unix(),
-                    resolution: 'D',
-                    token,
-                });
-
-                if (res.data.s === 'no_data') {
-                    alert(`No trading data for ${date.toString()}`);
-                    updateOneDayCandle(undefined);
-                    return;
-                };
-
-                console.log(res.data);
-                updateOneDayCandle(res.data);
-                return;
+    const onChangeBuyDate: BaseKeyboardPickerProps['onChange'] = (date) => {
+        if (!!date) {
+            const index = activeStockProvider.getIndexByTimestamp(date.unix());
+            if (index === -1) {
+                // invalid date
+                return alert('No trading data available for selected date. Please pick another date.');
             };
-        } catch(error) {
-            errorHandler(error);
+            updateForm({
+                ...form,
+                date,
+            });
+            updateCandlestickIndex(index);
         };
     };
 
     const onClick = () => {
         const price = getPrice(); // price is the price of the stock at purchase time
+        if (price === undefined) return;
         const total = getTotal(); // total is the amount the user wants to spend
         // from the two vars above we can do all the calculations we need
-        
-        // const shares = getShares();
 
         const trade: BuyBoxForm = {
             ...form,
@@ -127,11 +79,8 @@ export default function BuyBox() {
         portfolioProvider.addToPortfolio(trade);
     };
 
-    const getPrice = (): currency => {
-        if (!!oneDayCandle) {
-            return currency(oneDayCandle.l[0]);
-        };
-        return currency(0);
+    const getPrice = () => {
+        return activeStockProvider.getBuyPriceByIndex(candlestickIndex);
     };
 
     const getTotal = () => {
@@ -139,8 +88,7 @@ export default function BuyBox() {
     };
 
     const isDisabled = () => {
-
-        return !oneDayCandle;
+        return candlestickIndex === -1 || buyAmount > curr.value;
     };
 
     const onChangeInput = (event: any) => {
@@ -182,8 +130,8 @@ export default function BuyBox() {
                 label="Buy Date"
                 value={date}
                 onChange={onChangeBuyDate}
-                minDate={minDate}
-                maxDate={maxDate}
+                minDate={activeStockProvider.minDate || minDate}
+                maxDate={activeStockProvider.maxDate || maxDate}
             />
             <Input
                 adornment="$"

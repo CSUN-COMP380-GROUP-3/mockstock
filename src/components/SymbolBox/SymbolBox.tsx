@@ -7,7 +7,7 @@ import { useTheme } from '@material-ui/core/styles';
 import { VariableSizeList, ListChildComponentProps } from 'react-window';
 import StockSymbolData from '../../interfaces/StockSymbolData';
 import { filteredSymbols } from '../../contexts/StockSymbolsContext';
-import { ActiveStockContext, getStockInfoForFrom } from '../../contexts/ActiveStockContext';
+import { ActiveStockContext, activeStockProvider } from '../../contexts/ActiveStockContext';
 import "./SymbolBox.css"
 
 const LISTBOX_PADDING = 8; // px
@@ -100,23 +100,16 @@ export const groupBy = ({ symbol }: StockSymbolData) => symbol[0];
 export interface SymbolBoxProps extends Partial<AutocompleteProps<StockSymbolData, false, false, false>> { };
 
 export default function SymbolBox(props: SymbolBoxProps) {
-    const { activeStock, updateActiveStock } = React.useContext(ActiveStockContext);
+    const activeStock = React.useContext(ActiveStockContext);
 
-    const { stock, to, from } = activeStock;
+    const { stock } = activeStock;
 
     /**Triggers when the user selects a symbol from the SymbolBox */
-    const onSelect = async (event: any, value: any) => {
-        getStockInfoForFrom(value, from, to).then((activeStockInfo) => {
-            updateActiveStock(activeStockInfo);
-        });
+    const onSelect = (event: any, value: any) => {
+        if (!!value) {
+            activeStockProvider.switchActiveStock(value as StockSymbolData);
+        };
     };
-
-    /**Initializes Active Stock Context with what ever initial symbol was loaded in Active Stock Context */
-    React.useEffect(() => {
-        getStockInfoForFrom(stock, from, to).then((activeStockInfo) => {
-            updateActiveStock(activeStockInfo);
-        });
-    }, [])
 
     return (
         <Autocomplete
