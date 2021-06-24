@@ -65,6 +65,7 @@ export default function BuyBox() {
 
         const trade: BuyBoxForm = {
             ...form,
+            stock: activeStock.stock,
             timestamp: moment(),
             total,
             price,

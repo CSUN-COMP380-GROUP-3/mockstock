@@ -73,6 +73,7 @@ export default function SellBox() {
 
         const trade: SellBoxForm = {
             ...form,
+            stock: activeStock.stock,
             timestamp: moment(),
             total,
             price,
