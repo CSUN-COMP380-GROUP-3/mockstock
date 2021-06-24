@@ -44,6 +44,13 @@ export default function SellBox() {
     // this state controls the candlestick index
     const [ candlestickIndex, updateCandlestickIndex ] = React.useState(activeStockProvider.getIndexByTimestamp(date.unix()));
 
+    React.useEffect(() => {
+        updateForm({
+            ...form,
+            stock: activeStock.stock,
+        })
+    },[stock])
+
     const onChangeSellDate: BaseKeyboardPickerProps['onChange'] = (date) => {
         if (!!date) {
             const index = activeStockProvider.getIndexByTimestamp(date.unix());
