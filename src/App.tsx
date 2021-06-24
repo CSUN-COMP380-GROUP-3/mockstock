@@ -12,7 +12,7 @@ import SellBox from './components/SellBox/SellBox';
 
 import { GlobalContext } from './components/GlobalContext/GlobalContext';
 import StockInfo from './components/StockInfo/StockInfo';
-import PortfolioList from './components/Portfolio/Portfolio';
+import Portfolio from './components/Portfolio/Portfolio';
 
 function App() {
 
@@ -31,7 +31,7 @@ function App() {
               <StockChart />
             </Grid>
             <Grid item>
-              <PortfolioList></PortfolioList>
+              <Portfolio />
             </Grid>
           </Grid>
         </Grid>

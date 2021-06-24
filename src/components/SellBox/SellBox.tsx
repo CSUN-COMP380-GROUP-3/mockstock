@@ -144,13 +144,6 @@ export default function SellBox() {
         });
 
         tradesContext.updateTrades([trade, ...tradesContext.trades]);
-
-        // remove assets from portfolio
-        let newPortfolio = {...portfolio};
-        let oldTrades = newPortfolio[stock.symbol] || [];
-        newPortfolio[stock.symbol] = [trade, ...oldTrades];
-
-        updatePortfolio(newPortfolio);
     };
 
     const getPrice = (): currency => {

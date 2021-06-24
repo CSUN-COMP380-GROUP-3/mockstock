@@ -6,9 +6,7 @@ import { initLiquidBalanceContext, LiquidBalanceContext, LiquidBalanceInterface 
 import { WatchListContext, WatchListTracker, WatchListInterface } from '../../contexts/WatchListContext';
 import { tradesProviderValue, TradesContext, TradesInterface } from '../../contexts/TradesContext';
 import { ActiveStockContext, ActiveStockInterface, initActiveStockContext } from '../../contexts/ActiveStockContext';
-import { initPortfolioContext, PortfolioContext, PortfolioInterface } from '../../contexts/PortfolioContext';
-
-
+import { portfolioProvider, PortfolioContext, PortfolioInterface } from '../../contexts/PortfolioContext';
 
 export const GlobalContext: React.FC = ({ children }) => {
     const [liquidBalance, updateLiquidBalance] = React.useState<LiquidBalanceInterface>(initLiquidBalanceContext.liquidBalance);
@@ -24,8 +22,9 @@ export const GlobalContext: React.FC = ({ children }) => {
     tradesProviderValue.trades = trades;
     tradesProviderValue.updateTrades = updateTrades;
 
-    const [ portfolio, updatePortfolio ] = React.useState<PortfolioInterface>(initPortfolioContext.portfolio);
-    const stocksProviderValue = { portfolio, updatePortfolio };
+    const [portfolio, updatePortfolio] = React.useState<PortfolioInterface>(portfolioProvider.portfolio);
+    portfolioProvider.portfolio = portfolio;
+    portfolioProvider.updatePortfolio = updatePortfolio;
 
     return <React.Fragment>
         <TokenContext.Provider value={TOKEN}>
@@ -34,7 +33,7 @@ export const GlobalContext: React.FC = ({ children }) => {
                     <LiquidBalanceContext.Provider value={liquidBalanceProviderValue}>
                         <ActiveStockContext.Provider value={activeStockProviderValue}>
                             <WatchListContext.Provider value={watchListProviderValue}>
-                                <PortfolioContext.Provider value={stocksProviderValue} >
+                                <PortfolioContext.Provider value={portfolio}>
                                     {children}
                                 </PortfolioContext.Provider>
                             </WatchListContext.Provider>

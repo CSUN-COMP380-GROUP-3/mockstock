@@ -1,7 +1,5 @@
 import React from 'react';
-import { PortfolioContext } from '../../contexts/PortfolioContext';
-import currency from 'currency.js';
-import moment from 'moment';
+import { PortfolioContext, portfolioProvider } from '../../contexts/PortfolioContext';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
@@ -9,8 +7,8 @@ import { FixedSizeList, ListChildComponentProps } from 'react-window';
 import PortfolioItem from '../PortfolioItem/PortfolioItem';
 import { makeStyles } from '@material-ui/core/styles';
 
-export default function PortfolioList() {
-    const { portfolio } = React.useContext(PortfolioContext);
+export default function Portfolio() {
+    const portfolio = React.useContext(PortfolioContext);
 
     const Row = (props: ListChildComponentProps) => {
         const { index, style } = props;
@@ -38,7 +36,7 @@ export default function PortfolioList() {
         <Card data-testid="portfoliolist" className={classes.root}>
             <CardHeader title="Portfolio"></CardHeader>
             <CardContent>
-                <FixedSizeList height={400} width={400} itemSize={80} itemCount={Object.keys(portfolio).length}>
+                <FixedSizeList height={400} width={400} itemSize={80} itemCount={portfolioProvider.length}>
                     {Row}
                 </FixedSizeList>
             </CardContent>
