@@ -4,8 +4,8 @@ import ReactApexChart from "react-apexcharts";
 import "./StockChart.css";
 
 export default function StockChart() {
-    const { activeStock } = React.useContext(ActiveStockContext);
-    const { candles } = activeStock;
+  const activeStock = React.useContext(ActiveStockContext);
+  const { candles } = activeStock;
 
   const data = []
   if (candles) {

@@ -1,6 +1,6 @@
 import React from 'react';
 import Typography from '@material-ui/core/Typography';
-import { ActiveStockContext } from '../../contexts/ActiveStockContext';
+import { ActiveStockContext, activeStockProvider } from '../../contexts/ActiveStockContext';
 import { LiquidBalanceContext } from '../../contexts/LiquidBalanceContext';
 import DatePicker, {minDate, maxDate} from '../DatePicker/DatePicker';
 import moment from 'moment';
@@ -10,9 +10,6 @@ import Trade from '../../interfaces/Trade';
 import currency from 'currency.js';
 import Slider from '../Slider/Slider';
 import Input from '../Input/Input';
-import { fetchCandles, errorHandler } from '../utils';
-import CandleStickData from '../../interfaces/CandleStickData';
-import { TokenContext } from '../../contexts/TokenContext';
 import { tradesProvider } from '../../contexts/TradesContext';
 import { portfolioProvider } from '../../contexts/PortfolioContext';
 
@@ -24,12 +21,7 @@ export interface SellBoxProps {
 };
 
 export default function SellBox() {
-    const isInit = React.useRef(false);
-
-    const token = React.useContext<string>(TokenContext);
-
-    const { activeStock } = React.useContext(ActiveStockContext);
-
+    const activeStock = React.useContext(ActiveStockContext);
     const { stock } = activeStock;
 
     const { liquidBalance, updateLiquidBalance } = React.useContext(LiquidBalanceContext);
@@ -38,7 +30,7 @@ export default function SellBox() {
     const earliestDate = tradesProvider.getEarliestDateBySymbol(stock.symbol);
 
     const [ form, updateForm ] = React.useState<SellBoxForm>({
-        date: earliestDate || minDate, // because we cannot sell prior to time it was first purchased, the buy date should be the minimum date
+        date: earliestDate || activeStockProvider.minDate || minDate,
         total: currency(0),
         type: 'SELL',
         stock,
@@ -48,68 +40,22 @@ export default function SellBox() {
 
     // this state controls the number of shares to sell
     const [ shareAmount, updateShareAmount ] = React.useState(0);
-    
-    // this state controls the oneDayCandle aka where we will extract the selling price from
-    const [ oneDayCandle, updateOneDayCandle ] = React.useState<CandleStickData>();
 
-    React.useEffect(() => {
-        if (!isInit.current) {
-            fetchCandles({
-                symbol: stock.symbol,
-                from: date?.unix() || minDate.unix(),
-                to: date?.unix() || minDate.unix(),
-                resolution: 'D',
-                token,
-            })
-                .then(res => {
-                    if (res.data.s === 'ok') {
-                        console.log('init oneDayCandle');
-                        console.log(res.data);
-                        updateOneDayCandle(res.data);
-                    };
-                })
-                .catch(errorHandler)
-            isInit.current = true;
-        };
-    });
+    // this state controls the candlestick index
+    const [ candlestickIndex, updateCandlestickIndex ] = React.useState(activeStockProvider.getIndexByTimestamp(date.unix()));
 
-    const onChangeSellDate: BaseKeyboardPickerProps['onChange'] = async (date) => {
-        // should be some form of validation here
-        // there will be some days where there is no trading activity
-        
-        // when this date changes we need to fetch the new candlestick data
-        // should we fetch from the api or do we just search within our own candlestick data?
-        try {
-            if (!!date) {
-                // first update form with latest user selected date
-                updateForm({
-                    ...form,
-                    date,
-                });
-
-                // now we need to look at the date and fetch the candles and see if we get data back
-                // otherwise if no_data then we to tell the user to select another date
-                const res = await fetchCandles({
-                    symbol: stock.symbol,
-                    from: date.unix(),
-                    to: date.unix(),
-                    resolution: 'D',
-                    token,
-                });
-
-                if (res.data.s === 'no_data') {
-                    alert(`No trading data for ${date.toString()}`);
-                    updateOneDayCandle(undefined);
-                    return;
-                };
-
-                console.log(res.data);
-                updateOneDayCandle(res.data);
-                return;
+    const onChangeSellDate: BaseKeyboardPickerProps['onChange'] = (date) => {
+        if (!!date) {
+            const index = activeStockProvider.getIndexByTimestamp(date.unix());
+            if (index === -1) {
+                // invalid date
+                return alert('No trading data available for selected date. Please pick another date.');
             };
-        } catch(error) {
-            // if an error fetching data from the api occurs we need to also let the user know so they can retry
-            errorHandler(error);
+            updateForm({
+                ...form,
+                date,
+            });
+            updateCandlestickIndex(index);
         };
     };
 
@@ -121,7 +67,9 @@ export default function SellBox() {
 
         // should not be able to click this if oneDayCandle is not set
         const price = getPrice();
+        if (price === undefined) return;
         const total = getTotal();
+        if (total === undefined) return;
 
         const trade: SellBoxForm = {
             ...form,
@@ -139,16 +87,13 @@ export default function SellBox() {
         portfolioProvider.addToPortfolio(trade);
     };
 
-    const getPrice = (): currency => {
-        if (!!oneDayCandle) {
-            return currency(oneDayCandle.h[0]);
-        };
-        return currency(0);
+    const getPrice = () => {
+        return activeStockProvider.getSellPriceByIndex(candlestickIndex);
     };
 
     const getTotal = () => {
         const shares = currency(shareAmount);
-        return getPrice().multiply(shares);
+        return getPrice()?.multiply(shares);
     }
     
     const onChangeInput = (event: any) => {
@@ -189,7 +134,7 @@ export default function SellBox() {
         
         // also cannot sell if the resulting trade would be less than 0;
         const resultingTrade = totalShares - shareAmount;
-        return !oneDayCandle || totalShares <= 0 || resultingTrade < 0;
+        return candlestickIndex === -1 || totalShares <= 0 || resultingTrade < 0;
     };
     return (
         <div data-testid="sellbox">
@@ -199,8 +144,8 @@ export default function SellBox() {
                 label="Sell Date" 
                 value={date} 
                 onChange={onChangeSellDate}
-                minDate={!!earliestDate ? earliestDate : minDate}
-                maxDate={maxDate}
+                minDate={earliestDate || activeStockProvider.minDate || minDate}
+                maxDate={activeStockProvider.maxDate || maxDate}
             />
             <Input 
                 adornment="Shares:" 

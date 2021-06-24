@@ -10,11 +10,7 @@ import ListItem from '@material-ui/core/ListItem';
 
 export default function WatchList() {
 
-    const { watchList, updateWatchList } = React.useContext<WatchListContextInterface>(WatchListContext);
-
-    // const cleanUp = () => { // TODO: need to think of a way to close this socket
-
-    // };
+    const { watchList } = React.useContext<WatchListContextInterface>(WatchListContext);
 
     return <React.Fragment>
         <Card data-testid="watchlist">

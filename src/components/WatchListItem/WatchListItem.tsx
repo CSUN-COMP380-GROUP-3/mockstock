@@ -2,11 +2,10 @@ import React from 'react';
 import { CardProps } from '@material-ui/core/Card';
 import Typography from '@material-ui/core/Typography';
 import currency from 'currency.js';
-import { ActiveStockContext, getStockInfoForFrom } from '../../contexts/ActiveStockContext';
+import { activeStockProvider } from '../../contexts/ActiveStockContext';
 import { Listener } from '../../interfaces/WebSocketData';
 import "./WatchListItem.css";
 import FinnHubTrade from '../websocket';
-import { filteredSymbols } from '../../contexts/StockSymbolsContext';
 
 export interface WatchListItemProps extends CardProps {
     symbol: string;
@@ -14,10 +13,6 @@ export interface WatchListItemProps extends CardProps {
 
 export default function WatchListItem(props: WatchListItemProps) {
     const { symbol, style } = props;
-
-    const { activeStock, updateActiveStock } = React.useContext(ActiveStockContext);
-
-    const { to, from, stock } = activeStock;
 
     const [displayPrice, setDisplayPrice] = React.useState<number>();
 
@@ -27,9 +22,7 @@ export default function WatchListItem(props: WatchListItemProps) {
      */
     const onClick = async () => {
         console.log(`${symbol} clicked from watchlist`);
-        getStockInfoForFrom(filteredSymbols.find(s => s.symbol === symbol) || filteredSymbols[0], from, to).then((activeStockInfo) => {
-            updateActiveStock(activeStockInfo);
-        });
+        activeStockProvider.switchActiveStockByName(symbol);
     };
 
     /**

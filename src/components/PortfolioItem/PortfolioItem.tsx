@@ -2,9 +2,7 @@ import React from 'react';
 import Card, { CardProps } from '@material-ui/core/Card';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
-import { ActiveStockContext } from '../../contexts/ActiveStockContext';
-import { TokenContext } from '../../contexts/TokenContext';
-import { fetchCandles, errorHandler } from '../utils';
+import { activeStockProvider } from '../../contexts/ActiveStockContext';
 import Trade from '../../interfaces/Trade';
 import currency from 'currency.js';
 
@@ -20,12 +18,6 @@ export interface ProcessedData {
 };
 
 export default function PortfolioListItem(props: PortfolioListItemProps) {
-    const token = React.useContext<string>(TokenContext);
-
-    const { activeStock, updateActiveStock } = React.useContext(ActiveStockContext);
-
-    const { to, from } = activeStock;
-    
     const { style, data } = props;
     const stock = data[0].stock;
     const { symbol } = stock;
@@ -52,25 +44,8 @@ export default function PortfolioListItem(props: PortfolioListItemProps) {
     });
     const { root } = useStyles();
 
-    const onClick = async () => {
-        try {
-            const res = await fetchCandles({
-                symbol,
-                to: to.unix(),
-                from: from.unix(),
-                resolution: 'D',
-                token,
-            });
-    
-            updateActiveStock({
-                ...activeStock,
-                candles: res.data,
-                stock,
-            });
-
-        } catch(error) {
-            errorHandler(error);
-        };
+    const onClick = () => {
+        activeStockProvider.switchActiveStock(stock);
     };
 
     const processTrades = () => {
