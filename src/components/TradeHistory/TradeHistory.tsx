@@ -1,8 +1,7 @@
 import React from 'react';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
-import TradeHistoryTable from '../TradeHistoryTable/TradeHistoryTable'
-
+import TradeHistoryTable from '../TradeHistoryTable/TradeHistoryTable';
 
 function rand() {
     return Math.round(Math.random() * 20) - 10;
@@ -33,7 +32,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export default function TradeHistory() {
-  // getModalStyle is not a pure function, we roll the style only on the first render
+    // getModalStyle is not a pure function, we roll the style only on the first render
     const classes = useStyles();
 
     const [modalStyle] = React.useState(getModalStyle);
