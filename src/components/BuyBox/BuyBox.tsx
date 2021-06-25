@@ -10,51 +10,59 @@ import { portfolioProvider } from '../../contexts/PortfolioContext';
 import DatePicker, { maxDate, minDate } from '../DatePicker/DatePicker';
 import { BaseKeyboardPickerProps } from '@material-ui/pickers/_shared/hooks/useKeyboardPickerState';
 import { LiquidBalanceContext } from '../../contexts/LiquidBalanceContext';
-import { ActiveStockContext, activeStockProvider } from '../../contexts/ActiveStockContext';
+import {
+    ActiveStockContext,
+    activeStockProvider,
+} from '../../contexts/ActiveStockContext';
 import Input from '../Input/Input';
 
 export interface BuyBoxForm extends Trade {
-    type: 'BUY',
-};
+    type: 'BUY';
+}
 
-export interface BuyBoxProps { };
+export interface BuyBoxProps {}
 
 export default function BuyBox() {
     const activeStock = React.useContext(ActiveStockContext);
     const { stock } = activeStock;
 
-    const { liquidBalance, updateLiquidBalance } = React.useContext(LiquidBalanceContext);
+    const { liquidBalance, updateLiquidBalance } =
+        React.useContext(LiquidBalanceContext);
     const { curr } = liquidBalance;
 
-    const [ form, updateForm ] = React.useState<BuyBoxForm>({
+    const [form, updateForm] = React.useState<BuyBoxForm>({
         date: activeStockProvider.minDate || minDate, // this is the selected date of the buy
         total: currency(0),
         stock,
         timestamp: moment(),
-        type: 'BUY'
+        type: 'BUY',
     });
 
     const { date } = form;
 
     // this state controls the amount user wants to spend
-    const [ buyAmount, updateBuyAmount ] = React.useState(0);
+    const [buyAmount, updateBuyAmount] = React.useState(0);
 
     // this state controls the candlestick index
-    const [ candlestickIndex, updateCandlestickIndex ] = React.useState(activeStockProvider.getIndexByTimestamp(date.unix()));
+    const [candlestickIndex, updateCandlestickIndex] = React.useState(
+        activeStockProvider.getIndexByTimestamp(date.unix()),
+    );
 
     const onChangeBuyDate: BaseKeyboardPickerProps['onChange'] = (date) => {
         if (!!date) {
             const index = activeStockProvider.getIndexByTimestamp(date.unix());
             if (index === -1) {
                 // invalid date
-                return alert('No trading data available for selected date. Please pick another date.');
-            };
+                return alert(
+                    'No trading data available for selected date. Please pick another date.',
+                );
+            }
             updateForm({
                 ...form,
                 date,
             });
             updateCandlestickIndex(index);
-        };
+        }
     };
 
     const onClick = () => {
@@ -93,39 +101,59 @@ export default function BuyBox() {
     };
 
     const onChangeInput = (event: any) => {
-        updateBuyAmount(currency(event.target.value).value);
+        var regExp = /[a-zA-Z]/g;
+        if (regExp.test(event.target.value)) {
+            return;
+        }
+        updateBuyAmount(event.target.value);
     };
 
-    const onChangeSlider: any = (event: React.ChangeEvent<{}>, value: number) => {
-        updateBuyAmount(value);
-    }; 
+    const handleBlur = () => {
+        if (buyAmount < 0) {
+            updateBuyAmount(0);
+        } else if (buyAmount > curr.value) {
+            updateBuyAmount(curr.value);
+        }
+    };
 
-    const getMarks = (maxAmount: number) => curr.value === 0 ? [] : [
-        {
-            value: 0,
-            label: '0%',
-        },
-        {
-            value: maxAmount * 0.25,
-            label: '25%',
-        },
-        {
-            value: maxAmount * 0.5,
-            label: '50%',
-        },
-        {
-            value: maxAmount * 0.75,
-            label: '75%',
-        },
-        {
-            value: maxAmount,
-            label: '100%',
-        },
-    ];
+    const onChangeSlider: any = (
+        event: React.ChangeEvent<{}>,
+        value: number,
+    ) => {
+        updateBuyAmount(value);
+    };
+
+    const getMarks = (maxAmount: number) =>
+        curr.value === 0
+            ? []
+            : [
+                  {
+                      value: 0,
+                      label: '0%',
+                  },
+                  {
+                      value: maxAmount * 0.25,
+                      label: '25%',
+                  },
+                  {
+                      value: maxAmount * 0.5,
+                      label: '50%',
+                  },
+                  {
+                      value: maxAmount * 0.75,
+                      label: '75%',
+                  },
+                  {
+                      value: maxAmount,
+                      label: '100%',
+                  },
+              ];
 
     return (
         <div data-testid="buybox">
-            <Typography id="input-slider" gutterBottom variant="h5">Buy {stock.symbol}</Typography>
+            <Typography id="input-slider" gutterBottom variant="h5">
+                Buy {stock.symbol}
+            </Typography>
             <DatePicker
                 id="buyDate"
                 value={date}
@@ -138,8 +166,9 @@ export default function BuyBox() {
                 adornment="$"
                 value={buyAmount}
                 onChange={onChangeInput}
+                onBlur={handleBlur}
                 inputProps={{
-                    type: 'number',
+                    type: 'number || string',
                     min: 0,
                     step: 0.01,
                     max: curr.value,
@@ -150,12 +179,11 @@ export default function BuyBox() {
                 onChange={onChangeSlider}
                 marks={getMarks(curr.value)}
                 max={curr.value}
+                step={0.01}
             />
-            <Button
-                disabled={isDisabled()}
-                onClick={onClick}
-            >Buy
+            <Button disabled={isDisabled()} onClick={onClick}>
+                Buy
             </Button>
         </div>
     );
-};
+}
