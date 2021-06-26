@@ -101,8 +101,7 @@ export default function BuyBox() {
     };
 
     const onChangeInput = (event: any) => {
-        var regExp = /[a-zA-Z]/g;
-        if (regExp.test(event.target.value)) {
+        if (isNaN(event.target.value)) {
             return;
         }
         updateBuyAmount(event.target.value);
