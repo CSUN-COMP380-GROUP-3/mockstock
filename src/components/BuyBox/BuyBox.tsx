@@ -86,6 +86,8 @@ export default function BuyBox() {
 
         tradesProvider.addToTrades(trade);
         portfolioProvider.addToPortfolio(trade);
+
+        updateBuyAmount(0);
     };
 
     const getPrice = () => {

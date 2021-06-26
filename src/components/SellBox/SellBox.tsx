@@ -93,6 +93,8 @@ export default function SellBox() {
 
         tradesProvider.addToTrades(trade);
         portfolioProvider.addToPortfolio(trade);
+
+        updateShareAmount(0);
     };
 
     const getPrice = () => {
