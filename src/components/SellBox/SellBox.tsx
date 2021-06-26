@@ -122,8 +122,8 @@ export default function SellBox() {
         } else if (shareAmount > totalShares) {
             updateShareAmount(totalShares);
         } else {
-            var num = Number(shareAmount).toFixed(4);
-            updateShareAmount(Number(num));
+            // var num = Number(shareAmount).toFixed(4);
+            // updateShareAmount(Number(num));
         }
     };
 
