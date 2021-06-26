@@ -88,7 +88,7 @@ class TradesProvider implements TradesContextInterface {
                     // SELL
                     acc -= shares;
                 }
-                return Number(acc.toFixed(4));
+                return acc;
             },
             0,
         );

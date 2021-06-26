@@ -102,11 +102,10 @@ export default function SellBox() {
     };
 
     const getTotal = () => {
-        console.log(shareAmount);
-        const shares = currency(shareAmount);
-        console.log(shares);
-        console.log(shares.value);
-        return getPrice()?.multiply(shares);
+        const hold = getPrice();
+        const hold2 = Number(hold?.value);
+        const hold3 = shareAmount * hold2;
+        return currency(hold3);
     };
 
     const onChangeInput = (event: any) => {
