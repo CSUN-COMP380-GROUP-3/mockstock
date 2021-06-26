@@ -86,6 +86,8 @@ export default function BuyBox() {
 
         tradesProvider.addToTrades(trade);
         portfolioProvider.addToPortfolio(trade);
+
+        updateBuyAmount(0);
     };
 
     const getPrice = () => {
@@ -101,8 +103,7 @@ export default function BuyBox() {
     };
 
     const onChangeInput = (event: any) => {
-        var regExp = /[a-zA-Z]/g;
-        if (regExp.test(event.target.value)) {
+        if (isNaN(event.target.value)) {
             return;
         }
         updateBuyAmount(event.target.value);
@@ -113,6 +114,8 @@ export default function BuyBox() {
             updateBuyAmount(0);
         } else if (buyAmount > curr.value) {
             updateBuyAmount(curr.value);
+        } else {
+            updateBuyAmount(currency(buyAmount).value);
         }
     };
 

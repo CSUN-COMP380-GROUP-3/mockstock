@@ -93,6 +93,8 @@ export default function SellBox() {
 
         tradesProvider.addToTrades(trade);
         portfolioProvider.addToPortfolio(trade);
+
+        updateShareAmount(0);
     };
 
     const getPrice = () => {
@@ -108,8 +110,7 @@ export default function SellBox() {
     };
 
     const onChangeInput = (event: any) => {
-        var regExp = /[a-zA-Z]/g;
-        if (regExp.test(event.target.value)) {
+        if (isNaN(event.target.value)) {
             return;
         }
         updateShareAmount(event.target.value);
@@ -120,6 +121,9 @@ export default function SellBox() {
             updateShareAmount(0);
         } else if (shareAmount > totalShares) {
             updateShareAmount(totalShares);
+        } else {
+            // var num = Number(shareAmount).toFixed(4);
+            // updateShareAmount(Number(num));
         }
     };
 
