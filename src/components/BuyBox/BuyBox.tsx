@@ -112,6 +112,8 @@ export default function BuyBox() {
             updateBuyAmount(0);
         } else if (buyAmount > curr.value) {
             updateBuyAmount(curr.value);
+        } else {
+            updateBuyAmount(currency(buyAmount).value);
         }
     };
 
