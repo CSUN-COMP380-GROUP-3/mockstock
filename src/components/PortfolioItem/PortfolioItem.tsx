@@ -86,7 +86,7 @@ export default function PortfolioListItem(props: PortfolioListItemProps) {
     
     console.log(`cost basis ${costBasis}`);
     const comp = totalShares.value === 0 ?
-         <div></div> : 
+         <React.Fragment></React.Fragment> : 
          <Card data-testid="watchlistitem" style={style} className={root} onClick={onClick}>
             <Typography variant="h6" className="symbol">{symbol}</Typography>
             <div className="details" >

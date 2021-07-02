@@ -3,26 +3,12 @@ import { PortfolioContext, portfolioProvider } from '../../contexts/PortfolioCon
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
-import { FixedSizeList, ListChildComponentProps } from 'react-window';
 import PortfolioItem from '../PortfolioItem/PortfolioItem';
 import { makeStyles } from '@material-ui/core/styles';
+import List from '@material-ui/core/List';
 
 export default function Portfolio() {
     const portfolio = React.useContext(PortfolioContext);
-
-    const Row = (props: ListChildComponentProps) => {
-        const { index, style } = props;
-
-        const data = Object.values(portfolio)[index];
-
-        return (
-            <PortfolioItem 
-                key={index} 
-                style={style} 
-                data={data}
-            />
-        );
-    };
 
     const useStyles = makeStyles({
         root: {
@@ -36,9 +22,14 @@ export default function Portfolio() {
         <Card data-testid="portfoliolist" className={classes.root}>
             <CardHeader title="Portfolio"></CardHeader>
             <CardContent>
-                <FixedSizeList height={400} width={400} itemSize={80} itemCount={portfolioProvider.length}>
-                    {Row}
-                </FixedSizeList>
+                <List>
+                    { Object.entries(portfolio).map(([key, value]) => {
+                        return <PortfolioItem
+                            key={key}
+                            data={value}
+                        />
+                    })}
+                </List>
             </CardContent>
         </Card>
     </React.Fragment>;
