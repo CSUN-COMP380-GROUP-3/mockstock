@@ -32,7 +32,7 @@ export default function BuyBox() {
 
     const [form, updateForm] = React.useState<BuyBoxForm>({
         date: activeStockProvider.minDate || minDate, // this is the selected date of the buy
-        total: currency(0),
+        total: 0,
         stock,
         timestamp: moment(),
         type: 'BUY',
@@ -95,7 +95,7 @@ export default function BuyBox() {
     };
 
     const getTotal = () => {
-        return currency(buyAmount);
+        return buyAmount;
     };
 
     const isDisabled = () => {

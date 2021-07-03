@@ -10,7 +10,6 @@ import moment from 'moment';
 import { BaseKeyboardPickerProps } from '@material-ui/pickers/_shared/hooks/useKeyboardPickerState';
 import { Button } from '@material-ui/core';
 import Trade from '../../interfaces/Trade';
-import currency from 'currency.js';
 import Slider from '../Slider/Slider';
 import Input from '../Input/Input';
 import { tradesProvider } from '../../contexts/TradesContext';
@@ -34,7 +33,7 @@ export default function SellBox() {
 
     const [form, updateForm] = React.useState<SellBoxForm>({
         date: earliestDate || activeStockProvider.minDate || minDate,
-        total: currency(0),
+        total: 0,
         type: 'SELL',
         stock,
         timestamp: moment(),
@@ -102,11 +101,8 @@ export default function SellBox() {
     };
 
     const getTotal = () => {
-        console.log(shareAmount);
-        const shares = currency(shareAmount);
-        console.log(shares);
-        console.log(shares.value);
-        return getPrice()?.multiply(shares);
+        const gP = getPrice();
+        return Number(gP) * shareAmount;
     };
 
     const onChangeInput = (event: any) => {

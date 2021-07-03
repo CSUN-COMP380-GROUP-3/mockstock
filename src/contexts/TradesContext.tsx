@@ -81,14 +81,14 @@ class TradesProvider implements TradesContextInterface {
     getTotalSharesBySymbol(symbol?: string): number {
         return this.filterBySymbol(symbol).reduce(
             (acc, { total, price, type }) => {
-                const shares = total.value / price!.value;
+                const shares = total / price!;
                 if (type === 'BUY') {
                     acc += shares;
                 } else {
                     // SELL
                     acc -= shares;
                 }
-                return Number(acc.toFixed(4));
+                return acc;
             },
             0,
         );

@@ -8,8 +8,8 @@ export type TradeType = 'BUY' | 'SELL';
 export default interface Trade {
     stock: StockSymbolData;
     date: Moment;
-    price?: currency; // price related to the asset
-    total: currency; // total amount of the trade
+    price?: number; // price related to the asset
+    total: number; // total amount of the trade
     timestamp: Moment;
     type: TradeType;
-};
+}
