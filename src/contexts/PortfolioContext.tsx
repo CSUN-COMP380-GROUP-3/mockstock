@@ -29,7 +29,7 @@ class PortfolioProvider implements PortfolioContextInterface {
     updatePortfolio: (portfolio: PortfolioInterface) => void;
     constructor() {
         this.portfolio = {};
-        this.updatePortfolio = () => {};
+        this.updatePortfolio = () => { };
     }
 
     /**
@@ -63,18 +63,10 @@ class PortfolioProvider implements PortfolioContextInterface {
             } else {
                 // SELL
                 const tradeTotalShares = total / Number(price);
-                const tradeSharePrice = Number(price);
                 const oldTotalShares = newPortfolio[stock.symbol].totalShares;
-                const oldSharesPrice = newPortfolio[stock.symbol].sharesPrice;
                 const newTotalShares = oldTotalShares - tradeTotalShares;
-                const newTop =
-                    oldTotalShares * oldSharesPrice -
-                    tradeTotalShares * tradeSharePrice;
-                const newSharesPrice = newTop / newTotalShares;
 
                 newPortfolio[stock.symbol].totalShares = newTotalShares;
-                newPortfolio[stock.symbol].sharesPrice = newSharesPrice;
-                // If totalShares 0 or any isNan Infinity delete stock from portfolio
                 if (
                     newTotalShares === 0 ||
                     newTotalShares === Number.POSITIVE_INFINITY ||
