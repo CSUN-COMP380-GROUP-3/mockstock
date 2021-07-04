@@ -47,10 +47,10 @@ class PortfolioProvider implements PortfolioContextInterface {
         const { stock, total, price, type } = trade;
         const newPortfolio = Object.assign({}, this.portfolio);
         if (this.has(stock.symbol)) {
+            const tradeTotalShares = total / Number(price);
+            const oldTotalShares = newPortfolio[stock.symbol].totalShares;
             if (type === 'BUY') {
-                const tradeTotalShares = total / Number(price);
                 const tradeSharePrice = Number(price);
-                const oldTotalShares = newPortfolio[stock.symbol].totalShares;
                 const oldSharesPrice = newPortfolio[stock.symbol].sharesPrice;
                 const newTotalShares = tradeTotalShares + oldTotalShares;
                 const newTop =
@@ -62,8 +62,6 @@ class PortfolioProvider implements PortfolioContextInterface {
                 newPortfolio[stock.symbol].sharesPrice = newSharesPrice;
             } else {
                 // SELL
-                const tradeTotalShares = total / Number(price);
-                const oldTotalShares = newPortfolio[stock.symbol].totalShares;
                 const newTotalShares = oldTotalShares - tradeTotalShares;
 
                 newPortfolio[stock.symbol].totalShares = newTotalShares;
