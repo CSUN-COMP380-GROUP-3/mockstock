@@ -63,7 +63,7 @@ class ActiveStockProvider implements ActiveStockProviderInterface {
             quote: { o: 1, h: 1, l: 1, c: 1, pc: 1 },
             candles: { c: [], h: [], l: [], o: [], s: '', v: [], t: [] },
         };
-        this.updateActiveStock = () => {};
+        this.updateActiveStock = () => { };
         this.initializeData();
     }
 
@@ -168,7 +168,7 @@ class ActiveStockProvider implements ActiveStockProviderInterface {
         return this.activeStock.candles.t.findIndex((curr) => {
             const currentTimestamp = moment.unix(curr);
             return currentTimestamp.isSame(targetTimestamp, 'day');
-        });
+        }) - 1;
     }
 
     /**
