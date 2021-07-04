@@ -13,7 +13,7 @@ import Trade from '../../interfaces/Trade';
 import Slider from '../Slider/Slider';
 import Input from '../Input/Input';
 import { tradesProvider } from '../../contexts/TradesContext';
-import { portfolioProvider } from '../../contexts/PortfolioContext';
+import { PortfolioContext, portfolioProvider } from '../../contexts/PortfolioContext';
 
 export interface SellBoxForm extends Trade {
     type: 'SELL';
@@ -23,12 +23,16 @@ export interface SellBoxProps { }
 
 export default function SellBox() {
     const activeStock = React.useContext(ActiveStockContext);
+    const portfolio = React.useContext(PortfolioContext);
+
     const { stock } = activeStock;
 
     const { liquidBalance, updateLiquidBalance } =
         React.useContext(LiquidBalanceContext);
 
-    const totalShares = tradesProvider.getTotalSharesBySymbol(stock.symbol);
+    const totalShares = portfolio[stock.symbol]?.totalShares || 0;
+    
+    // should we also keep track of the earliest date on the portfolio?
     const earliestDate = tradesProvider.getEarliestDateBySymbol(stock.symbol);
 
     const [form, updateForm] = React.useState<SellBoxForm>({
