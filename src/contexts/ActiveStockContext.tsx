@@ -166,9 +166,9 @@ class ActiveStockProvider implements ActiveStockProviderInterface {
     getIndexByTimestamp(timestamp: number): number {
         const targetTimestamp = moment.unix(timestamp);
         return this.activeStock.candles.t.findIndex((curr) => {
-            const currentTimestamp = moment.unix(curr);
+            const currentTimestamp = moment.unix(curr).utcOffset(420);
             return currentTimestamp.isSame(targetTimestamp, 'day');
-        }) - 1;
+        });
     }
 
     /**
