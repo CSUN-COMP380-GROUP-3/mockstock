@@ -19,7 +19,7 @@ export interface SellBoxForm extends Trade {
     type: 'SELL';
 }
 
-export interface SellBoxProps {}
+export interface SellBoxProps { }
 
 export default function SellBox() {
     const activeStock = React.useContext(ActiveStockContext);
@@ -44,9 +44,7 @@ export default function SellBox() {
     const [shareAmount, updateShareAmount] = React.useState(0);
 
     // this state controls the candlestick index
-    const [candlestickIndex, updateCandlestickIndex] = React.useState(
-        activeStockProvider.getIndexByTimestamp(date.unix()),
-    );
+    const [candlestickIndex, updateCandlestickIndex] = React.useState(0);
 
     const onChangeSellDate: BaseKeyboardPickerProps['onChange'] = (date) => {
         if (!!date) {
@@ -134,27 +132,27 @@ export default function SellBox() {
         maxShares === 0
             ? []
             : [
-                  {
-                      value: 0,
-                      label: '0%',
-                  },
-                  {
-                      value: maxShares * 0.25,
-                      label: '25%',
-                  },
-                  {
-                      value: maxShares * 0.5,
-                      label: '50%',
-                  },
-                  {
-                      value: maxShares * 0.75,
-                      label: '75%',
-                  },
-                  {
-                      value: maxShares,
-                      label: '100%',
-                  },
-              ];
+                {
+                    value: 0,
+                    label: '0%',
+                },
+                {
+                    value: maxShares * 0.25,
+                    label: '25%',
+                },
+                {
+                    value: maxShares * 0.5,
+                    label: '50%',
+                },
+                {
+                    value: maxShares * 0.75,
+                    label: '75%',
+                },
+                {
+                    value: maxShares,
+                    label: '100%',
+                },
+            ];
 
     const isDisabled = () => {
         // here we need to check and see if the stock is in the portfolio
