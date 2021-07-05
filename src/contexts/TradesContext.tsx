@@ -1,20 +1,15 @@
 import React from 'react';
 import Trade from '../interfaces/Trade';
-import currency from 'currency.js';
 import { Moment } from 'moment';
 
 export type TradesInterface = Trade[];
 
-export interface TradesContextInterface {
+export interface TradesProviderInterface {
     trades: TradesInterface;
     updateTrades: (trades: TradesInterface) => void;
     addToTrades: (trade: Trade) => boolean;
     filterBySymbol: (symbol?: string) => Trade[];
-    getTotalSharesBySymbol: (symbol?: string) => number;
-    getTotalAmountBySymbol: (symbol?: string) => currency;
     getEarliestDateBySymbol: (symbol?: string) => Moment;
-    totalShares: number;
-    totalAmount: currency;
     earliestDate: Moment;
 }
 
@@ -24,7 +19,7 @@ export interface TradesContextInterface {
  * trades and updateTrades properties, respectively. Doing so allows all the logic related
  * to trades be handled within this exported instance on line 114.
  */
-class TradesProvider implements TradesContextInterface {
+class TradesProvider implements TradesProviderInterface {
     trades: TradesInterface;
     updateTrades: (trades: TradesInterface) => void;
     constructor() {
@@ -58,43 +53,6 @@ class TradesProvider implements TradesContextInterface {
     }
 
     /**
-     * Returns the total sum of all the trades filtered by symbol as a currency object
-     * @param symbol The stock's unique identifier
-     */
-    getTotalAmountBySymbol(symbol?: string): currency {
-        return this.filterBySymbol(symbol).reduce((acc, { total, type }) => {
-            if (type === 'BUY') {
-                acc = acc.add(total);
-            } else {
-                // SELL
-                acc = acc.subtract(total);
-            }
-            return acc;
-        }, currency(0));
-    }
-
-    /**
-     * Returns the total number of shares filtered by symbol
-     * @param symbol The stock's unique identifier
-     * @returns
-     */
-    getTotalSharesBySymbol(symbol?: string): number {
-        return this.filterBySymbol(symbol).reduce(
-            (acc, { total, price, type }) => {
-                const shares = total.value / price!.value;
-                if (type === 'BUY') {
-                    acc += shares;
-                } else {
-                    // SELL
-                    acc -= shares;
-                }
-                return Number(acc.toFixed(4));
-            },
-            0,
-        );
-    }
-
-    /**
      * Returns the earliest trade, filtered by symbol as a Moment object
      * @param symbol The stock's unique identifier
      */
@@ -110,14 +68,6 @@ class TradesProvider implements TradesContextInterface {
             }
             return acc;
         }, null as any);
-    }
-
-    get totalShares() {
-        return this.getTotalSharesBySymbol();
-    }
-
-    get totalAmount() {
-        return this.getTotalAmountBySymbol();
     }
 
     get earliestDate() {

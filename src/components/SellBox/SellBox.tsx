@@ -10,31 +10,34 @@ import moment from 'moment';
 import { BaseKeyboardPickerProps } from '@material-ui/pickers/_shared/hooks/useKeyboardPickerState';
 import { Button } from '@material-ui/core';
 import Trade from '../../interfaces/Trade';
-import currency from 'currency.js';
 import Slider from '../Slider/Slider';
 import Input from '../Input/Input';
 import { tradesProvider } from '../../contexts/TradesContext';
-import { portfolioProvider } from '../../contexts/PortfolioContext';
+import { PortfolioContext, portfolioProvider } from '../../contexts/PortfolioContext';
 
 export interface SellBoxForm extends Trade {
     type: 'SELL';
 }
 
-export interface SellBoxProps {}
+export interface SellBoxProps { }
 
 export default function SellBox() {
     const activeStock = React.useContext(ActiveStockContext);
+    const portfolio = React.useContext(PortfolioContext);
+
     const { stock } = activeStock;
 
     const { liquidBalance, updateLiquidBalance } =
         React.useContext(LiquidBalanceContext);
 
-    const totalShares = tradesProvider.getTotalSharesBySymbol(stock.symbol);
+    const totalShares = portfolio[stock.symbol]?.totalShares || 0;
+    
+    // should we also keep track of the earliest date on the portfolio?
     const earliestDate = tradesProvider.getEarliestDateBySymbol(stock.symbol);
 
     const [form, updateForm] = React.useState<SellBoxForm>({
         date: earliestDate || activeStockProvider.minDate || minDate,
-        total: currency(0),
+        total: 0,
         type: 'SELL',
         stock,
         timestamp: moment(),
@@ -45,9 +48,7 @@ export default function SellBox() {
     const [shareAmount, updateShareAmount] = React.useState(0);
 
     // this state controls the candlestick index
-    const [candlestickIndex, updateCandlestickIndex] = React.useState(
-        activeStockProvider.getIndexByTimestamp(date.unix()),
-    );
+    const [candlestickIndex, updateCandlestickIndex] = React.useState(0);
 
     const onChangeSellDate: BaseKeyboardPickerProps['onChange'] = (date) => {
         if (!!date) {
@@ -102,11 +103,8 @@ export default function SellBox() {
     };
 
     const getTotal = () => {
-        console.log(shareAmount);
-        const shares = currency(shareAmount);
-        console.log(shares);
-        console.log(shares.value);
-        return getPrice()?.multiply(shares);
+        const gP = getPrice();
+        return Number(gP) * shareAmount;
     };
 
     const onChangeInput = (event: any) => {
@@ -138,27 +136,27 @@ export default function SellBox() {
         maxShares === 0
             ? []
             : [
-                  {
-                      value: 0,
-                      label: '0%',
-                  },
-                  {
-                      value: maxShares * 0.25,
-                      label: '25%',
-                  },
-                  {
-                      value: maxShares * 0.5,
-                      label: '50%',
-                  },
-                  {
-                      value: maxShares * 0.75,
-                      label: '75%',
-                  },
-                  {
-                      value: maxShares,
-                      label: '100%',
-                  },
-              ];
+                {
+                    value: 0,
+                    label: '0%',
+                },
+                {
+                    value: maxShares * 0.25,
+                    label: '25%',
+                },
+                {
+                    value: maxShares * 0.5,
+                    label: '50%',
+                },
+                {
+                    value: maxShares * 0.75,
+                    label: '75%',
+                },
+                {
+                    value: maxShares,
+                    label: '100%',
+                },
+            ];
 
     const isDisabled = () => {
         // here we need to check and see if the stock is in the portfolio

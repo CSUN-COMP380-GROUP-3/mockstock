@@ -20,7 +20,7 @@ export interface BuyBoxForm extends Trade {
     type: 'BUY';
 }
 
-export interface BuyBoxProps {}
+export interface BuyBoxProps { }
 
 export default function BuyBox() {
     const activeStock = React.useContext(ActiveStockContext);
@@ -32,7 +32,7 @@ export default function BuyBox() {
 
     const [form, updateForm] = React.useState<BuyBoxForm>({
         date: activeStockProvider.minDate || minDate, // this is the selected date of the buy
-        total: currency(0),
+        total: 0,
         stock,
         timestamp: moment(),
         type: 'BUY',
@@ -44,9 +44,7 @@ export default function BuyBox() {
     const [buyAmount, updateBuyAmount] = React.useState(0);
 
     // this state controls the candlestick index
-    const [candlestickIndex, updateCandlestickIndex] = React.useState(
-        activeStockProvider.getIndexByTimestamp(date.unix()),
-    );
+    const [candlestickIndex, updateCandlestickIndex] = React.useState(0);
 
     const onChangeBuyDate: BaseKeyboardPickerProps['onChange'] = (date) => {
         if (!!date) {
@@ -95,7 +93,7 @@ export default function BuyBox() {
     };
 
     const getTotal = () => {
-        return currency(buyAmount);
+        return buyAmount;
     };
 
     const isDisabled = () => {
@@ -130,27 +128,27 @@ export default function BuyBox() {
         curr.value === 0
             ? []
             : [
-                  {
-                      value: 0,
-                      label: '0%',
-                  },
-                  {
-                      value: maxAmount * 0.25,
-                      label: '25%',
-                  },
-                  {
-                      value: maxAmount * 0.5,
-                      label: '50%',
-                  },
-                  {
-                      value: maxAmount * 0.75,
-                      label: '75%',
-                  },
-                  {
-                      value: maxAmount,
-                      label: '100%',
-                  },
-              ];
+                {
+                    value: 0,
+                    label: '0%',
+                },
+                {
+                    value: maxAmount * 0.25,
+                    label: '25%',
+                },
+                {
+                    value: maxAmount * 0.5,
+                    label: '50%',
+                },
+                {
+                    value: maxAmount * 0.75,
+                    label: '75%',
+                },
+                {
+                    value: maxAmount,
+                    label: '100%',
+                },
+            ];
 
     return (
         <div data-testid="buybox">

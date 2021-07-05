@@ -77,10 +77,10 @@ export default function TradeHistoryTable() {
                                 {trade.date.format()}
                             </StyledTableCell>
                             <StyledTableCell align="right">
-                                {trade.price?.value}
+                                {trade.price}
                             </StyledTableCell>
                             <StyledTableCell align="right">
-                                {trade.total.value}
+                                {trade.total}
                             </StyledTableCell>
                             <StyledTableCell align="right">
                                 {trade.type}

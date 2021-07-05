@@ -22,23 +22,29 @@ export interface ActiveStockInterface {
     stock: StockSymbolData;
     quote: QuoteData;
     candles: CandleStickData;
-};
+}
 
 /** Interface for the ActiveStockProvider */
 export interface ActiveStockProviderInterface {
     activeStock: ActiveStockInterface;
     updateActiveStock: (activeStock: ActiveStockInterface) => void;
-    fetchCandlesAndQuoteByStockSymbol: ({symbol}: StockSymbolData) => Promise<[AxiosResponse<CandleStickData>, AxiosResponse<QuoteData>]>;
-    fetchCandlesAndQuote: () => Promise<[AxiosResponse<CandleStickData>, AxiosResponse<QuoteData>]>;
+    fetchCandlesAndQuoteByStockSymbol: ({
+        symbol,
+    }: StockSymbolData) => Promise<
+        [AxiosResponse<CandleStickData>, AxiosResponse<QuoteData>]
+    >;
+    fetchCandlesAndQuote: () => Promise<
+        [AxiosResponse<CandleStickData>, AxiosResponse<QuoteData>]
+    >;
     switchActiveStock: (newStockSymbol: StockSymbolData) => void;
     minDate: Moment | undefined;
     maxDate: Moment | undefined;
     getIndexByTimestamp: (timestamp: number) => number;
-    getBuyPriceByTimestamp: (timestamp: number) => currency | undefined;
-    getBuyPriceByIndex: (index: number) =>  currency | undefined;
-    getSellPriceByTimestamp: (timestamp: number) => currency | undefined;
-    getSellPriceByIndex: (index: number) =>  currency | undefined;
-};
+    getBuyPriceByTimestamp: (timestamp: number) => number | undefined;
+    getBuyPriceByIndex: (index: number) => number | undefined;
+    getSellPriceByTimestamp: (timestamp: number) => number | undefined;
+    getSellPriceByIndex: (index: number) => number | undefined;
+}
 
 /**
  * ActiveStockProvider is meant to be a wrapper around the activeStock state. When the global
@@ -51,46 +57,53 @@ class ActiveStockProvider implements ActiveStockProviderInterface {
     updateActiveStock: (activeStock: ActiveStockInterface) => void;
     constructor() {
         this.activeStock = {
-            stock: filteredSymbols.find(s => s.symbol === initSymbol) || filteredSymbols[0],
+            stock:
+                filteredSymbols.find((s) => s.symbol === initSymbol) ||
+                filteredSymbols[0],
             quote: { o: 1, h: 1, l: 1, c: 1, pc: 1 },
-            candles: { c: [], h: [], l: [], o: [], s: "", v: [], t: [] }
+            candles: { c: [], h: [], l: [], o: [], s: '', v: [], t: [] },
         };
-        this.updateActiveStock = () => {};
+        this.updateActiveStock = () => { };
         this.initializeData();
-    };
+    }
 
     /**
      * Only to be called by the constructor. Will throw an error if anything goes wrong and stops
      * execution. Fetches candlestick and quote data for the initialized symbol.
-     * 
+     *
      * TODO: catch the error and handle it appropriately rather than letting it just block execution
      */
     private initializeData() {
         console.log('initializing data');
-        this.fetchCandlesAndQuote()
-            .then(([candlesResponse, quoteResponse]) => {
-                this.updateActiveStock({
-                    stock: this.activeStock.stock,
-                    candles: candlesResponse.data,
-                    quote: quoteResponse.data,
-                });
+        this.fetchCandlesAndQuote().then(([candlesResponse, quoteResponse]) => {
+            this.updateActiveStock({
+                stock: this.activeStock.stock,
+                candles: candlesResponse.data,
+                quote: quoteResponse.data,
             });
-    };
+        });
+    }
 
     /**
      * Fetch the max amount of candles and quote data together of current activeStock.
      * @returns An array of axios responses
      */
-    fetchCandlesAndQuote(): Promise<[AxiosResponse<CandleStickData>, AxiosResponse<QuoteData>]> {
+    fetchCandlesAndQuote(): Promise<
+        [AxiosResponse<CandleStickData>, AxiosResponse<QuoteData>]
+    > {
         return this.fetchCandlesAndQuoteByStockSymbol(this.activeStock.stock);
-    };
+    }
 
     /**
      * Fetches the max amoutn of candles and quote data together of stockSymbol
-     * @param stockSymbol StockSymbolData of the desired stock 
-     * @returns 
+     * @param stockSymbol StockSymbolData of the desired stock
+     * @returns
      */
-    fetchCandlesAndQuoteByStockSymbol({symbol}: StockSymbolData): Promise<[AxiosResponse<CandleStickData>, AxiosResponse<QuoteData>]> {
+    fetchCandlesAndQuoteByStockSymbol({
+        symbol,
+    }: StockSymbolData): Promise<
+        [AxiosResponse<CandleStickData>, AxiosResponse<QuoteData>]
+    > {
         const candlePromise = fetchCandles({
             symbol,
             from: minDate.unix(),
@@ -98,49 +111,52 @@ class ActiveStockProvider implements ActiveStockProviderInterface {
             resolution: 'D',
             token: TOKEN,
         });
-    
+
         const quotePromise = fetchQuote({
             symbol,
-            token: TOKEN
+            token: TOKEN,
         });
 
         return Promise.all([candlePromise, quotePromise]);
-    };
+    }
 
     /**
      * Fetches candlestick and quote data first, then update activeStock via updateActiveStock
-     * 
+     *
      * TODO: handle errors appropriately
      * @param newSymbol New desired symbol
      */
     async switchActiveStock(newStockSymbol: StockSymbolData) {
         try {
-            const [candlesResponse, quoteResponse] = await this.fetchCandlesAndQuoteByStockSymbol(newStockSymbol);
-            if (candlesResponse.data.s === 'no_data') { throw new NoDataError(); };
+            const [candlesResponse, quoteResponse] =
+                await this.fetchCandlesAndQuoteByStockSymbol(newStockSymbol);
+            if (candlesResponse.data.s === 'no_data') {
+                throw new NoDataError();
+            }
             this.updateActiveStock({
                 stock: newStockSymbol,
                 quote: quoteResponse.data,
                 candles: candlesResponse.data,
             });
-        } catch(error) {
+        } catch (error) {
             errorHandler(error);
 
             // should we just retry?
             // await wait(500);
             // await this.switchActiveStock(newSymbol);
-        };
-    };
+        }
+    }
 
     /**
      * Switch the activeStock by stock ticker
      * @param name Desired stock by symbol name
-     * @returns 
+     * @returns
      */
     async switchActiveStockByName(name: string) {
-        const newStockSymbol = filteredSymbols.find(s => s.symbol === name);
-        if (newStockSymbol === undefined) return; 
+        const newStockSymbol = filteredSymbols.find((s) => s.symbol === name);
+        if (newStockSymbol === undefined) return;
         this.switchActiveStock(newStockSymbol);
-    };
+    }
 
     /**
      * Finds the matching unix timestamp amongs the candlestick timestamp array and returns it's index
@@ -149,52 +165,51 @@ class ActiveStockProvider implements ActiveStockProviderInterface {
      */
     getIndexByTimestamp(timestamp: number): number {
         const targetTimestamp = moment.unix(timestamp);
-        return this.activeStock.candles.t
-            .findIndex(curr => {
-                const currentTimestamp = moment.unix(curr);
-                return currentTimestamp.isSame(targetTimestamp, 'day');
-            });
-    };
+        return this.activeStock.candles.t.findIndex((curr) => {
+            const currentTimestamp = moment.unix(curr).utcOffset(420);
+            return currentTimestamp.isSame(targetTimestamp, 'day');
+        });
+    }
 
     /**
      * Assumes perfect entry into the market and returns the lowest price at the given timestamp
      * @param timestamp Unix timestamp
      * @returns Buy price
      */
-    getBuyPriceByTimestamp(timestamp: number): currency | undefined {
+    getBuyPriceByTimestamp(timestamp: number): number | undefined {
         const index = this.getIndexByTimestamp(timestamp);
-        return this.getBuyPriceByIndex(index);
-    };
+        return Number(this.getBuyPriceByIndex(index));
+    }
 
     /**
      * Assumes prefect entry into the market and returns the lowest price at the given index
      * @param index Index of the corresponding candlestick
      * @returns Buy price
      */
-    getBuyPriceByIndex(index: number): currency | undefined {
+    getBuyPriceByIndex(index: number): number | undefined {
         if (index === -1) return undefined;
-        return currency(this.activeStock.candles.l[index]);
-    };
-    
+        return Number(this.activeStock.candles.c[index]);
+    }
+
     /**
      * Assumes perfect exit from the market and returns the highest price at the given timestamp
      * @param timestamp Unix timestamp
      * @returns Sell price
      */
-    getSellPriceByTimestamp(timestamp: number): currency | undefined {
+    getSellPriceByTimestamp(timestamp: number): number | undefined {
         const index = this.getIndexByTimestamp(timestamp);
-        return this.getSellPriceByIndex(index);
-    };
+        return Number(this.getSellPriceByIndex(index));
+    }
 
     /**
      * Assumes prefect exit from the market and returns the highest price at the given index
      * @param index Index of the corresponding candlestick
      * @returns Sell price
      */
-    getSellPriceByIndex(index: number): currency | undefined {
+    getSellPriceByIndex(index: number): number | undefined {
         if (index === -1) return undefined;
-        return currency(this.activeStock.candles.h[index]);
-    };
+        return Number(this.activeStock.candles.c[index]);
+    }
 
     /**
      * Gets the earliest possible date to start trading the underlying stock
@@ -203,9 +218,9 @@ class ActiveStockProvider implements ActiveStockProviderInterface {
         if (this.activeStock.candles.t.length > 0) {
             const firstTimestamp = this.activeStock.candles.t[0];
             return moment.unix(firstTimestamp);
-        };
+        }
         return undefined;
-    };
+    }
 
     /**
      * Gets the latest possible date to stop trading the underlying stock
@@ -213,14 +228,15 @@ class ActiveStockProvider implements ActiveStockProviderInterface {
     get maxDate(): Moment | undefined {
         const candleTimestamps = this.activeStock.candles.t;
         if (candleTimestamps.length > 0) {
-            const lastTimestamp = candleTimestamps[candleTimestamps.length-1];
+            const lastTimestamp = candleTimestamps[candleTimestamps.length - 1];
             return moment.unix(lastTimestamp);
-        };
+        }
         return undefined;
-    };
-
-};
+    }
+}
 
 export const activeStockProvider = new ActiveStockProvider();
 
-export const ActiveStockContext = React.createContext<ActiveStockInterface>(activeStockProvider.activeStock);
+export const ActiveStockContext = React.createContext<ActiveStockInterface>(
+    activeStockProvider.activeStock,
+);
