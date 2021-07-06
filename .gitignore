@@ -26,3 +26,5 @@ yarn-error.log*
 src/initCandles.json
 src/symbols.json
 package-lock.json
+
+*.pem

@@ -13,6 +13,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { TradesContext } from '../../contexts/TradesContext';
+import moment from 'moment';
 
 const StyledTableCell = withStyles((theme: Theme) =>
     createStyles({
@@ -69,7 +70,7 @@ export default function TradeHistoryTable() {
                 </TableHead>
                 <TableBody>
                     {tradesContext.map((trade) => {
-                        const tradeDate = trade.date.toString().split(' ');
+                        const tradeDate = moment.unix(trade.date).toString().split(' ');
                         return (
                             <StyledTableRow key={trade.stock.symbol}>
                                 <StyledTableCell component="th" scope="trade">

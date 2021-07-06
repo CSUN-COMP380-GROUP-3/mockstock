@@ -4,7 +4,7 @@ import {
     ActiveStockContext,
     activeStockProvider,
 } from '../../contexts/ActiveStockContext';
-import { LiquidBalanceContext } from '../../contexts/LiquidBalanceContext';
+import { liquidBalanceProvider } from '../../contexts/LiquidBalanceContext';
 import DatePicker, { minDate, maxDate } from '../DatePicker/DatePicker';
 import moment from 'moment';
 import { BaseKeyboardPickerProps } from '@material-ui/pickers/_shared/hooks/useKeyboardPickerState';
@@ -30,20 +30,17 @@ export default function SellBox() {
 
     const { stock } = activeStock;
 
-    const { liquidBalance, updateLiquidBalance } =
-        React.useContext(LiquidBalanceContext);
-
     const totalShares = portfolio[stock.symbol]?.totalShares || 0;
 
     // should we also keep track of the earliest date on the portfolio?
     const earliestDate = tradesProvider.getEarliestDateBySymbol(stock.symbol);
 
     const [form, updateForm] = React.useState<SellBoxForm>({
-        date: earliestDate || activeStockProvider.minDate || minDate,
+        date: earliestDate?.unix() || activeStockProvider.minDate?.unix() || minDate.unix(),
         total: 0,
         type: 'SELL',
         stock,
-        timestamp: moment(),
+        timestamp: moment().unix(),
     });
     const { date } = form;
 
@@ -64,19 +61,13 @@ export default function SellBox() {
             }
             updateForm({
                 ...form,
-                date,
+                date: date.unix(),
             });
             updateCandlestickIndex(index);
         }
     };
 
-    const onClick = async () => {
-        // need to calculate the amount of the trade
-        // amount = shares * price
-        // getting the price is a bit tricky
-        // need to find the price that corresponds to the sell date
-
-        // should not be able to click this if oneDayCandle is not set
+    const onClick = () => {
         const price = getPrice();
         if (price === undefined) return;
         const total = getTotal();
@@ -84,27 +75,15 @@ export default function SellBox() {
 
         const trade: SellBoxForm = {
             ...form,
-            stock: activeStock.stock,
-            timestamp: moment(),
+            stock,
+            timestamp: moment().unix(),
             total,
             price,
         };
 
-        updateLiquidBalance({
-            curr: liquidBalance.curr.add(total),
-            prev: liquidBalance.prev,
-        });
-
-        await tradesProvider.addToTrades(trade);
-        await portfolioProvider.addToPortfolio(trade);
-        const newPortfolio = Object.assign({}, portfolioProvider.portfolio);
-        let portfolioStringified = JSON.stringify(newPortfolio);
-        await localStorage.removeItem('portfolio');
-        localStorage.setItem('portfolio', portfolioStringified); // Save portfolio in local storage
-        const newTradeHistory = Object.assign({}, tradesProvider.trades);
-        let tradeHistoryStringified = JSON.stringify(newTradeHistory);
-        await localStorage.removeItem('tradeHistory');
-        localStorage.setItem('tradeHistory', tradeHistoryStringified); // Save portfolio in local stoage
+        liquidBalanceProvider.add(total);
+        tradesProvider.addToTrades(trade);
+        portfolioProvider.addToPortfolio(trade);
 
         updateShareAmount(0);
     };
@@ -194,7 +173,7 @@ export default function SellBox() {
             <Typography variant="h5">Sell {stock.symbol}</Typography>
             <DatePicker
                 id="sellDate"
-                value={date}
+                value={moment.unix(date)}
                 onChange={onChangeSellDate}
                 minDate={earliestDate || activeStockProvider.minDate || minDate}
                 maxDate={activeStockProvider.maxDate || maxDate}

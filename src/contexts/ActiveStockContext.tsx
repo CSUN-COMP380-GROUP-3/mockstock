@@ -9,13 +9,16 @@ import { fetchQuote, fetchCandles, errorHandler } from '../components/utils';
 import { TOKEN } from './TokenContext';
 import { AxiosResponse } from 'axios';
 import { NoDataError } from '../components/errors';
-import currency from 'currency.js';
+import storage from '../components/storage';
+
 // ActiveStock provides data about the stock currently being displayed on the left-side of the screen.
 // ActiveStock provides two essential pieces of information, Candlestick Information and Quote Information.
 // The ActiveStock is only expected to change ONCE every time the user chooses a new symbol to view.
 
+const STORAGE_KEY = 'activeStock';
+
 /**The initial Symbol to load up when first visiting the site */
-export const initSymbol = process.env.REACT_APP_INITIAL_STOCK || 'GME';
+export const initSymbol = storage?.getItem(STORAGE_KEY) || process.env.REACT_APP_INITIAL_STOCK || 'GME';
 
 /**The type that ActiveStock's active stock should follow */
 export interface ActiveStockInterface {
@@ -74,7 +77,7 @@ class ActiveStockProvider implements ActiveStockProviderInterface {
      * TODO: catch the error and handle it appropriately rather than letting it just block execution
      */
     private initializeData() {
-        console.log('initializing data');
+        storage?.setItem(STORAGE_KEY, initSymbol);
         this.fetchCandlesAndQuote().then(([candlesResponse, quoteResponse]) => {
             this.updateActiveStock({
                 stock: this.activeStock.stock,
@@ -138,6 +141,7 @@ class ActiveStockProvider implements ActiveStockProviderInterface {
                 quote: quoteResponse.data,
                 candles: candlesResponse.data,
             });
+            storage?.setItem(STORAGE_KEY, newStockSymbol.symbol);
         } catch (error) {
             errorHandler(error);
 
