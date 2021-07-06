@@ -1,6 +1,7 @@
 import React from 'react';
 import Trade from '../interfaces/Trade';
 import moment, { Moment } from 'moment';
+import storage from '../components/storage';
 
 export type TradesInterface = Trade[];
 
@@ -12,7 +13,7 @@ export interface TradesProviderInterface {
     getEarliestDateBySymbol: (symbol?: string) => Moment;
     earliestDate: Moment;
 }
-
+const STORAGE_KEY = 'tradeHistory';
 /**
  * TradesProvider is meant to be a wrapper around the trades state. When the global
  * state is created its reference and update function are placed in the TradesProvider's
@@ -23,29 +24,48 @@ class TradesProvider implements TradesProviderInterface {
     trades: TradesInterface;
     updateTrades: (trades: TradesInterface) => void;
     constructor() {
-        let fromLocal = localStorage.getItem('tradeHistory');
-        let localObject;
-        if (!!fromLocal) {
-            localObject = JSON.parse(fromLocal!);
-        }
         this.trades = [];
-        let here = [];
-        if (!!localObject) {
-            for (var i in localObject) {
-                let hold: Trade = {
-                    date: moment(localObject[i]['date']),
-                    stock: localObject[i]['stock'],
-                    total: Number(localObject[i]['total']),
-                    timestamp: moment(localObject[i]['timestamp']),
-                    type: localObject[i]['type'],
-                    price: Number(localObject[i]['price']),
-                };
-                here.push(hold);
-            }
-            this.trades = here;
-        }
         this.updateTrades = () => {};
+        this.importFromStorage();
     }
+
+    /**
+     * Trade history data is a stringified array so we parse and set as trades
+     * 
+     * TODO: need some way to verify that the stringified array is what we expect
+     * it to be. maybe we need to use public/private key and sign and verify similar
+     * to how jwt works
+     */
+    private importFromStorage() {
+        let fromLocal = storage?.getItem(STORAGE_KEY);
+        if (!!fromLocal) {
+            try {
+                let localObject = JSON.parse(fromLocal);
+                // here is where we can verify
+                if (!!localObject) {
+                    this.trades = [...localObject];
+                }
+            } catch(e) {
+                console.log('Failed to import trade history from storage');
+            }
+        }
+    };
+
+    /**
+     * Stringify the trades array and store in local storage
+     * 
+     * @param trades - array of Trade objects
+     * 
+     * TODO: sign before storing in local storage so that we can verify the data
+     * is untampered
+     */
+    private exportToStorage(trades: Trade[]) {
+        const tradeHistoryStr = JSON.stringify(trades);
+        // here is where we would sign the string
+        if (!!tradeHistoryStr) {
+            storage?.setItem(STORAGE_KEY, tradeHistoryStr);
+        };
+    };
 
     /**
      * Makes a copy of the current trades, unshifts the trade unto copy
@@ -57,6 +77,7 @@ class TradesProvider implements TradesProviderInterface {
         const newTrades = [...this.trades];
         newTrades.unshift(trade);
         this.updateTrades(newTrades);
+        this.exportToStorage(newTrades);
         return true;
     }
 
@@ -78,12 +99,13 @@ class TradesProvider implements TradesProviderInterface {
      */
     getEarliestDateBySymbol(symbol?: string): Moment {
         return this.filterBySymbol(symbol).reduce((acc, { date, type }) => {
+            const _date = moment.unix(date);
             if (type === 'BUY') {
                 if (!!acc) {
-                    acc = date.isBefore(acc) ? date : acc;
+                    acc = _date.isBefore(acc) ? date : acc;
                 } else {
                     // SELL
-                    acc = date;
+                    acc = _date;
                 }
             }
             return acc;
