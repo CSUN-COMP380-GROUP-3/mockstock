@@ -83,12 +83,16 @@ export default function BuyBox() {
             prev: liquidBalance.prev,
         });
 
-        tradesProvider.addToTrades(trade);
+        await tradesProvider.addToTrades(trade);
         await portfolioProvider.addToPortfolio(trade);
         const newPortfolio = Object.assign({}, portfolioProvider.portfolio);
         let portfolioStringified = JSON.stringify(newPortfolio);
         await localStorage.removeItem('portfolio');
-        localStorage.setItem('portfolio', portfolioStringified); // Save portfolio in local storage
+        localStorage.setItem('portfolio', portfolioStringified); // Save portfolio in local stoage
+        const newTradeHistory = Object.assign({}, tradesProvider.trades);
+        let tradeHistoryStringified = JSON.stringify(newTradeHistory);
+        await localStorage.removeItem('tradeHistory');
+        localStorage.setItem('tradeHistory', tradeHistoryStringified); // Save portfolio in local stoage
 
         updateBuyAmount(0);
     };

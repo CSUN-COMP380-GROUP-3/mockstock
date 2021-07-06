@@ -1,6 +1,6 @@
 import React from 'react';
 import Trade from '../interfaces/Trade';
-import { Moment } from 'moment';
+import moment, { Moment } from 'moment';
 
 export type TradesInterface = Trade[];
 
@@ -23,7 +23,26 @@ class TradesProvider implements TradesProviderInterface {
     trades: TradesInterface;
     updateTrades: (trades: TradesInterface) => void;
     constructor() {
+        let fromLocal = localStorage.getItem('tradeHistory');
+        let localObject;
+        if (!!fromLocal) {
+            localObject = JSON.parse(fromLocal!);
+        }
         this.trades = [];
+        let here = [];
+        if (!!localObject) {
+            for (var i in localObject) {
+                let hold: Trade = {
+                    date: moment(localObject[i]['date']),
+                    stock: localObject[i]['stock'],
+                    total: Number(localObject[i]['total']),
+                    timestamp: localObject[i]['timestamp'],
+                    type: localObject[i]['type'],
+                };
+                here.push(hold);
+            }
+            this.trades = here;
+        }
         this.updateTrades = () => {};
     }
 
