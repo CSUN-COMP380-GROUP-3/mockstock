@@ -47,7 +47,7 @@ export default function TradeHistory() {
     };
 
     return (
-        <div>
+        <div style={{ margin: 15 }}>
             <button type="button" onClick={handleOpen}>
                 Trade History
             </button>
