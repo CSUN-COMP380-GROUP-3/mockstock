@@ -90,8 +90,6 @@ class PortfolioProvider implements PortfolioContextInterface {
         }
         this.updatePortfolio(newPortfolio);
 
-        // NEED TO SAVE PORTFOLIO TO LOCAL STORAGE NOW
-
         return true;
     }
 
