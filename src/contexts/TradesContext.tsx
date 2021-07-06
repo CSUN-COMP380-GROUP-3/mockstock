@@ -102,7 +102,7 @@ class TradesProvider implements TradesProviderInterface {
             const _date = moment.unix(date);
             if (type === 'BUY') {
                 if (!!acc) {
-                    acc = _date.isBefore(acc) ? date : acc;
+                    acc = _date.isBefore(acc) ? _date : acc;
                 } else {
                     // SELL
                     acc = _date;
