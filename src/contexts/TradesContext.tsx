@@ -36,7 +36,7 @@ class TradesProvider implements TradesProviderInterface {
                     date: moment(localObject[i]['date']),
                     stock: localObject[i]['stock'],
                     total: Number(localObject[i]['total']),
-                    timestamp: localObject[i]['timestamp'],
+                    timestamp: moment(localObject[i]['timestamp']),
                     type: localObject[i]['type'],
                     price: Number(localObject[i]['price']),
                 };
