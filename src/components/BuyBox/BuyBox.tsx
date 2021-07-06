@@ -9,7 +9,7 @@ import { tradesProvider } from '../../contexts/TradesContext';
 import { portfolioProvider } from '../../contexts/PortfolioContext';
 import DatePicker, { maxDate, minDate } from '../DatePicker/DatePicker';
 import { BaseKeyboardPickerProps } from '@material-ui/pickers/_shared/hooks/useKeyboardPickerState';
-import { LiquidBalanceContext } from '../../contexts/LiquidBalanceContext';
+import { liquidBalanceProvider, LiquidBalanceContext } from '../../contexts/LiquidBalanceContext';
 import {
     ActiveStockContext,
     activeStockProvider,
@@ -26,9 +26,7 @@ export default function BuyBox() {
     const activeStock = React.useContext(ActiveStockContext);
     const { stock } = activeStock;
 
-    const { liquidBalance, updateLiquidBalance } =
-        React.useContext(LiquidBalanceContext);
-    const { curr } = liquidBalance;
+    const balance = React.useContext(LiquidBalanceContext);
 
     const [form, updateForm] = React.useState<BuyBoxForm>({
         date: activeStockProvider.minDate?.unix() || minDate.unix(), // this is the selected date of the buy
@@ -78,11 +76,7 @@ export default function BuyBox() {
             price,
         };
 
-        updateLiquidBalance({
-            curr: liquidBalance.curr.subtract(total),
-            prev: liquidBalance.prev,
-        });
-
+        liquidBalanceProvider.subtract(total);
         tradesProvider.addToTrades(trade);
         portfolioProvider.addToPortfolio(trade);
         
@@ -98,7 +92,7 @@ export default function BuyBox() {
     };
 
     const isDisabled = () => {
-        return candlestickIndex === -1 || buyAmount > curr.value;
+        return candlestickIndex === -1 || buyAmount > balance;
     };
 
     const onChangeInput = (event: any) => {
@@ -111,8 +105,8 @@ export default function BuyBox() {
     const handleBlur = () => {
         if (buyAmount < 0) {
             updateBuyAmount(0);
-        } else if (buyAmount > curr.value) {
-            updateBuyAmount(curr.value);
+        } else if (buyAmount > balance) {
+            updateBuyAmount(balance);
         } else {
             updateBuyAmount(currency(buyAmount).value);
         }
@@ -126,7 +120,7 @@ export default function BuyBox() {
     };
 
     const getMarks = (maxAmount: number) =>
-        curr.value === 0
+        balance === 0
             ? []
             : [
                   {
@@ -182,14 +176,14 @@ export default function BuyBox() {
                     type: 'number || string',
                     min: 0,
                     step: 0.01,
-                    max: curr.value,
+                    max: balance,
                 }}
             />
             <Slider
                 value={buyAmount}
                 onChange={onChangeSlider}
-                marks={getMarks(curr.value)}
-                max={curr.value}
+                marks={getMarks(balance)}
+                max={balance}
                 step={0.01}
             />
             <Button disabled={isDisabled()} onClick={onClick}>

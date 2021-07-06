@@ -4,7 +4,7 @@ import {
     ActiveStockContext,
     activeStockProvider,
 } from '../../contexts/ActiveStockContext';
-import { LiquidBalanceContext } from '../../contexts/LiquidBalanceContext';
+import { liquidBalanceProvider } from '../../contexts/LiquidBalanceContext';
 import DatePicker, { minDate, maxDate } from '../DatePicker/DatePicker';
 import moment from 'moment';
 import { BaseKeyboardPickerProps } from '@material-ui/pickers/_shared/hooks/useKeyboardPickerState';
@@ -29,9 +29,6 @@ export default function SellBox() {
     const portfolio = React.useContext(PortfolioContext);
 
     const { stock } = activeStock;
-
-    const { liquidBalance, updateLiquidBalance } =
-        React.useContext(LiquidBalanceContext);
 
     const totalShares = portfolio[stock.symbol]?.totalShares || 0;
 
@@ -84,11 +81,7 @@ export default function SellBox() {
             price,
         };
 
-        updateLiquidBalance({
-            curr: liquidBalance.curr.add(total),
-            prev: liquidBalance.prev,
-        });
-
+        liquidBalanceProvider.add(total);
         tradesProvider.addToTrades(trade);
         portfolioProvider.addToPortfolio(trade);
 
