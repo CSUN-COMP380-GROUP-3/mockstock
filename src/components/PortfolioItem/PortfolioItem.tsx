@@ -2,20 +2,15 @@ import Card, { CardProps } from '@material-ui/core/Card';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import { activeStockProvider } from '../../contexts/ActiveStockContext';
-import StockSymbolData from '../../interfaces/StockSymbolData';
+import { PortfolioDataInterface } from '../../contexts/PortfolioContext';
 
 export interface PortfolioListItemProps extends CardProps {
-    data: {
-        totalShares: number;
-        sharesPrice: number;
-        stock: StockSymbolData;
-    };
+    data: PortfolioDataInterface;
 }
 
 export default function PortfolioListItem(props: PortfolioListItemProps) {
     const { style, data } = props;
-    const stock = data.stock;
-    const { symbol } = stock;
+    const {symbol} = data.stock;
 
     const useStyles = makeStyles({
         root: {
@@ -39,7 +34,7 @@ export default function PortfolioListItem(props: PortfolioListItemProps) {
     const { root } = useStyles();
 
     const onClick = () => {
-        activeStockProvider.switchActiveStock(stock);
+        activeStockProvider.switchActiveStock(data.stock);
     };
 
     const comp = (
