@@ -32,12 +32,15 @@ class TradesProvider implements TradesProviderInterface {
         let here = [];
         if (!!localObject) {
             for (var i in localObject) {
+                console.log(localObject[i]['total']);
+                console.log(Number(localObject[i]['total']));
                 let hold: Trade = {
                     date: moment(localObject[i]['date']),
                     stock: localObject[i]['stock'],
                     total: Number(localObject[i]['total']),
                     timestamp: localObject[i]['timestamp'],
                     type: localObject[i]['type'],
+                    price: localObject[i]['price'],
                 };
                 here.push(hold);
             }
