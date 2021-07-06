@@ -63,7 +63,7 @@ export default function BuyBox() {
         }
     };
 
-    const onClick = () => {
+    const onClick = async () => {
         const price = getPrice(); // price is the price of the stock at purchase time
         if (price === undefined) return;
         const total = getTotal(); // total is the amount the user wants to spend
@@ -84,7 +84,10 @@ export default function BuyBox() {
         });
 
         tradesProvider.addToTrades(trade);
-        portfolioProvider.addToPortfolio(trade);
+        await portfolioProvider.addToPortfolio(trade);
+        const newPortfolio = Object.assign({}, portfolioProvider.portfolio);
+        let portfolioStringified = JSON.stringify(newPortfolio);
+        localStorage.setItem('portfolio', portfolioStringified); // Save portfolio in local storage
 
         updateBuyAmount(0);
     };

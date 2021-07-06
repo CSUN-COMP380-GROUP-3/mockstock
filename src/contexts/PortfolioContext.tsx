@@ -28,8 +28,14 @@ class PortfolioProvider implements PortfolioContextInterface {
     portfolio: PortfolioInterface;
     updatePortfolio: (portfolio: PortfolioInterface) => void;
     constructor() {
-        this.portfolio = {};
-        this.updatePortfolio = () => { };
+        let fromLocal = localStorage.getItem('portfolio');
+        let localObject = JSON.parse(fromLocal!);
+        if (!!localObject) {
+            this.portfolio = localObject;
+        } else {
+            this.portfolio = {};
+        }
+        this.updatePortfolio = () => {};
     }
 
     /**
@@ -83,6 +89,9 @@ class PortfolioProvider implements PortfolioContextInterface {
             };
         }
         this.updatePortfolio(newPortfolio);
+
+        // NEED TO SAVE PORTFOLIO TO LOCAL STORAGE NOW
+
         return true;
     }
 
