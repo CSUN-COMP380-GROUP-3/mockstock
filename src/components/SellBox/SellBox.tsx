@@ -13,13 +13,16 @@ import Trade from '../../interfaces/Trade';
 import Slider from '../Slider/Slider';
 import Input from '../Input/Input';
 import { tradesProvider } from '../../contexts/TradesContext';
-import { PortfolioContext, portfolioProvider } from '../../contexts/PortfolioContext';
+import {
+    PortfolioContext,
+    portfolioProvider,
+} from '../../contexts/PortfolioContext';
 
 export interface SellBoxForm extends Trade {
     type: 'SELL';
 }
 
-export interface SellBoxProps { }
+export interface SellBoxProps {}
 
 export default function SellBox() {
     const activeStock = React.useContext(ActiveStockContext);
@@ -31,7 +34,7 @@ export default function SellBox() {
         React.useContext(LiquidBalanceContext);
 
     const totalShares = portfolio[stock.symbol]?.totalShares || 0;
-    
+
     // should we also keep track of the earliest date on the portfolio?
     const earliestDate = tradesProvider.getEarliestDateBySymbol(stock.symbol);
 
@@ -136,27 +139,27 @@ export default function SellBox() {
         maxShares === 0
             ? []
             : [
-                {
-                    value: 0,
-                    label: '0%',
-                },
-                {
-                    value: maxShares * 0.25,
-                    label: '25%',
-                },
-                {
-                    value: maxShares * 0.5,
-                    label: '50%',
-                },
-                {
-                    value: maxShares * 0.75,
-                    label: '75%',
-                },
-                {
-                    value: maxShares,
-                    label: '100%',
-                },
-            ];
+                  {
+                      value: 0,
+                      label: '0%',
+                  },
+                  {
+                      value: maxShares * 0.25,
+                      label: '25%',
+                  },
+                  {
+                      value: maxShares * 0.5,
+                      label: '50%',
+                  },
+                  {
+                      value: maxShares * 0.75,
+                      label: '75%',
+                  },
+                  {
+                      value: maxShares,
+                      label: '100%',
+                  },
+              ];
 
     const isDisabled = () => {
         // here we need to check and see if the stock is in the portfolio
@@ -170,7 +173,16 @@ export default function SellBox() {
         );
     };
     return (
-        <div data-testid="sellbox">
+        <div
+            data-testid="sellbox"
+            style={{
+                backgroundColor: '#fff',
+                border: 10,
+                borderRadius: 3,
+                padding: 25,
+                marginTop: 20,
+            }}
+        >
             <Typography variant="h5">Sell {stock.symbol}</Typography>
             <DatePicker
                 id="sellDate"

@@ -20,7 +20,7 @@ export interface BuyBoxForm extends Trade {
     type: 'BUY';
 }
 
-export interface BuyBoxProps { }
+export interface BuyBoxProps {}
 
 export default function BuyBox() {
     const activeStock = React.useContext(ActiveStockContext);
@@ -68,6 +68,7 @@ export default function BuyBox() {
         if (price === undefined) return;
         const total = getTotal(); // total is the amount the user wants to spend
         // from the two vars above we can do all the calculations we need
+        if (total === 0) return;
 
         const trade: BuyBoxForm = {
             ...form,
@@ -128,30 +129,39 @@ export default function BuyBox() {
         curr.value === 0
             ? []
             : [
-                {
-                    value: 0,
-                    label: '0%',
-                },
-                {
-                    value: maxAmount * 0.25,
-                    label: '25%',
-                },
-                {
-                    value: maxAmount * 0.5,
-                    label: '50%',
-                },
-                {
-                    value: maxAmount * 0.75,
-                    label: '75%',
-                },
-                {
-                    value: maxAmount,
-                    label: '100%',
-                },
-            ];
+                  {
+                      value: 0,
+                      label: '0%',
+                  },
+                  {
+                      value: maxAmount * 0.25,
+                      label: '25%',
+                  },
+                  {
+                      value: maxAmount * 0.5,
+                      label: '50%',
+                  },
+                  {
+                      value: maxAmount * 0.75,
+                      label: '75%',
+                  },
+                  {
+                      value: maxAmount,
+                      label: '100%',
+                  },
+              ];
 
     return (
-        <div data-testid="buybox">
+        <div
+            data-testid="buybox"
+            style={{
+                backgroundColor: '#fff',
+                border: 0,
+                borderRadius: 3,
+                padding: 25,
+                marginTop: 20,
+            }}
+        >
             <Typography id="input-slider" gutterBottom variant="h5">
                 Buy {stock.symbol}
             </Typography>
