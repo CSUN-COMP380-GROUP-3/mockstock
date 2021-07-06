@@ -68,25 +68,34 @@ export default function TradeHistoryTable() {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {tradesContext.map((trade) => (
-                        <StyledTableRow key={trade.stock.symbol}>
-                            <StyledTableCell component="th" scope="trade">
-                                {trade.stock.symbol}
-                            </StyledTableCell>
-                            <StyledTableCell align="right">
-                                {trade.date.format()}
-                            </StyledTableCell>
-                            <StyledTableCell align="right">
-                                {trade.price}
-                            </StyledTableCell>
-                            <StyledTableCell align="right">
-                                {trade.total}
-                            </StyledTableCell>
-                            <StyledTableCell align="right">
-                                {trade.type}
-                            </StyledTableCell>
-                        </StyledTableRow>
-                    ))}
+                    {tradesContext.map((trade) => {
+                        const tradeDate = trade.date.toString().split(' ');
+                        return (
+                            <StyledTableRow key={trade.stock.symbol}>
+                                <StyledTableCell component="th" scope="trade">
+                                    {trade.stock.symbol}
+                                </StyledTableCell>
+                                <StyledTableCell align="right">
+                                    {tradeDate[0] +
+                                        ' - ' +
+                                        tradeDate[1] +
+                                        ' ' +
+                                        tradeDate[2] +
+                                        ' - ' +
+                                        tradeDate[3]}
+                                </StyledTableCell>
+                                <StyledTableCell align="right">
+                                    {trade.price}
+                                </StyledTableCell>
+                                <StyledTableCell align="right">
+                                    {trade.total}
+                                </StyledTableCell>
+                                <StyledTableCell align="right">
+                                    {trade.type}
+                                </StyledTableCell>
+                            </StyledTableRow>
+                        );
+                    })}
                 </TableBody>
             </Table>
         </TableContainer>
