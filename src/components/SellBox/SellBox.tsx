@@ -70,7 +70,7 @@ export default function SellBox() {
         }
     };
 
-    const onClick = () => {
+    const onClick = async () => {
         // need to calculate the amount of the trade
         // amount = shares * price
         // getting the price is a bit tricky
@@ -96,7 +96,11 @@ export default function SellBox() {
         });
 
         tradesProvider.addToTrades(trade);
-        portfolioProvider.addToPortfolio(trade);
+        await portfolioProvider.addToPortfolio(trade);
+        const newPortfolio = Object.assign({}, portfolioProvider.portfolio);
+        let portfolioStringified = JSON.stringify(newPortfolio);
+        await localStorage.removeItem('portfolio');
+        localStorage.setItem('portfolio', portfolioStringified); // Save portfolio in local storage
 
         updateShareAmount(0);
     };

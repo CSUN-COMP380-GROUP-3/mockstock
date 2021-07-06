@@ -87,6 +87,7 @@ export default function BuyBox() {
         await portfolioProvider.addToPortfolio(trade);
         const newPortfolio = Object.assign({}, portfolioProvider.portfolio);
         let portfolioStringified = JSON.stringify(newPortfolio);
+        await localStorage.removeItem('portfolio');
         localStorage.setItem('portfolio', portfolioStringified); // Save portfolio in local storage
 
         updateBuyAmount(0);
