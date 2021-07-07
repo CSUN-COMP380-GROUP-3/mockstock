@@ -1,11 +1,38 @@
 import React from 'react';
 import { CardProps } from '@material-ui/core/Card';
-import Typography from '@material-ui/core/Typography';
+import Typography, { TypographyProps } from '@material-ui/core/Typography';
 import currency from 'currency.js';
 import { activeStockProvider } from '../../contexts/ActiveStockContext';
 import { Listener } from '../../interfaces/WebSocketData';
 import "./WatchListItem.css";
 import FinnHubTrade from '../websocket';
+import { BehaviorSubject } from 'rxjs';
+
+export interface WatchListItemPriceProps extends TypographyProps {
+    displayedPrice$: BehaviorSubject<number>;
+};
+
+export function WatchListItemPrice(props: WatchListItemPriceProps) {
+    const [ displayedPrice, updateDisplayedPrice ] = React.useState(0);
+    const { displayedPrice$, variant, className } = props;
+
+    React.useEffect(() => {
+        const subscription = displayedPrice$.subscribe(price => {
+            updateDisplayedPrice(price);
+        });
+        return () => {
+            subscription.unsubscribe();
+        };
+    });
+
+    return <Typography 
+        variant={variant} 
+        className={className} 
+        data-testid={'watchlistitem-'+className}
+        >
+            {!!displayedPrice ? currency(displayedPrice).format() : '$-'}
+        </Typography>;
+};
 
 export interface WatchListItemProps extends CardProps {
     symbol: string;
@@ -14,7 +41,7 @@ export interface WatchListItemProps extends CardProps {
 export default function WatchListItem(props: WatchListItemProps) {
     const { symbol, style } = props;
 
-    const [displayPrice, setDisplayPrice] = React.useState<number>();
+    const displayedPrice$ = new BehaviorSubject(0);
 
     /**
      * Is called when user clicks on this component.
@@ -40,7 +67,7 @@ export default function WatchListItem(props: WatchListItemProps) {
         volume: number,
         tradeConditions: string[]
     ) => {
-        setDisplayPrice(price);
+        displayedPrice$.next(price);
     };
 
     /**
@@ -53,14 +80,14 @@ export default function WatchListItem(props: WatchListItemProps) {
                 FinnHubTrade.stopListen(symbol, updatePrice);
             }
         };
-    }, [FinnHubTrade.socket.OPEN]);
+    });
 
     return (
         <div data-testid="watchlistitem" style={style} className="list-item" onClick={onClick}>
             <Typography variant="h6" className="symbol">{symbol}</Typography>
             <div className="details">
                 <Typography variant="subtitle2" className="percent" data-testid="watchlistitem-percent">(-%)</Typography>
-                <Typography variant="h6" className="dollar" data-testid="watchlistitem-dollar">{!!displayPrice ? currency(displayPrice).format() : '$-'}</Typography>
+                <WatchListItemPrice variant="h6" className="dollar" displayedPrice$={displayedPrice$}/>
             </div>
         </div>
     );
