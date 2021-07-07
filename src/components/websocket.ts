@@ -56,7 +56,7 @@ module FinnHubTrade {
                 }
             })
             // resets all symbol.dispatched to false
-            Object.keys(listenerDispatch).map((symbol) => {
+            Object.keys(listenerDispatch).forEach((symbol) => {
                 listenerDispatch[symbol].dispatched = false;
             })
         };
