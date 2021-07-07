@@ -1,4 +1,5 @@
 import React from 'react';
+import storage from '../components/storage';
 
 export interface WatchListInterface { [symbol: string]: number };
 
@@ -8,6 +9,7 @@ export interface WatchListContextInterface {
 };
 
 export module WatchListTracker {
+    const STORAGE_KEY = 'watchList';
 
     /**
      * Keeps track of what symbols are on the watchlist. 
@@ -22,7 +24,7 @@ export module WatchListTracker {
      */
     const initWatchList = function () {
         // TODO: obtain watchlist from localstorage.
-        let temp = Object.keys({
+        let loadWatchList = {
             'GME': 0,
             'AMC': 0,
             'BB': 0,
@@ -30,13 +32,30 @@ export module WatchListTracker {
             'INTC': 0,
             'AAPL': 0,
             'TSLA': 0
-        });
+        };
+
+        const fromStorage = storage?.getItem(STORAGE_KEY);
+        if (!!fromStorage) {
+            try {
+                const parsedWatchList = JSON.parse(fromStorage);
+                if (!!parsedWatchList) { loadWatchList = parsedWatchList };
+            } catch(e) {
+                console.log('Failed to load watchlist from storage');
+            };
+        };
+        const temp = Object.keys(loadWatchList);
         temp.forEach((symbol) => {
             WatchList[symbol] = 0;
-        })
+        });
     }
 
     initWatchList();
+
+    const exportToStorage = (watchList: WatchListInterface): void => {
+        const watchListStr = JSON.stringify(watchList);
+        storage?.setItem(STORAGE_KEY, watchListStr);
+    };
+
 
     /**
      * Contains the initial symbols found in the user's Watchlist and the state's update function.
@@ -59,6 +78,7 @@ export module WatchListTracker {
         }
         let shittyWatchList: WatchListInterface = {};
         Object.assign(shittyWatchList, WatchList);
+        exportToStorage(shittyWatchList);
         return shittyWatchList;
     }
 
@@ -75,6 +95,7 @@ export module WatchListTracker {
         }
         let shittyWatchList: WatchListInterface = {};
         Object.assign(shittyWatchList, WatchList);
+        exportToStorage(shittyWatchList);
         return shittyWatchList;
     }
 }
