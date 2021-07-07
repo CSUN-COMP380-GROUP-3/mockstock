@@ -1,7 +1,6 @@
 import React from 'react';
 import {
     PortfolioContext,
-    portfolioProvider,
 } from '../../contexts/PortfolioContext';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
@@ -10,6 +9,7 @@ import PortfolioItem from '../PortfolioItem/PortfolioItem';
 import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import TradeHistory from '../TradeHistory/TradeHistory';
+import { v4 as uuid } from 'uuid';
 
 export default function Portfolio() {
     const portfolio = React.useContext(PortfolioContext);
@@ -29,8 +29,8 @@ export default function Portfolio() {
                 <TradeHistory />
                 <CardContent>
                     <List>
-                        {Object.entries(portfolio).map(([key, value]) => {
-                            return <PortfolioItem key={key} data={value} />;
+                        {Object.entries(portfolio).map(([symbol, data]) => {
+                            return <PortfolioItem key={'p'+uuid()} data={data} />;
                         })}
                     </List>
                 </CardContent>

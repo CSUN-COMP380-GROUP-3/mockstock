@@ -18,10 +18,9 @@ export default function StockInfo() {
     const { watchList, updateWatchList } =
         React.useContext<WatchListContextInterface>(WatchListContext);
     const activeStock = React.useContext(ActiveStockContext);
+    const { stock, quote } = activeStock;
 
-    const [displayPrice, setDisplayPrice] = React.useState<number>(1);
-
-    const { stock } = activeStock;
+    const [displayPrice, setDisplayPrice] = React.useState<number>(quote.c);
 
     /**Depending on whether the active symbol is already within the watchlist, adds or removes the active symbol to the watchlist */
     const manipWatchList = () => {
@@ -35,24 +34,16 @@ export default function StockInfo() {
     };
 
     /**
-     * If the user is viewing this during off-hours, this ensures that the display price will always at least have the most current price.
-     */
-    React.useEffect(() => {
-        setDisplayPrice(activeStock.quote.c);
-    }, []);
-
-    /**
      * Sets up a listener for the active symbol to retrieve live price data every time the active stock changes.
      */
     React.useEffect(() => {
-        setDisplayPrice(activeStock.quote.c);
         if (WS.socket.OPEN) {
             WS.listen(stock.symbol, updatePrice);
             return () => {
                 WS.stopListen(stock.symbol, updatePrice);
             };
         }
-    }, [activeStock]);
+    });
 
     /**
      * Updates the price state whenever the websocket calls it because of a message.

@@ -7,6 +7,7 @@ import WatchListItem from '../WatchListItem/WatchListItem';
 import "./WatchList.css";
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
+import { v4 as uuid } from 'uuid';
 
 export default function WatchList() {
 
@@ -18,8 +19,8 @@ export default function WatchList() {
             </CardHeader>
             <CardContent className="watch-list">
                 <List>
-                    {Object.entries(watchList).map(([symbol, value]) => {
-                        return (<ListItem key={symbol}>
+                    {Object.entries(watchList).map(([symbol]) => {
+                        return (<ListItem key={'w'+uuid()}>
                             <WatchListItem symbol={symbol}></WatchListItem>
                         </ListItem>);
                     })}
