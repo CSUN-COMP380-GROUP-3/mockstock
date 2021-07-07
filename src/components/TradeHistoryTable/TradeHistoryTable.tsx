@@ -14,6 +14,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { TradesContext } from '../../contexts/TradesContext';
 import moment from 'moment';
+import { v4 as uuid } from 'uuid';
 
 const StyledTableCell = withStyles((theme: Theme) =>
     createStyles({
@@ -72,7 +73,7 @@ export default function TradeHistoryTable() {
                     {tradesContext.map((trade) => {
                         const tradeDate = moment.unix(trade.date).toString().split(' ');
                         return (
-                            <StyledTableRow key={trade.stock.symbol}>
+                            <StyledTableRow key={'t'+uuid()}>
                                 <StyledTableCell component="th" scope="trade">
                                     {trade.stock.symbol}
                                 </StyledTableCell>
