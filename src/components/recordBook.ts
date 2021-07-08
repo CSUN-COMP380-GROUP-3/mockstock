@@ -1,14 +1,5 @@
 import storage from '../components/storage';
-/*
 
-	c: number[]; // list of close prices for returned candles
-	h: number[]; // list of high prices for returned candles
-	l: number[]; // list of low prices for returned candles
-	o: number[]; // list of open prices for returned candles
-	s: string;   // status of the response
-	v: number[]; // list of volume data for returned candles
-	t: number[]; // list of UNIX timestamp for returned candles.
-*/
 interface CandlestickRecord {
 	close: number,
 	high: number,
@@ -19,14 +10,19 @@ interface CandlestickRecord {
 }
 
 interface Record {
-	candlestickData: CandlestickRecord,
+	candlestickIndex: number,
 	sharesOwned: number,
 	costBasis: number,
 	// trades: SOMETHING[]
 }
 
+interface RecordBook {
+	candlestickData: CandlestickRecord[],
+	records: Record[]
+}
+
 interface CashRecord {
-	timestamp: number,
+	candlestickTimestamp: number,
 	cashOwned: number,
 	// trades: SOMETHING[]
 }
@@ -34,7 +30,7 @@ interface CashRecord {
 module RecordBooks {
 
 	const RECORDBOOK_SYMBOL_LIST_KEY = "RECORDBOOK_SYMBOL_LIST"
-	const _recordbook: { [symbol: string]: Record[] } = {};
+	const _recordbook: { [symbol: string]: RecordBook } = {};
 
 	const initRecordBooks = function () {
 		// get list of symbols
@@ -46,7 +42,11 @@ module RecordBooks {
 				const symbol = symbolList[i];
 				try {
 					const recordBook = getFromStorage(symbol + "RecordBook");
-					_recordbook[symbol] = recordBook;
+					const candlestickData = getFromStorage(symbol + "CandlestickData");
+					_recordbook[symbol] = {
+						candlestickData: candlestickData,
+						records: recordBook
+					}
 				} catch (e) {
 					// no data found... 
 					// TODO: what do?
