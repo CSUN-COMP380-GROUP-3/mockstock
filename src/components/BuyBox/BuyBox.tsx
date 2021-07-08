@@ -15,7 +15,7 @@ import {
     activeStockProvider,
 } from '../../contexts/ActiveStockContext';
 import Input from '../Input/Input';
-
+import "./BuyBox.css";
 export interface BuyBoxForm extends Trade {
     type: 'BUY';
 }
@@ -146,16 +146,7 @@ export default function BuyBox() {
               ];
 
     return (
-        <div
-            data-testid="buybox"
-            style={{
-                backgroundColor: '#fff',
-                border: 0,
-                borderRadius: 3,
-                padding: 25,
-                marginTop: 20,
-            }}
-        >
+        <div data-testid="buybox" className = "buy-box">
             <Typography id="input-slider" gutterBottom variant="h5">
                 Buy {stock.symbol}
             </Typography>
@@ -186,7 +177,7 @@ export default function BuyBox() {
                 max={balance}
                 step={0.01}
             />
-            <Button disabled={isDisabled()} onClick={onClick}>
+            <Button disabled={isDisabled()} onClick={onClick} className = "buy-button">
                 Buy
             </Button>
         </div>

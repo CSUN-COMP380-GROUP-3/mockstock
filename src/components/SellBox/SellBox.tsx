@@ -17,7 +17,7 @@ import {
     PortfolioContext,
     portfolioProvider,
 } from '../../contexts/PortfolioContext';
-
+import "./SellBox.css";
 export interface SellBoxForm extends Trade {
     type: 'SELL';
 }
@@ -160,15 +160,15 @@ export default function SellBox() {
         );
     };
     return (
-        <div
+        <div className = "sell-box"
             data-testid="sellbox"
-            style={{
-                backgroundColor: '#fff',
-                border: 10,
-                borderRadius: 3,
-                padding: 25,
-                marginTop: 20,
-            }}
+            // style={{
+            //     backgroundColor: '#fff',
+            //     border: 10,
+            //     borderRadius: 3,
+            //     padding: 25,
+            //     marginTop: 20,
+            // }}
         >
             <Typography variant="h5">Sell {stock.symbol}</Typography>
             <DatePicker
@@ -198,7 +198,7 @@ export default function SellBox() {
                 marks={getMarks(totalShares)}
                 max={totalShares}
             />
-            <Button onClick={onClick} disabled={isDisabled()}>
+            <Button onClick={onClick} disabled={isDisabled()} className = "sell-button">
                 Sell
             </Button>
         </div>

@@ -1,0 +1,9 @@
+.sell-box > .MuiButtonBase-root{
+    background-color: rgb(216, 0, 0);
+
+}
+
+.sell-box > .MuiButton-root{
+    color: rgb(255, 255, 255);
+
+}
