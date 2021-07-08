@@ -1,31 +1,33 @@
 import React from 'react';
-import Modal from '@material-ui/core/Modal';
+import Popover from '@material-ui/core/Popover';
 import TradeHistoryTable from '../TradeHistoryTable/TradeHistoryTable';
+import HistoryIcon from '@material-ui/icons/History';
 
 export default function TradeHistory() {
-    const [open, setOpen] = React.useState(false);
 
-    const handleOpen = () => {
-        setOpen(true);
+    const [ anchorEl, setAnchorEl ] = React.useState<SVGSVGElement | null>(null);
+
+    const onClick = (event: React.MouseEvent<SVGSVGElement>) => {
+        setAnchorEl(event.currentTarget);
     };
-
-    const handleClose = () => {
-        setOpen(false);
+    const onClose = () => {
+        setAnchorEl(null);
     };
 
     return (
-        <div style={{ margin: 15 }}>
-            <button type="button" onClick={handleOpen}>
-                Trade History
-            </button>
-            <Modal
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="simple-modal-title"
-                aria-describedby="simple-modal-description"
+        <React.Fragment>
+            <HistoryIcon onClick={onClick}/>
+            <Popover
+                open={!!anchorEl}
+                onClose={onClose}
+                anchorEl={anchorEl}
+                transformOrigin={{
+                    vertical: 'center',
+                    horizontal: 'center',
+                }}
             >
                 <TradeHistoryTable />
-            </Modal>
-        </div>
+            </Popover>
+        </React.Fragment>
     );
 }
