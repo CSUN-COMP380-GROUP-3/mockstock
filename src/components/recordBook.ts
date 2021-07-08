@@ -31,6 +31,7 @@ module RecordBooks {
 
 	const RECORDBOOK_SYMBOL_LIST_KEY = "RECORDBOOK_SYMBOL_LIST"
 	const CASH_RECORDBOOK_KEY = "CASH_RECORDBOOK"
+	const INITIAL_CASH = 100000;
 
 	const _recordbook: { [symbol: string]: RecordBook } = {};
 	let _cashRecordBook: CashRecord[] = [];
@@ -157,6 +158,59 @@ module RecordBooks {
 
 		// return lowest number of shares between given date and current date.
 		return shares;
+	}
+
+	/**
+	 * Returns the amount of cash that can be spent at the given candlestick timestamp.
+	 * 
+	 * The amount of cash is defined as the lowest amount of cash available between the given date and present day.
+	 * @param candlestickTimestamp Candlestick Timestamp (should be 0:00 UTC on that day)
+	 * @returns Highest amount of cash that can be spent on the given day
+	 */
+	export const getSpendableCashAt = (candlestickTimestamp: number): number => {
+
+		let recordIndex = -1;
+		let cash = 0;
+
+		// get index of record representing given date.
+		// TODO: Alternatively we could search through this using binary search or somerhing but linear is fine for now.
+		for (let i = 0; i < _cashRecordBook.length; i++) {
+			const record = _cashRecordBook[i];
+			const recordTimestamp = _cashRecordBook[i].candlestickTimestamp;
+
+			if (recordTimestamp <= candlestickTimestamp) {
+				// found the record for the given day!
+				cash = record.cashOwned;
+				recordIndex = i;
+				break;
+			}
+		}
+
+		// if no record for the day, return initial Cash.
+		if (recordIndex == -1) {
+			return INITIAL_CASH;
+		}
+
+		// if the record contains 0 cash, return 0
+		if (cash <= 0) {
+			return 0;
+		}
+
+		// for all records after that record, store lowest.
+		for (let i = recordIndex; i < _cashRecordBook.length; i++) {
+			const record = _cashRecordBook[i];
+			if (record.cashOwned < cash) {
+				cash = record.cashOwned;
+
+				// if the future records contain 0 cash, just stop now and return 0. 
+				if (cash <= 0) {
+					break;
+				}
+			}
+		}
+
+		// return lowest number of shares between given date and current date.
+		return cash;
 	}
 }
 
