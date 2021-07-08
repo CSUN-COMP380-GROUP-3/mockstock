@@ -3,6 +3,7 @@ img {
 }
 
 .subtitle {
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
   position: relative;
   margin: 0;
   margin-top: -.8rem;
