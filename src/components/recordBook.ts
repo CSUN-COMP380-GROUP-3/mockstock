@@ -117,26 +117,13 @@ module RecordBooks {
 	 * 
 	 * The number of sellable shares is defined as the lowest number of shares owned between the given date and present day.
 	 * @param candlestickTimestamp Candlestick Timestamp (should be 0:00 UTC on that day)
+	 * @param symbol Symbol to search for
 	 * @returns Highest number of shares that can be sold on the given day.
 	 */
 	export const getSellableSharesAtFor = (candlestickTimestamp: number, symbol: string): number => {
 
-		let recordIndex = -1;
-		let shares = 0;
-
-		// get index of record representing given date.
-		// TODO: Alternatively we could search through this using binary search or somerhing but linear is fine for now.
-		for (let i = 0; i < _recordbook[symbol].records.length; i++) {
-			const record = _recordbook[symbol].records[i];
-			const recordTimestamp = _recordbook[symbol].candlestickData[record.candlestickIndex].timestamp;
-
-			if (recordTimestamp <= candlestickTimestamp) {
-				// found the record for the given day!
-				shares = record.sharesOwned;
-				recordIndex = i;
-				break;
-			}
-		}
+		let recordIndex = getFirstRecordIndexAtFor(candlestickTimestamp, symbol);
+		let shares = _recordbook[symbol].records[recordIndex].sharesOwned;
 
 		// if no record for the day, or no owned stocks for the day, return 0
 		if (shares <= 0 || recordIndex == -1) {
@@ -169,27 +156,14 @@ module RecordBooks {
 	 */
 	export const getSpendableCashAt = (candlestickTimestamp: number): number => {
 
-		let recordIndex = -1;
-		let cash = 0;
-
-		// get index of record representing given date.
-		// TODO: Alternatively we could search through this using binary search or somerhing but linear is fine for now.
-		for (let i = 0; i < _cashRecordBook.length; i++) {
-			const record = _cashRecordBook[i];
-			const recordTimestamp = _cashRecordBook[i].candlestickTimestamp;
-
-			if (recordTimestamp <= candlestickTimestamp) {
-				// found the record for the given day!
-				cash = record.cashOwned;
-				recordIndex = i;
-				break;
-			}
-		}
+		let recordIndex = getFirstCashRecordAt(candlestickTimestamp);
 
 		// if no record for the day, return initial Cash.
 		if (recordIndex == -1) {
 			return INITIAL_CASH;
 		}
+
+		let cash = _cashRecordBook[recordIndex].cashOwned;
 
 		// if the record contains 0 cash, return 0
 		if (cash <= 0) {
@@ -211,6 +185,56 @@ module RecordBooks {
 
 		// return lowest number of shares between given date and current date.
 		return cash;
+	}
+
+	/**
+	 * Searches the Recordbook for the earliest Record that is at or before the given timestamp for the given symbol.
+	 * @param candlestickTimestamp Candlestick Timestamp (should be 0:00 UTC on that day)
+	 * @param symbol Symbol to search for
+	 * @returns The index of the record, or -1 if no record is found at or before the given date.
+	 */
+	const getFirstRecordIndexAtFor = function (candlestickTimestamp: number, symbol: string): number {
+		let recordIndex: number = -1;
+
+		// If we don't have records for the symbol, just return -1.
+		if (_recordbook[symbol] == undefined || _recordbook[symbol].records.length <= 0) {
+			return recordIndex;
+		}
+
+		// TODO: Alternatively we could search through this using binary search or somerhing but linear is fine for now.
+		for (let i = 0; i < _recordbook[symbol].records.length; i++) {
+			const record = _recordbook[symbol].records[i];
+			const recordTimestamp = _recordbook[symbol].candlestickData[record.candlestickIndex].timestamp;
+
+			if (recordTimestamp <= candlestickTimestamp) {
+				// found the record for the given day!
+				recordIndex = i;
+				break;
+			}
+		}
+		return recordIndex;
+	}
+
+	/**
+	 * Searches the CashRecordBook for the earliest Record that is at or before the given timestamp for the given symbol.
+	 * @param candlestickTimestamp Candlestick Timestamp (should be 0:00 UTC on that day)
+	 * @returns The index of the record, or -1 if no record is found at or before the given date.
+	 */
+	const getFirstCashRecordAt = function (candlestickTimestamp: number): number {
+		let recordIndex = -1;
+
+		// TODO: Alternatively we could search through this using binary search or somerhing but linear is fine for now.
+		for (let i = 0; i < _cashRecordBook.length; i++) {
+			const record = _cashRecordBook[i];
+
+			if (record.candlestickTimestamp <= candlestickTimestamp) {
+				// found the record for the given day!
+				recordIndex = i;
+				break;
+			}
+		}
+
+		return recordIndex;
 	}
 }
 
