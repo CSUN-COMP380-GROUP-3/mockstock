@@ -110,6 +110,54 @@ module RecordBooks {
 			storage?.setItem(key, valueJSON);
 		};
 	}
+
+	/**
+	 * Returns the number of sellable shares at the given candlestick timestamp, for the given symbol.
+	 * 
+	 * The number of sellable shares is defined as the lowest number of shares owned between the given date and present day.
+	 * @param candlestickTimestamp Candlestick Timestamp (should be 0:00 UTC on that day)
+	 * @returns Highest number of shares that can be sold on the given day.
+	 */
+	export const getSellableSharesAtFor = (candlestickTimestamp: number, symbol: string): number => {
+
+		let recordIndex = -1;
+		let shares = 0;
+
+		// get index of record representing given date.
+		// TODO: Alternatively we could search through this using binary search or somerhing but linear is fine for now.
+		for (let i = 0; i < _recordbook[symbol].records.length; i++) {
+			const record = _recordbook[symbol].records[i];
+			const recordTimestamp = _recordbook[symbol].candlestickData[record.candlestickIndex].timestamp;
+
+			if (recordTimestamp <= candlestickTimestamp) {
+				// found the record for the given day!
+				shares = record.sharesOwned;
+				recordIndex = i;
+				break;
+			}
+		}
+
+		// if no record for the day, or no owned stocks for the day, return 0
+		if (shares <= 0 || recordIndex == -1) {
+			return 0;
+		}
+
+		// for all records after that record, store lowest.
+		for (let i = recordIndex; i < _recordbook[symbol].records.length; i++) {
+			const record = _recordbook[symbol].records[i];
+			if (record.sharesOwned < shares) {
+				shares = record.sharesOwned;
+
+				// if the future records contain 0, just stop now and return 0. 
+				if (shares <= 0) {
+					break;
+				}
+			}
+		}
+
+		// return lowest number of shares between given date and current date.
+		return shares;
+	}
 }
 
 export default RecordBooks;
