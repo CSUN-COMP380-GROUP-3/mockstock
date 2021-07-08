@@ -30,7 +30,10 @@ interface CashRecord {
 module RecordBooks {
 
 	const RECORDBOOK_SYMBOL_LIST_KEY = "RECORDBOOK_SYMBOL_LIST"
+	const CASH_RECORDBOOK_KEY = "CASH_RECORDBOOK"
+
 	const _recordbook: { [symbol: string]: RecordBook } = {};
+	let _cashRecordBook: CashRecord[] = [];
 
 	const initRecordBooks = function () {
 		// get list of symbols
@@ -57,6 +60,16 @@ module RecordBooks {
 			// This is probably the first time the user has accessed this site.
 			// We'll initialize it to an empty array, and update it as the user trades.
 			setToStorage(RECORDBOOK_SYMBOL_LIST_KEY, []);
+		}
+
+		// get cash Recordbook
+		try {
+			_cashRecordBook = getFromStorage(CASH_RECORDBOOK_KEY);
+		} catch (e) {
+			// no records! ... that's fine right?
+			// This is probably the first time the user has accessed this site.
+			// We'll initialize it to an empty array, and update it as the user trades.
+			setToStorage(CASH_RECORDBOOK_KEY, []);
 		}
 	}
 
