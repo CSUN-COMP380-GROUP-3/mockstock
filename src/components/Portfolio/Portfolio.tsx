@@ -4,12 +4,13 @@ import {
 } from '../../contexts/PortfolioContext';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import CardHeader from '@material-ui/core/CardHeader';
 import PortfolioItem from '../PortfolioItem/PortfolioItem';
 import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import TradeHistory from '../TradeHistory/TradeHistory';
 import { v4 as uuid } from 'uuid';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
 
 export default function Portfolio() {
     const portfolio = React.useContext(PortfolioContext);
@@ -18,6 +19,15 @@ export default function Portfolio() {
         root: {
             height: '100%',
         },
+        header: {
+            justifyContent: "flex-start",
+            alignItems: "center",
+            borderBottom: "2px solid #323232",
+        },
+        title: {
+            width: "100%",
+            padding: "1rem 0 14px 1rem",
+        }
     });
 
     const classes = useStyles();
@@ -25,8 +35,16 @@ export default function Portfolio() {
     return (
         <React.Fragment>
             <Card data-testid="portfoliolist" className={classes.root}>
-                <CardHeader title="Portfolio"></CardHeader>
-                <TradeHistory />
+                <Grid container spacing={1} className={classes.header}>
+                    <Grid item>
+                        <div className={classes.title}>
+                            <Typography variant="h5">Portfolio</Typography>
+                        </div>
+                    </Grid>
+                    <Grid item>
+                        <TradeHistory />
+                    </Grid>
+                </Grid>
                 <CardContent>
                     <List>
                         {Object.entries(portfolio).map(([symbol, data]) => {

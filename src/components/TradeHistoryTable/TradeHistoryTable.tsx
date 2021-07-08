@@ -15,6 +15,7 @@ import Paper from '@material-ui/core/Paper';
 import { TradesContext } from '../../contexts/TradesContext';
 import moment from 'moment';
 import { v4 as uuid } from 'uuid';
+import currency from 'currency.js';
 
 const StyledTableCell = withStyles((theme: Theme) =>
     createStyles({
@@ -39,8 +40,10 @@ const StyledTableRow = withStyles((theme: Theme) =>
 )(TableRow);
 
 const useStyles = makeStyles({
-    table: {
-        minWidth: 700,
+    container: {
+        width: "800px",
+        height: "400px",
+        overflowY: "scroll"
     },
 });
 
@@ -50,47 +53,41 @@ export default function TradeHistoryTable() {
     const tradesContext = React.useContext(TradesContext);
 
     return (
-        <TableContainer component={Paper}>
-            <Table className={classes.table} aria-label="customized table">
+        <TableContainer component={Paper} className={classes.container}>
+            <Table aria-label="customized table" stickyHeader>
                 <TableHead>
                     <TableRow>
                         <StyledTableCell>Stock Symbol </StyledTableCell>
                         <StyledTableCell align="right">
-                            Date and Time of Trade
+                            Date Traded
                         </StyledTableCell>
                         <StyledTableCell align="right">
-                            Price of Stock&nbsp;
+                            Stock Price
                         </StyledTableCell>
                         <StyledTableCell align="right">
-                            Total Amount Purchased&nbsp;
+                            Trade Amount
                         </StyledTableCell>
                         <StyledTableCell align="right">
-                            TYPE&nbsp;
+                            Type
                         </StyledTableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
                     {tradesContext.map((trade) => {
-                        const tradeDate = moment.unix(trade.date).toString().split(' ');
+                        const timestamp = moment.unix(trade.date).format("MM/DD/YYYY HH:mm:ss A");
                         return (
                             <StyledTableRow key={'t'+uuid()}>
                                 <StyledTableCell component="th" scope="trade">
                                     {trade.stock.symbol}
                                 </StyledTableCell>
                                 <StyledTableCell align="right">
-                                    {tradeDate[0] +
-                                        ' - ' +
-                                        tradeDate[1] +
-                                        ' ' +
-                                        tradeDate[2] +
-                                        ' - ' +
-                                        tradeDate[3]}
+                                    {timestamp}
                                 </StyledTableCell>
                                 <StyledTableCell align="right">
-                                    {trade.price}
+                                    {currency(trade.price!).format()}
                                 </StyledTableCell>
                                 <StyledTableCell align="right">
-                                    {trade.total}
+                                    {currency(trade.total).format()}
                                 </StyledTableCell>
                                 <StyledTableCell align="right">
                                     {trade.type}
