@@ -28,7 +28,7 @@ export default function SellBox() {
     const activeStock = React.useContext(ActiveStockContext);
     const portfolio = React.useContext(PortfolioContext);
 
-    const { stock } = activeStock;
+    const { stock, candles } = activeStock;
 
     const totalShares = portfolio[stock.symbol]?.totalShares || 0;
 
@@ -177,7 +177,7 @@ export default function SellBox() {
                 onChange={onChangeSellDate}
                 minDate={earliestDate || activeStockProvider.minDate || minDate}
                 maxDate={activeStockProvider.maxDate || maxDate}
-                disableWeekends={true}
+                validUnixTimestamps={candles.t}
             />
             <Input
                 adornment="Shares:"

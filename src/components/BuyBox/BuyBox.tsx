@@ -24,7 +24,7 @@ export interface BuyBoxProps {}
 
 export default function BuyBox() {
     const activeStock = React.useContext(ActiveStockContext);
-    const { stock } = activeStock;
+    const { stock, candles } = activeStock;
 
     const balance = React.useContext(LiquidBalanceContext);
 
@@ -165,7 +165,7 @@ export default function BuyBox() {
                 onChange={onChangeBuyDate}
                 minDate={activeStockProvider.minDate || minDate}
                 maxDate={activeStockProvider.maxDate || maxDate}
-                disableWeekends={true}
+                validUnixTimestamps={candles.t}
             />
             <Input
                 adornment="$"
