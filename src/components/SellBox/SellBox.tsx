@@ -13,10 +13,7 @@ import Trade from '../../interfaces/Trade';
 import Slider from '../Slider/Slider';
 import Input from '../Input/Input';
 import { tradesProvider } from '../../contexts/TradesContext';
-import {
-    PortfolioContext,
-    portfolioProvider,
-} from '../../contexts/PortfolioContext';
+import { portfolioProvider } from '../../contexts/PortfolioContext';
 
 export interface SellBoxForm extends Trade {
     type: 'SELL';
@@ -26,7 +23,12 @@ export interface SellBoxProps {}
 
 export default function SellBox() {
     const activeStock = React.useContext(ActiveStockContext);
-    const portfolio = React.useContext(PortfolioContext);
+    const [ portfolio, updatePortfolio ] = React.useState(portfolioProvider.portfolio);
+    
+    React.useEffect(() => {
+        const portfolioSubscription = portfolioProvider.portfolio$.subscribe(updatePortfolio);
+        return () => { portfolioSubscription.unsubscribe(); };
+    }, []);
 
     const { stock } = activeStock;
 

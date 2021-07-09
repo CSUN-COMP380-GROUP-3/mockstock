@@ -5,10 +5,8 @@ import { StockSymbolsContext, filteredSymbols } from '../../contexts/StockSymbol
 import { WatchListContext, WatchListTracker, WatchListInterface } from '../../contexts/WatchListContext';
 import { tradesProvider, TradesContext, TradesInterface } from '../../contexts/TradesContext';
 import { activeStockProvider, ActiveStockContext, ActiveStockInterface } from '../../contexts/ActiveStockContext';
-import { portfolioProvider, PortfolioContext, PortfolioInterface } from '../../contexts/PortfolioContext';
 
 export const GlobalContext: React.FC = ({ children }) => {
-
     const [activeStock, updateActiveStock] = React.useState<ActiveStockInterface>(activeStockProvider.activeStock);
     activeStockProvider.activeStock = activeStock;
     activeStockProvider.updateActiveStock = updateActiveStock;
@@ -20,19 +18,13 @@ export const GlobalContext: React.FC = ({ children }) => {
     tradesProvider.trades = trades;
     tradesProvider.updateTrades = updateTrades;
 
-    const [portfolio, updatePortfolio] = React.useState<PortfolioInterface>(portfolioProvider.portfolio);
-    portfolioProvider.portfolio = portfolio;
-    portfolioProvider.updatePortfolio = updatePortfolio;
-
     return <React.Fragment>
         <TokenContext.Provider value={TOKEN}>
             <TradesContext.Provider value={trades}>
                 <StockSymbolsContext.Provider value={filteredSymbols}>
                     <ActiveStockContext.Provider value={activeStock}>
                         <WatchListContext.Provider value={watchListProviderValue}>
-                            <PortfolioContext.Provider value={portfolio}>
-                                {children}
-                            </PortfolioContext.Provider>
+                            {children}
                         </WatchListContext.Provider>
                     </ActiveStockContext.Provider>
                 </StockSymbolsContext.Provider>
