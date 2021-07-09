@@ -10,10 +10,7 @@ import { portfolioProvider } from '../../contexts/PortfolioContext';
 import DatePicker, { maxDate, minDate } from '../DatePicker/DatePicker';
 import { BaseKeyboardPickerProps } from '@material-ui/pickers/_shared/hooks/useKeyboardPickerState';
 import { liquidBalanceProvider } from '../../contexts/LiquidBalanceContext';
-import {
-    ActiveStockContext,
-    activeStockProvider,
-} from '../../contexts/ActiveStockContext';
+import { activeStockProvider } from '../../contexts/ActiveStockContext';
 import Input from '../Input/Input';
 
 export interface BuyBoxForm extends Trade {
@@ -23,17 +20,22 @@ export interface BuyBoxForm extends Trade {
 export interface BuyBoxProps {}
 
 export default function BuyBox() {
-    const activeStock = React.useContext(ActiveStockContext);
-    const { stock } = activeStock;
+    // when active stock changes we want to rerender this component
+    const [ activeStock, updateActiveStock ] = React.useState(activeStockProvider.activeStock);
 
-    // when liquid balance rerenders we need to rerender this component
+    // when liquid balance changes we need to rerender this component
     const [ balance, updateBalance ] = React.useState(liquidBalanceProvider.balance);
 
     React.useEffect(() => {
+        const activeStockSubscription = activeStockProvider.activeStock$.subscribe(updateActiveStock);
         const balanceSubscription = liquidBalanceProvider.balance$.subscribe(updateBalance);
-        return () => { balanceSubscription.unsubscribe(); };
+        return () => { 
+            activeStockSubscription.unsubscribe();
+            balanceSubscription.unsubscribe(); 
+        };
     }, []);
 
+    const { stock } = activeStock;
     
     const [form, updateForm] = React.useState<BuyBoxForm>({
         date: activeStockProvider.minDate?.unix() || minDate.unix(), // this is the selected date of the buy
