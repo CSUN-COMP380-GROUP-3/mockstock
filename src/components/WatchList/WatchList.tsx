@@ -1,5 +1,5 @@
 import React from 'react';
-import { WatchListContext, WatchListContextInterface } from '../../contexts/WatchListContext';
+import { WatchListTracker } from '../../contexts/WatchListContext';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
@@ -11,7 +11,12 @@ import { v4 as uuid } from 'uuid';
 
 export default function WatchList() {
 
-    const { watchList } = React.useContext<WatchListContextInterface>(WatchListContext);
+    const [watchList, updateWatchList] = React.useState(WatchListTracker.WatchList);
+    
+    React.useEffect(() => {
+        const watchListSubscription = WatchListTracker.WatchList$.subscribe(updateWatchList);
+        return () => { watchListSubscription.unsubscribe(); };
+    }, []);
 
     return <React.Fragment>
         <Card data-testid="watchlist">
