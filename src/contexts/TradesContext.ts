@@ -2,11 +2,13 @@ import React from 'react';
 import Trade from '../interfaces/Trade';
 import moment, { Moment } from 'moment';
 import storage from '../components/storage';
+import { BehaviorSubject } from 'rxjs';
 
 export type TradesInterface = Trade[];
 
 export interface TradesProviderInterface {
     trades: TradesInterface;
+    trades$: BehaviorSubject<TradesInterface>;
     updateTrades: (trades: TradesInterface) => void;
     addToTrades: (trade: Trade) => boolean;
     filterBySymbol: (symbol?: string) => Trade[];
@@ -22,10 +24,10 @@ const STORAGE_KEY = 'tradeHistory';
  */
 class TradesProvider implements TradesProviderInterface {
     trades: TradesInterface;
-    updateTrades: (trades: TradesInterface) => void;
+    trades$: BehaviorSubject<TradesInterface>;
     constructor() {
         this.trades = [];
-        this.updateTrades = () => {};
+        this.trades$ = new BehaviorSubject(this.trades);
         this.importFromStorage();
     }
 
@@ -44,6 +46,7 @@ class TradesProvider implements TradesProviderInterface {
                 // here is where we can verify
                 if (!!localObject) {
                     this.trades = [...localObject];
+                    this.updateTrades(this.trades);
                 }
             } catch(e) {
                 console.log('Failed to import trade history from storage');
@@ -65,6 +68,12 @@ class TradesProvider implements TradesProviderInterface {
         if (!!tradeHistoryStr) {
             storage?.setItem(STORAGE_KEY, tradeHistoryStr);
         };
+    };
+
+    /**Aside from assigning a new value we must also push to the observable */
+    updateTrades(trades: TradesInterface) {
+        this.trades = trades;
+        this.trades$.next(this.trades);
     };
 
     /**
@@ -118,9 +127,3 @@ class TradesProvider implements TradesProviderInterface {
 }
 
 export const tradesProvider = new TradesProvider();
-
-// TODO: initialize the trades from localStorage
-
-export const TradesContext = React.createContext<TradesInterface>(
-    tradesProvider.trades,
-);
