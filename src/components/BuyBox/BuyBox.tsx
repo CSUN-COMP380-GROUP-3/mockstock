@@ -29,7 +29,7 @@ export default function BuyBox() {
     const balance = React.useContext(LiquidBalanceContext);
 
     const [form, updateForm] = React.useState<BuyBoxForm>({
-        date: activeStockProvider.minDate?.unix() || minDate.unix(), // this is the selected date of the buy
+        date: maxDate.unix(), // this is the selected date of the buy
         total: 0,
         stock,
         timestamp: moment().unix(),

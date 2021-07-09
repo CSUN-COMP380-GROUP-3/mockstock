@@ -36,7 +36,7 @@ export default function SellBox() {
     const earliestDate = tradesProvider.getEarliestDateBySymbol(stock.symbol);
 
     const [form, updateForm] = React.useState<SellBoxForm>({
-        date: earliestDate?.unix() || activeStockProvider.minDate?.unix() || minDate.unix(),
+        date: earliestDate?.unix() || maxDate.unix(),
         total: 0,
         type: 'SELL',
         stock,
