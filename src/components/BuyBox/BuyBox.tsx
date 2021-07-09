@@ -26,7 +26,14 @@ export default function BuyBox() {
     const activeStock = React.useContext(ActiveStockContext);
     const { stock, candles } = activeStock;
 
-    const balance = liquidBalanceProvider.balance;
+    // when liquid balance rerenders we need to rerender this component
+    const [ balance, updateBalance ] = React.useState(liquidBalanceProvider.balance);
+
+    React.useEffect(() => {
+        const balanceSubscription = liquidBalanceProvider.balance$.subscribe(updateBalance);
+        return () => { balanceSubscription.unsubscribe(); };
+    }, []);
+
     
     const [form, updateForm] = React.useState<BuyBoxForm>({
         date: maxDate.unix(), // this is the selected date of the buy
