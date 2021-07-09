@@ -1,12 +1,15 @@
 import storage from '../components/storage';
+import { activeStockProvider } from '../contexts/ActiveStockContext';
+import CandleStickData from '../interfaces/CandleStickData';
 
-interface CandlestickRecord {
-	close: number,
-	high: number,
-	low: number,
-	open: number,
-	volume: number,
-	timestamp: number
+interface RecordBook {
+	candlesticks: CandlestickRecordBook,
+	records: Record[]
+}
+
+interface CandlestickRecordBook {
+	lastUpdated: number,
+	data: CandleStickData
 }
 
 interface Record {
@@ -14,11 +17,6 @@ interface Record {
 	sharesOwned: number,
 	costBasis: number,
 	// trades: SOMETHING[]
-}
-
-interface RecordBook {
-	candlestickData: CandlestickRecord[],
-	records: Record[]
 }
 
 interface CashRecord {
@@ -36,6 +34,11 @@ module RecordBooks {
 	const _recordbook: { [symbol: string]: RecordBook } = {};
 	let _cashRecordBook: CashRecord[] = [];
 
+	/**
+	 * Initializes RecordBooks.
+	 * 
+	 * First gets the list of symbols for which we have records, and then grabs those records and their stored candlestick data. 
+	 */
 	const initRecordBooks = function () {
 		// get list of symbols
 		try {
@@ -48,11 +51,11 @@ module RecordBooks {
 					const recordBook = getFromStorage(symbol + "RecordBook");
 					const candlestickData = getFromStorage(symbol + "CandlestickData");
 					_recordbook[symbol] = {
-						candlestickData: candlestickData,
+						candlesticks: candlestickData,
 						records: recordBook
 					}
 				} catch (e) {
-					// no data found... 
+					// no data found for one of our symbols...
 					// TODO: what do?
 				}
 			}
@@ -129,7 +132,7 @@ module RecordBooks {
 		// TODO: Alternatively we could search through this using binary search or somerhing but linear is fine for now.
 		for (let i = 0; i < _recordbook[symbol].records.length; i++) {
 			const record = _recordbook[symbol].records[i];
-			const recordTimestamp = _recordbook[symbol].candlestickData[record.candlestickIndex].timestamp;
+			const recordTimestamp = _recordbook[symbol].candlesticks.data.t[record.candlestickIndex];
 
 			if (recordTimestamp <= candlestickTimestamp) {
 				// found the record for the given day!
@@ -160,6 +163,53 @@ module RecordBooks {
 		}
 
 		return recordIndex;
+	}
+
+	/**
+	 * Obtains ActiveStock's CandleStickData and updates the stored CandleStick Data with whatever is found in ActiveStock that it does not already contain.
+	 * @todo Can potentially have a gap in data if we don't store candlestick data after a year the old data is stored...
+	 */
+	const storeCandlesticksFromActive = () => {
+		const activeStock = activeStockProvider.activeStock;
+		const candleStickData = activeStock.candles;
+		const symbol = activeStock.stock.symbol;
+		try {
+			const existingCandleSticks: CandleStickData = getFromStorage(symbol + "CandlestickData");
+			const lastTimestamp = existingCandleSticks.t[existingCandleSticks.t.length - 1];
+			const firstGreaterIndex = candleStickData.t.findIndex((value) => {
+				return (value > lastTimestamp);
+			});
+			if (firstGreaterIndex != -1) {
+				// Concatenate CandlestickData
+				const cConcat = candleStickData.c.slice(firstGreaterIndex);
+				existingCandleSticks.c.concat(cConcat);
+
+				const hConcat = candleStickData.h.slice(firstGreaterIndex);
+				existingCandleSticks.h.concat(hConcat);
+
+				const lConcat = candleStickData.l.slice(firstGreaterIndex);
+				existingCandleSticks.l.concat(lConcat);
+
+				const oConcat = candleStickData.o.slice(firstGreaterIndex);
+				existingCandleSticks.o.concat(oConcat);
+
+				const vConcat = candleStickData.v.slice(firstGreaterIndex);
+				existingCandleSticks.v.concat(vConcat);
+
+				const tConcat = candleStickData.t.slice(firstGreaterIndex);
+				existingCandleSticks.t.concat(tConcat);
+
+				// Store to Storage
+				setToStorage(symbol + "candleStickData", existingCandleSticks);
+			} else {
+				// activeStock's candlestick data does not contain any new data
+				return;
+			}
+		} catch (e) {
+			// no stored candlestick data, store what's in activecontext.
+			setToStorage(symbol + "candleStickData", activeStock.candles);
+		}
+
 	}
 
 	/**
