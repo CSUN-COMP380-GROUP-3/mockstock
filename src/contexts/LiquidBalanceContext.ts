@@ -20,16 +20,17 @@ class LiquidBalanceProvider implements LiquidBalanceProviderInterface {
     balance: number;
     balance$: BehaviorSubject<number>;
     private previousBalance: number;
-    updateLiquidBalance: (balance: number) => void;
     constructor() {
         // we need to verify the storage
         this.balance = currency(storage?.getItem(STORAGE_KEY) || process.env.REACT_APP_SEED_MONEY || 100000).value;
         this.balance$ = new BehaviorSubject(this.balance); 
         this.previousBalance = currency(process.env.REACT_APP_SEED_MONEY || 100000).value;
-        this.updateLiquidBalance = (balance: number) => {
-            this.balance = balance;
-            this.balance$.next(this.balance);
-        };
+    };
+
+    /** Aside from setting the balance we need to also push the new value to the observable */
+    updateLiquidBalance(balance: number) {
+        this.balance = balance;
+        this.balance$.next(this.balance);
     };
 
     add(balance: number) {
