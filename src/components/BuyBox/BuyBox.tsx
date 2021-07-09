@@ -9,7 +9,7 @@ import { tradesProvider } from '../../contexts/TradesContext';
 import { portfolioProvider } from '../../contexts/PortfolioContext';
 import DatePicker, { maxDate, minDate } from '../DatePicker/DatePicker';
 import { BaseKeyboardPickerProps } from '@material-ui/pickers/_shared/hooks/useKeyboardPickerState';
-import { liquidBalanceProvider, LiquidBalanceContext } from '../../contexts/LiquidBalanceContext';
+import { liquidBalanceProvider } from '../../contexts/LiquidBalanceContext';
 import {
     ActiveStockContext,
     activeStockProvider,
@@ -26,8 +26,8 @@ export default function BuyBox() {
     const activeStock = React.useContext(ActiveStockContext);
     const { stock } = activeStock;
 
-    const balance = React.useContext(LiquidBalanceContext);
-
+    const balance = liquidBalanceProvider.balance;
+    
     const [form, updateForm] = React.useState<BuyBoxForm>({
         date: activeStockProvider.minDate?.unix() || minDate.unix(), // this is the selected date of the buy
         total: 0,
