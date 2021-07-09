@@ -1,4 +1,3 @@
-import React from 'react';
 import Trade from '../interfaces/Trade';
 import moment, { Moment } from 'moment';
 import storage from '../components/storage';
