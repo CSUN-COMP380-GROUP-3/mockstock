@@ -1,6 +1,6 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
-import { ActiveStockContext } from '../../contexts/ActiveStockContext';
+import { activeStockProvider } from '../../contexts/ActiveStockContext';
 import './StockInfo.css';
 import {
     WatchListContext,
@@ -17,7 +17,14 @@ import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 export default function StockInfo() {
     const { watchList, updateWatchList } =
         React.useContext<WatchListContextInterface>(WatchListContext);
-    const activeStock = React.useContext(ActiveStockContext);
+
+    const [ activeStock, updateActiveStock ] = React.useState(activeStockProvider.activeStock);
+
+    React.useEffect(() => {
+        const activeStockSubscription = activeStockProvider.activeStock$.subscribe(updateActiveStock);
+        return () => { activeStockSubscription.unsubscribe(); };
+    }, []);
+
     const { stock, quote } = activeStock;
 
     const [displayPrice, setDisplayPrice] = React.useState<number>(quote.c);

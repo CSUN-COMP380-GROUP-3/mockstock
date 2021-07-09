@@ -10,31 +10,33 @@ import { portfolioProvider } from '../../contexts/PortfolioContext';
 import DatePicker, { maxDate, minDate } from '../DatePicker/DatePicker';
 import { BaseKeyboardPickerProps } from '@material-ui/pickers/_shared/hooks/useKeyboardPickerState';
 import { liquidBalanceProvider } from '../../contexts/LiquidBalanceContext';
-import {
-    ActiveStockContext,
-    activeStockProvider,
-} from '../../contexts/ActiveStockContext';
+import { activeStockProvider } from '../../contexts/ActiveStockContext';
 import Input from '../Input/Input';
 
 export interface BuyBoxForm extends Trade {
     type: 'BUY';
 }
 
-export interface BuyBoxProps {}
+export interface BuyBoxProps { }
 
 export default function BuyBox() {
-    const activeStock = React.useContext(ActiveStockContext);
-    const { stock, candles } = activeStock;
+    // when active stock changes we want to rerender this component
+    const [activeStock, updateActiveStock] = React.useState(activeStockProvider.activeStock);
 
-    // when liquid balance rerenders we need to rerender this component
-    const [ balance, updateBalance ] = React.useState(liquidBalanceProvider.balance);
+    // when liquid balance changes we need to rerender this component
+    const [balance, updateBalance] = React.useState(liquidBalanceProvider.balance);
 
     React.useEffect(() => {
+        const activeStockSubscription = activeStockProvider.activeStock$.subscribe(updateActiveStock);
         const balanceSubscription = liquidBalanceProvider.balance$.subscribe(updateBalance);
-        return () => { balanceSubscription.unsubscribe(); };
+        return () => {
+            activeStockSubscription.unsubscribe();
+            balanceSubscription.unsubscribe();
+        };
     }, []);
 
-    
+    const { stock } = activeStock;
+
     const [form, updateForm] = React.useState<BuyBoxForm>({
         date: maxDate.unix(), // this is the selected date of the buy
         total: 0,
@@ -86,7 +88,7 @@ export default function BuyBox() {
         liquidBalanceProvider.subtract(total);
         tradesProvider.addToTrades(trade);
         portfolioProvider.addToPortfolio(trade);
-        
+
         updateBuyAmount(0);
     };
 
@@ -130,27 +132,27 @@ export default function BuyBox() {
         balance === 0
             ? []
             : [
-                  {
-                      value: 0,
-                      label: '0%',
-                  },
-                  {
-                      value: maxAmount * 0.25,
-                      label: '25%',
-                  },
-                  {
-                      value: maxAmount * 0.5,
-                      label: '50%',
-                  },
-                  {
-                      value: maxAmount * 0.75,
-                      label: '75%',
-                  },
-                  {
-                      value: maxAmount,
-                      label: '100%',
-                  },
-              ];
+                {
+                    value: 0,
+                    label: '0%',
+                },
+                {
+                    value: maxAmount * 0.25,
+                    label: '25%',
+                },
+                {
+                    value: maxAmount * 0.5,
+                    label: '50%',
+                },
+                {
+                    value: maxAmount * 0.75,
+                    label: '75%',
+                },
+                {
+                    value: maxAmount,
+                    label: '100%',
+                },
+            ];
 
     return (
         <div
