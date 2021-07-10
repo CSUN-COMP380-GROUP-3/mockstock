@@ -33,11 +33,8 @@ function App() {
                     <Grid item>
                         <StockInfo />
                     </Grid>
-                    <Grid item>
+                    <Grid item className="stock-box">
                         <StockChart />
-                    </Grid>
-                    <Grid item>
-                        <Portfolio />
                     </Grid>
                 </Grid>
             </Grid>
@@ -47,9 +44,12 @@ function App() {
                         <LiquidBalance />
                     </Grid>
                     <Grid item>
-                        <WatchList />
+                      <Portfolio />
                     </Grid>
                     <Grid item>
+                        <WatchList />
+                    </Grid>
+                    <Grid item className="buy-sell-container">
                         <BuyBox />
                         <SellBox />
                     </Grid>

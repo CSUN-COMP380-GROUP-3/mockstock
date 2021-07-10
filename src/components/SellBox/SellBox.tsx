@@ -10,6 +10,7 @@ import Trade from '../../interfaces/Trade';
 import Slider from '../Slider/Slider';
 import Input from '../Input/Input';
 import { tradesProvider } from '../../contexts/TradesContext';
+import "./SellBox.css";
 import { portfolioProvider } from '../../contexts/PortfolioContext';
 
 export interface SellBoxForm extends Trade {
@@ -164,15 +165,15 @@ export default function SellBox() {
         );
     };
     return (
-        <div
+        <div className = "sell-box"
             data-testid="sellbox"
-            style={{
-                backgroundColor: '#fff',
-                border: 10,
-                borderRadius: 3,
-                padding: 25,
-                marginTop: 20,
-            }}
+            // style={{
+            //     backgroundColor: '#fff',
+            //     border: 10,
+            //     borderRadius: 3,
+            //     padding: 25,
+            //     marginTop: 20,
+            // }}
         >
             <Typography variant="h5">Sell {stock.symbol}</Typography>
             <DatePicker
@@ -202,7 +203,7 @@ export default function SellBox() {
                 marks={getMarks(totalShares)}
                 max={totalShares}
             />
-            <Button onClick={onClick} disabled={isDisabled()}>
+            <Button onClick={onClick} disabled={isDisabled()} className = "sell-button">
                 Sell
             </Button>
         </div>
