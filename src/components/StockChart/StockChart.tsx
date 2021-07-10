@@ -53,7 +53,7 @@ export default function StockChart() {
             chart: {
               type: 'candlestick',
 
-              height: "100%"
+              height: "100%",
               zoom: {
                 autoScaleYaxis: true,
               }
