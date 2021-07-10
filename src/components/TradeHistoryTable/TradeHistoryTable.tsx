@@ -55,7 +55,7 @@ export default function TradeHistoryTable() {
     return (
         <TableContainer component={Paper} className={classes.container}>
             <Table aria-label="customized table" stickyHeader>
-                <TableHead>
+                <TableHead className="handle">
                     <TableRow>
                         <StyledTableCell>Stock Symbol </StyledTableCell>
                         <StyledTableCell align="right">
