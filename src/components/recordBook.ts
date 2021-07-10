@@ -195,13 +195,22 @@ module RecordBooks {
 	/**
 	 * Obtains ActiveStock's CandleStickData and updates the stored CandleStick Data with whatever is found in ActiveStock that it does not already contain.
 	 * @todo Can potentially have a gap in data if we don't store candlestick data after a year the old data is stored...
+	 * @todo This should probably be moved to some other module/class. Perhaps in ActiveContext
 	 */
-	const storeCandlesticksFromActive = () => {
+	const storeCandlesticksFromActiveAt = (currentDate: number) => {
 		const activeStock = activeStockProvider.activeStock;
 		const candleStickData = activeStock.candles;
 		const symbol = activeStock.stock.symbol;
 		try {
-			const existingCandleSticks: CandleStickData = getFromStorage(symbol + "CandlestickData");
+			const existingCandleStickRecordBook: CandlestickRecordBook = getFromStorage(symbol + "CandlestickData");
+			const lastUpdated = existingCandleStickRecordBook.lastUpdated;
+			const existingCandleSticks = existingCandleStickRecordBook.data;
+
+			// if lastUpdated is within a day of the previous record's "lastUpdated" value, just don't update 'cause it's already in there.
+			if (lastUpdated + (24 * 60 * 60) > currentDate) {
+				return;
+			}
+
 			const lastTimestamp = existingCandleSticks.t[existingCandleSticks.t.length - 1];
 			const firstGreaterIndex = candleStickData.t.findIndex((value) => {
 				return (value > lastTimestamp);
@@ -227,7 +236,11 @@ module RecordBooks {
 				existingCandleSticks.t.concat(tConcat);
 
 				// Store to Storage
-				setToStorage(symbol + "candleStickData", existingCandleSticks);
+				const newRecordBook: CandlestickRecordBook = {
+					lastUpdated: currentDate,
+					data: existingCandleSticks
+				}
+				setToStorage(symbol + "candleStickData", newRecordBook);
 			} else {
 				// activeStock's candlestick data does not contain any new data
 				return;
