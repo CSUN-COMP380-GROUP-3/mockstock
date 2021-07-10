@@ -10,6 +10,8 @@ import { v4 as uuid } from 'uuid';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 
+
+
 export default function Portfolio() {
 
     const [ portfolio, updatePortfolio ] = React.useState(portfolioProvider.portfolio);
@@ -21,7 +23,7 @@ export default function Portfolio() {
 
     const useStyles = makeStyles({
         root: {
-            height: '100%',
+            maxHeight: '300px',
         },
         header: {
             justifyContent: "flex-start",
@@ -31,7 +33,8 @@ export default function Portfolio() {
         title: {
             width: "100%",
             padding: "1rem 0 14px 1rem",
-        }
+        },
+        
     });
 
     const classes = useStyles();
@@ -50,11 +53,16 @@ export default function Portfolio() {
                     </Grid>
                 </Grid>
                 <CardContent>
-                    <List>
-                        {Object.entries(portfolio).map(([symbol, data]) => {
-                            return <PortfolioItem key={'p'+uuid()} data={data} />;
-                        })}
-                    </List>
+                    {
+                        portfolioProvider.length === 0 ? 
+                        <Typography variant = "subtitle2">Portfolio is Empty</Typography> : 
+                        <List className = "portfolio-list">
+                            {Object.entries(portfolio).map(([symbol, data]) => {
+                                return <PortfolioItem key={'p'+uuid()} data={data} />;
+                            })}
+                        </List>
+                    }
+                    
                 </CardContent>
             </Card>
         </React.Fragment>

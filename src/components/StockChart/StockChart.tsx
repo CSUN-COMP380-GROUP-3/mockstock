@@ -52,7 +52,8 @@ export default function StockChart() {
           {
             chart: {
               type: 'candlestick',
-              height: 350,
+
+              height: "100%"
               zoom: {
                 autoScaleYaxis: true,
               }
@@ -76,7 +77,7 @@ export default function StockChart() {
             }
           }
         }
-        series={series} type="candlestick" height={350}
+        series={series} type="candlestick" height="100%"
       />
     </div>
   )
