@@ -23,7 +23,7 @@ export function WatchListItemPrice(props: WatchListItemPriceProps) {
         return () => {
             subscription.unsubscribe();
         };
-    });
+    }, [displayedPrice$]);
 
     return <Typography 
         variant={variant} 

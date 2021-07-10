@@ -1,15 +1,22 @@
 import React from 'react';
 import Typography from '@material-ui/core/Typography';
 import currency from 'currency.js';
-
-import { LiquidBalanceContext } from '../../contexts/LiquidBalanceContext';
-
+import { liquidBalanceProvider } from '../../contexts/LiquidBalanceContext';
 import "./LiquidBalance.css";
 import Grid from '@material-ui/core/Grid';
 
 export default function LiquidBalance() {
 
-  const balance = React.useContext(LiquidBalanceContext);
+  /** internal state only handled by this component */
+  const [ balance, updateBalance ] = React.useState(liquidBalanceProvider.balance);
+
+  /** on componentDidMount we subscribe to the observable and update internal state. 
+   * on componentWillUnmount we unsubscribe to make sure we dont have any memory leaks
+   */
+  React.useEffect(() => {
+    const subscription = liquidBalanceProvider.balance$.subscribe(updateBalance);
+    return () => { subscription.unsubscribe(); };
+  }, []);
 
   return (
     <React.Fragment>

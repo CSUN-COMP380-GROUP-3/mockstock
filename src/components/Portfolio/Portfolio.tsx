@@ -1,8 +1,5 @@
 import React from 'react';
-import {
-    PortfolioContext,
-    portfolioProvider
-} from '../../contexts/PortfolioContext';
+import { portfolioProvider } from '../../contexts/PortfolioContext';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import PortfolioItem from '../PortfolioItem/PortfolioItem';
@@ -16,7 +13,13 @@ import Typography from '@material-ui/core/Typography';
 
 
 export default function Portfolio() {
-    const portfolio = React.useContext(PortfolioContext);
+
+    const [ portfolio, updatePortfolio ] = React.useState(portfolioProvider.portfolio);
+
+    React.useEffect(() => {
+        const portfolioSubscription = portfolioProvider.portfolio$.subscribe(updatePortfolio);
+        return () => { portfolioSubscription.unsubscribe(); };
+    }, []);
 
     const useStyles = makeStyles({
         root: {

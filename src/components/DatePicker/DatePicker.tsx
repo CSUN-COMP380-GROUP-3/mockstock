@@ -14,18 +14,14 @@ import { Typography } from '@material-ui/core';
 import { Moment } from 'moment';
 
 export interface DatePickerProps extends MuiDatePickerProps {
-    disableWeekends?: boolean;
-};
-
-function disableWeekendsHandler(date?: MaterialUiPickersDate) {
-    return date?.day() === 0 || date?.day() === 6;
+    validUnixTimestamps?: number[];
 };
 
 export const minDate = moment().subtract(1, 'year');
 export const maxDate = moment().subtract(1, 'day');
 
 export default function DatePicker(props: DatePickerProps) {
-    const { disableWeekends, value } = props;
+    const { value, validUnixTimestamps } = props;
     const [ anchorEl, setAnchorEl ] = React.useState<SVGSVGElement | null>(null);
 
     const onClick = (event: React.MouseEvent<SVGSVGElement>) => {
@@ -34,6 +30,20 @@ export default function DatePicker(props: DatePickerProps) {
     const onClose = () => {
         setAnchorEl(null);
     };
+
+    const shouldDisableDateHandler = (date?: MaterialUiPickersDate) => {
+        if (date) {
+            if (validUnixTimestamps) {
+                for (const t of validUnixTimestamps) {
+                    const finnhub = moment.unix(t).utc();
+                    if (finnhub.isSame(date, 'day')) { return false; };
+                };
+                return true;
+            };
+        };
+        return false;
+    };
+
     return <React.Fragment>
         <MuiPickersUtilsProvider utils={MomentUtils}>
             <Grid container spacing={1} alignItems="center">
@@ -57,7 +67,7 @@ export default function DatePicker(props: DatePickerProps) {
                     disableFuture={true}
                     disableToolbar={true}
                     data-testid="datepicker"
-                    shouldDisableDate={disableWeekends ? disableWeekendsHandler : undefined}
+                    shouldDisableDate={shouldDisableDateHandler}
                 />
             </Popover>
         </MuiPickersUtilsProvider>

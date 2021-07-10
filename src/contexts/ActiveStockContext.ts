@@ -1,4 +1,3 @@
-import React from 'react';
 import moment, { Moment } from 'moment';
 import StockSymbolData from '../interfaces/StockSymbolData';
 import CandleStickData from '../interfaces/CandleStickData';
@@ -10,6 +9,7 @@ import { TOKEN } from './TokenContext';
 import { AxiosResponse } from 'axios';
 import { NoDataError } from '../components/errors';
 import storage from '../components/storage';
+import { BehaviorSubject } from 'rxjs';
 
 // ActiveStock provides data about the stock currently being displayed on the left-side of the screen.
 // ActiveStock provides two essential pieces of information, Candlestick Information and Quote Information.
@@ -30,6 +30,7 @@ export interface ActiveStockInterface {
 /** Interface for the ActiveStockProvider */
 export interface ActiveStockProviderInterface {
     activeStock: ActiveStockInterface;
+    activeStock$: BehaviorSubject<ActiveStockInterface>;
     updateActiveStock: (activeStock: ActiveStockInterface) => void;
     fetchCandlesAndQuoteByStockSymbol: ({
         symbol,
@@ -57,7 +58,7 @@ export interface ActiveStockProviderInterface {
  */
 class ActiveStockProvider implements ActiveStockProviderInterface {
     activeStock: ActiveStockInterface;
-    updateActiveStock: (activeStock: ActiveStockInterface) => void;
+    activeStock$: BehaviorSubject<ActiveStockInterface>;
     constructor() {
         this.activeStock = {
             stock:
@@ -66,7 +67,7 @@ class ActiveStockProvider implements ActiveStockProviderInterface {
             quote: { o: 1, h: 1, l: 1, c: 1, pc: 1 },
             candles: { c: [], h: [], l: [], o: [], s: '', v: [], t: [] },
         };
-        this.updateActiveStock = () => { };
+        this.activeStock$ = new BehaviorSubject(this.activeStock);
         this.initializeData();
     }
 
@@ -86,6 +87,11 @@ class ActiveStockProvider implements ActiveStockProviderInterface {
             });
         });
     }
+
+    updateActiveStock(activeStock: ActiveStockInterface) {
+        this.activeStock = activeStock;
+        this.activeStock$.next(this.activeStock);
+    };
 
     /**
      * Fetch the max amount of candles and quote data together of current activeStock.
@@ -241,7 +247,3 @@ class ActiveStockProvider implements ActiveStockProviderInterface {
 }
 
 export const activeStockProvider = new ActiveStockProvider();
-
-export const ActiveStockContext = React.createContext<ActiveStockInterface>(
-    activeStockProvider.activeStock,
-);

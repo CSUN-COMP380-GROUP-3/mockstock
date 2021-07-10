@@ -9,27 +9,36 @@ import { tradesProvider } from '../../contexts/TradesContext';
 import { portfolioProvider } from '../../contexts/PortfolioContext';
 import DatePicker, { maxDate, minDate } from '../DatePicker/DatePicker';
 import { BaseKeyboardPickerProps } from '@material-ui/pickers/_shared/hooks/useKeyboardPickerState';
-import { liquidBalanceProvider, LiquidBalanceContext } from '../../contexts/LiquidBalanceContext';
-import {
-    ActiveStockContext,
-    activeStockProvider,
-} from '../../contexts/ActiveStockContext';
+import { liquidBalanceProvider } from '../../contexts/LiquidBalanceContext';
+import { activeStockProvider } from '../../contexts/ActiveStockContext';
 import Input from '../Input/Input';
 import "./BuyBox.css";
 export interface BuyBoxForm extends Trade {
     type: 'BUY';
 }
 
-export interface BuyBoxProps {}
+export interface BuyBoxProps { }
 
 export default function BuyBox() {
-    const activeStock = React.useContext(ActiveStockContext);
-    const { stock } = activeStock;
+    // when active stock changes we want to rerender this component
+    const [activeStock, updateActiveStock] = React.useState(activeStockProvider.activeStock);
 
-    const balance = React.useContext(LiquidBalanceContext);
+    // when liquid balance changes we need to rerender this component
+    const [balance, updateBalance] = React.useState(liquidBalanceProvider.balance);
+
+    React.useEffect(() => {
+        const activeStockSubscription = activeStockProvider.activeStock$.subscribe(updateActiveStock);
+        const balanceSubscription = liquidBalanceProvider.balance$.subscribe(updateBalance);
+        return () => {
+            activeStockSubscription.unsubscribe();
+            balanceSubscription.unsubscribe();
+        };
+    }, []);
+
+    const { stock, candles } = activeStock;
 
     const [form, updateForm] = React.useState<BuyBoxForm>({
-        date: activeStockProvider.minDate?.unix() || minDate.unix(), // this is the selected date of the buy
+        date: maxDate.unix(), // this is the selected date of the buy
         total: 0,
         stock,
         timestamp: moment().unix(),
@@ -79,7 +88,7 @@ export default function BuyBox() {
         liquidBalanceProvider.subtract(total);
         tradesProvider.addToTrades(trade);
         portfolioProvider.addToPortfolio(trade);
-        
+
         updateBuyAmount(0);
     };
 
@@ -123,27 +132,27 @@ export default function BuyBox() {
         balance === 0
             ? []
             : [
-                  {
-                      value: 0,
-                      label: '0%',
-                  },
-                  {
-                      value: maxAmount * 0.25,
-                      label: '25%',
-                  },
-                  {
-                      value: maxAmount * 0.5,
-                      label: '50%',
-                  },
-                  {
-                      value: maxAmount * 0.75,
-                      label: '75%',
-                  },
-                  {
-                      value: maxAmount,
-                      label: '100%',
-                  },
-              ];
+                {
+                    value: 0,
+                    label: '0%',
+                },
+                {
+                    value: maxAmount * 0.25,
+                    label: '25%',
+                },
+                {
+                    value: maxAmount * 0.5,
+                    label: '50%',
+                },
+                {
+                    value: maxAmount * 0.75,
+                    label: '75%',
+                },
+                {
+                    value: maxAmount,
+                    label: '100%',
+                },
+            ];
 
     return (
         <div data-testid="buybox" className = "buy-box">
@@ -156,7 +165,7 @@ export default function BuyBox() {
                 onChange={onChangeBuyDate}
                 minDate={activeStockProvider.minDate || minDate}
                 maxDate={activeStockProvider.maxDate || maxDate}
-                disableWeekends={true}
+                validUnixTimestamps={candles.t}
             />
             <Input
                 adornment="$"

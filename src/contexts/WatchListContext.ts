@@ -1,4 +1,4 @@
-import React from 'react';
+import { BehaviorSubject } from 'rxjs';
 import storage from '../components/storage';
 
 export interface WatchListInterface { [symbol: string]: number };
@@ -51,18 +51,11 @@ export module WatchListTracker {
 
     initWatchList();
 
+    export const WatchList$ = new BehaviorSubject(WatchList);
+
     const exportToStorage = (watchList: WatchListInterface): void => {
         const watchListStr = JSON.stringify(watchList);
         storage?.setItem(STORAGE_KEY, watchListStr);
-    };
-
-
-    /**
-     * Contains the initial symbols found in the user's Watchlist and the state's update function.
-     */
-    export const initWatchListContext: WatchListContextInterface = {
-        watchList: WatchList,
-        updateWatchList: function () { },
     };
 
     /**
@@ -71,15 +64,14 @@ export module WatchListTracker {
      * @returns The newly updated WatchList to update the Watchlist state.
      */
     export const addToWatchList = (symbol: string) => {
-        if (WatchList[symbol] === undefined) {
+        if (!has(symbol)) {
             WatchList[symbol] = 0;
         } else {
             console.warn("System tried to add a symbol to the Watchlist that is already on the watchlist!");
         }
-        let shittyWatchList: WatchListInterface = {};
-        Object.assign(shittyWatchList, WatchList);
-        exportToStorage(shittyWatchList);
-        return shittyWatchList;
+        const newWatchList = Object.assign({}, WatchList);
+        exportToStorage(newWatchList);
+        WatchList$.next(newWatchList);
     }
 
     /**
@@ -88,16 +80,20 @@ export module WatchListTracker {
      * @returns The newly updated WatchList to update the WatchList state.
      */
     export const removeFromWatchList = (symbol: string) => {
-        if (WatchList[symbol] !== undefined) {
+        if (has(symbol)) {
             delete WatchList[symbol];
         } else {
             console.warn("System tried to remove a symbol from the Watchlist that was not already in the watchlist!")
         }
-        let shittyWatchList: WatchListInterface = {};
-        Object.assign(shittyWatchList, WatchList);
-        exportToStorage(shittyWatchList);
-        return shittyWatchList;
+        const newWatchList = Object.assign({}, WatchList);
+        exportToStorage(newWatchList);
+        WatchList$.next(newWatchList);
     }
-}
 
-export const WatchListContext = React.createContext(WatchListTracker.initWatchListContext);
+    /**
+     *  Checks if a given symbol is currently in the WatchList
+     */
+    export const has = (symbol: string): boolean => {
+        return WatchList[symbol] !== undefined;
+    };
+}

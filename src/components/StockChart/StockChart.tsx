@@ -1,10 +1,16 @@
 import React from 'react';
-import { ActiveStockContext } from '../../contexts/ActiveStockContext';
+import { activeStockProvider } from '../../contexts/ActiveStockContext';
 import ReactApexChart from "react-apexcharts";
 import "./StockChart.css";
 
 export default function StockChart() {
-  const activeStock = React.useContext(ActiveStockContext);
+  const [ activeStock, updateActiveStock ] = React.useState(activeStockProvider.activeStock);
+
+  React.useEffect(() => {
+    const activeStockSubscription = activeStockProvider.activeStock$.subscribe(updateActiveStock);
+    return () => { activeStockSubscription.unsubscribe(); };
+  }, []);
+
   const { candles } = activeStock;
 
   const data = []
