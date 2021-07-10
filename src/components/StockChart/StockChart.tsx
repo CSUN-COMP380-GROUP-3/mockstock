@@ -46,10 +46,14 @@ export default function StockChart() {
           {
             chart: {
               type: 'candlestick',
+
               height: "100%"
+              zoom: {
+                autoScaleYaxis: true,
+              }
             },
             title: {
-              text: 'CandleStick Chart',
+              text: 'Candlestick Chart',
               align: 'left'
             },
             xaxis: {
