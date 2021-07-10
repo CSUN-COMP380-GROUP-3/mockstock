@@ -12,7 +12,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import { TradesContext } from '../../contexts/TradesContext';
+import { tradesProvider } from '../../contexts/TradesContext';
 import moment from 'moment';
 import { v4 as uuid } from 'uuid';
 import currency from 'currency.js';
@@ -50,7 +50,12 @@ const useStyles = makeStyles({
 export default function TradeHistoryTable() {
     const classes = useStyles();
 
-    const tradesContext = React.useContext(TradesContext);
+    const [ trades, updateTrades ] = React.useState(tradesProvider.trades);
+
+    React.useEffect(() => {
+        const tradesSubscription = tradesProvider.trades$.subscribe(updateTrades);
+        return () => { tradesSubscription.unsubscribe(); };
+    }, []);
 
     return (
         <TableContainer component={Paper} className={classes.container}>
@@ -73,7 +78,7 @@ export default function TradeHistoryTable() {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {tradesContext.map((trade) => {
+                    {trades.map((trade) => {
                         const timestamp = moment.unix(trade.date).format("MM/DD/YYYY HH:mm:ss A");
                         return (
                             <StyledTableRow key={'t'+uuid()}>

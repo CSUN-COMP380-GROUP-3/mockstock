@@ -1,37 +1,64 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
-import { ActiveStockContext } from '../../contexts/ActiveStockContext';
+import { activeStockProvider } from '../../contexts/ActiveStockContext';
 import './StockInfo.css';
-import {
-    WatchListContext,
-    WatchListContextInterface,
-    WatchListTracker,
-} from '../../contexts/WatchListContext';
+import { WatchListTracker } from '../../contexts/WatchListContext';
 import Typography from '@material-ui/core/Typography';
 import currency from 'currency.js';
 import { Listener } from '../../interfaces/WebSocketData';
 import WS from '../websocket';
 import WatchIcon from '@material-ui/icons/Watch';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
+import { map } from 'rxjs/operators';
 
-export default function StockInfo() {
-    const { watchList, updateWatchList } =
-        React.useContext<WatchListContextInterface>(WatchListContext);
-    const activeStock = React.useContext(ActiveStockContext);
-    const { stock, quote } = activeStock;
+interface StockInfoWatchListIconProps {
+    symbol: string;
+    className: string;
+};
 
-    const [displayPrice, setDisplayPrice] = React.useState<number>(quote.c);
+function StockInfoWatchListIcon(props: StockInfoWatchListIconProps) {
+    const { symbol } = props;
+
+    const [ isInWatchList, updateIsInWatchList ] = React.useState(WatchListTracker.has(symbol));
+
+    React.useEffect(() => {
+        const watchListSubscription = WatchListTracker.WatchList$
+            .pipe(
+                map(() => WatchListTracker.has(symbol))
+            ).subscribe(updateIsInWatchList);
+        return () => { watchListSubscription.unsubscribe(); };
+    }, [symbol]);
 
     /**Depending on whether the active symbol is already within the watchlist, adds or removes the active symbol to the watchlist */
     const manipWatchList = () => {
-        if (watchList[stock.symbol] === undefined) {
-            // item is not already in watchlist, time to add to WatchList
-            updateWatchList(WatchListTracker.addToWatchList(stock.symbol));
-        } else {
+        if (isInWatchList) {
             // item is already in watchlist, time to remove from WatchList
-            updateWatchList(WatchListTracker.removeFromWatchList(stock.symbol));
+            WatchListTracker.removeFromWatchList(symbol);
+        } else {
+            // item is not already in watchlist, time to add to WatchList
+            WatchListTracker.addToWatchList(symbol);
         }
     };
+
+    return (
+        <div className={props.className} onClick={manipWatchList}>
+            {isInWatchList ? <RemoveCircleIcon /> : <WatchIcon />}
+        </div>
+    );
+};
+
+export default function StockInfo() {
+
+    const [ activeStock, updateActiveStock ] = React.useState(activeStockProvider.activeStock);
+
+    React.useEffect(() => {
+        const activeStockSubscription = activeStockProvider.activeStock$.subscribe(updateActiveStock);
+        return () => { activeStockSubscription.unsubscribe(); };
+    }, []);
+
+    const { stock, quote } = activeStock;
+
+    const [displayPrice, setDisplayPrice] = React.useState<number>(quote.c);
 
     /**
      * Sets up a listener for the active symbol to retrieve live price data every time the active stock changes.
@@ -43,7 +70,7 @@ export default function StockInfo() {
                 WS.stopListen(stock.symbol, updatePrice);
             };
         }
-    });
+    }, [stock.symbol]);
 
     /**
      * Updates the price state whenever the websocket calls it because of a message.
@@ -87,17 +114,10 @@ export default function StockInfo() {
                         </Typography>
                     </Grid>
                     <Grid item>
-                        <Typography
-                            variant="h4"
+                        <StockInfoWatchListIcon
                             className="active-watchlist-button"
-                            onClick={manipWatchList}
-                        >
-                            {watchList[stock.symbol] === undefined ? (
-                                <WatchIcon />
-                            ) : (
-                                <RemoveCircleIcon />
-                            )}
-                        </Typography>
+                            symbol={stock.symbol}
+                        />
                     </Grid>
                 </Grid>
             </Grid>

@@ -1,9 +1,6 @@
 import React from 'react';
 import Typography from '@material-ui/core/Typography';
-import {
-    ActiveStockContext,
-    activeStockProvider,
-} from '../../contexts/ActiveStockContext';
+import { activeStockProvider } from '../../contexts/ActiveStockContext';
 import { liquidBalanceProvider } from '../../contexts/LiquidBalanceContext';
 import DatePicker, { minDate, maxDate } from '../DatePicker/DatePicker';
 import moment from 'moment';
@@ -13,10 +10,7 @@ import Trade from '../../interfaces/Trade';
 import Slider from '../Slider/Slider';
 import Input from '../Input/Input';
 import { tradesProvider } from '../../contexts/TradesContext';
-import {
-    PortfolioContext,
-    portfolioProvider,
-} from '../../contexts/PortfolioContext';
+import { portfolioProvider } from '../../contexts/PortfolioContext';
 
 export interface SellBoxForm extends Trade {
     type: 'SELL';
@@ -25,8 +19,18 @@ export interface SellBoxForm extends Trade {
 export interface SellBoxProps {}
 
 export default function SellBox() {
-    const activeStock = React.useContext(ActiveStockContext);
-    const portfolio = React.useContext(PortfolioContext);
+    const [ activeStock, updateActiveStock ] = React.useState(activeStockProvider.activeStock);
+
+    const [ portfolio, updatePortfolio ] = React.useState(portfolioProvider.portfolio);
+    
+    React.useEffect(() => {
+        const activeStockSubscription = activeStockProvider.activeStock$.subscribe(updateActiveStock);
+        const portfolioSubscription = portfolioProvider.portfolio$.subscribe(updatePortfolio);
+        return () => { 
+            activeStockSubscription.unsubscribe();
+            portfolioSubscription.unsubscribe(); 
+        };
+    }, []);
 
     const { stock, candles } = activeStock;
 

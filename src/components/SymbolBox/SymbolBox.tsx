@@ -7,7 +7,7 @@ import { useTheme } from '@material-ui/core/styles';
 import { VariableSizeList, ListChildComponentProps } from 'react-window';
 import StockSymbolData from '../../interfaces/StockSymbolData';
 import { filteredSymbols } from '../../contexts/StockSymbolsContext';
-import { ActiveStockContext, activeStockProvider } from '../../contexts/ActiveStockContext';
+import { activeStockProvider } from '../../contexts/ActiveStockContext';
 import "./SymbolBox.css"
 
 const LISTBOX_PADDING = 8; // px
@@ -100,7 +100,12 @@ export const groupBy = ({ symbol }: StockSymbolData) => symbol[0];
 export interface SymbolBoxProps extends Partial<AutocompleteProps<StockSymbolData, false, false, false>> { };
 
 export default function SymbolBox(props: SymbolBoxProps) {
-    const activeStock = React.useContext(ActiveStockContext);
+    const [ activeStock, updateActiveStock ] = React.useState(activeStockProvider.activeStock);
+
+    React.useEffect(() => {
+        const activeStockSubscription = activeStockProvider.activeStock$.subscribe(updateActiveStock);
+        return () => { activeStockSubscription.unsubscribe(); };
+    }, []);
 
     const { stock } = activeStock;
 

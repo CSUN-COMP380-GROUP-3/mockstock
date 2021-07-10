@@ -1,11 +1,12 @@
-import React from 'react';
 import currency from 'currency.js';
 import storage from '../components/storage';
+import { BehaviorSubject } from 'rxjs';
 
 const STORAGE_KEY = 'balance';
 
 export interface LiquidBalanceProviderInterface {
     balance: number;
+    balance$: BehaviorSubject<number>;
     updateLiquidBalance: (balance: number) => void;
     add: (balance: number) => void;
     subtract: (balance: number) => void;
@@ -17,13 +18,19 @@ export interface LiquidBalanceProviderInterface {
  */
 class LiquidBalanceProvider implements LiquidBalanceProviderInterface {
     balance: number;
+    balance$: BehaviorSubject<number>;
     private previousBalance: number;
-    updateLiquidBalance: (balance: number) => void;
     constructor() {
-        // we need to verify the storage 
+        // we need to verify the storage
         this.balance = currency(storage?.getItem(STORAGE_KEY) || process.env.REACT_APP_SEED_MONEY || 100000).value;
+        this.balance$ = new BehaviorSubject(this.balance); 
         this.previousBalance = currency(process.env.REACT_APP_SEED_MONEY || 100000).value;
-        this.updateLiquidBalance = () => {};
+    };
+
+    /** Aside from setting the balance we need to also push the new value to the observable */
+    updateLiquidBalance(balance: number) {
+        this.balance = balance;
+        this.balance$.next(this.balance);
     };
 
     add(balance: number) {
@@ -46,5 +53,3 @@ class LiquidBalanceProvider implements LiquidBalanceProviderInterface {
 };
 
 export const liquidBalanceProvider = new LiquidBalanceProvider();
-
-export const LiquidBalanceContext = React.createContext(liquidBalanceProvider.balance);

@@ -1,7 +1,7 @@
-import React from 'react';
 import StockSymbolData from '../interfaces/StockSymbolData';
 import Trade from '../interfaces/Trade';
 import storage from '../components/storage';
+import { BehaviorSubject } from 'rxjs';
 
 export interface PortfolioInterface {
     [key: string]: PortfolioDataInterface;
@@ -15,6 +15,7 @@ export interface PortfolioDataInterface {
 
 export interface PortfolioContextInterface {
     portfolio: PortfolioInterface;
+    portfolio$: BehaviorSubject<PortfolioInterface>;
     updatePortfolio: (portfolio: PortfolioInterface) => void;
     has: (symbol: string) => boolean;
     addToPortfolio: (trade: Trade) => boolean;
@@ -31,13 +32,12 @@ const STORAGE_KEY = 'portfolio';
  */
 class PortfolioProvider implements PortfolioContextInterface {
     portfolio: PortfolioInterface;
-    updatePortfolio: (portfolio: PortfolioInterface) => void;
+    portfolio$: BehaviorSubject<PortfolioInterface>;
     constructor() {
         this.portfolio = {};
-        this.updatePortfolio = () => {};
+        this.portfolio$ = new BehaviorSubject(this.portfolio);
         this.importFromStorage();
     }
-
 
     /**
      * Portfolio data is a stringified portfolio object so we parse and set as portfolio
@@ -51,6 +51,7 @@ class PortfolioProvider implements PortfolioContextInterface {
                 // here is where we can verify
                 if (!!localObject) {
                     this.portfolio = {...localObject};
+                    this.updatePortfolio(this.portfolio);
                 }
             } catch(e) {
                 console.log('Failed to import portfolio from storage');
@@ -58,6 +59,11 @@ class PortfolioProvider implements PortfolioContextInterface {
         }
     };
 
+    /** Aside from setting the new portoflio we need to push it to the observable */
+    updatePortfolio(portfolio: PortfolioInterface) {
+        this.portfolio = portfolio;
+        this.portfolio$.next(this.portfolio);
+    };
 
     /**
      * Stringify the portfolio and store in local storage
@@ -138,7 +144,3 @@ class PortfolioProvider implements PortfolioContextInterface {
 }
 
 export const portfolioProvider = new PortfolioProvider();
-
-export const PortfolioContext = React.createContext<PortfolioInterface>(
-    portfolioProvider.portfolio,
-);
