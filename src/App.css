@@ -1,22 +1,14 @@
 .all-content {
-    height: 100vh;
+  height: 100vh;
 }
 
 .main-content {
-    background: var(--dark);
-    padding: 60px;
+  background: var(--dark);
+  padding: 60px;
 }
 
 .side-bar {
   background: var(--less-dark);
   padding: 30px;
 }
-.stock-box{
-  flex-grow: 2; 
-}
 
-.buy-sell-container{
-  background-color: rgb(255, 255, 255);
-  padding: 24px;
-  border-radius: 5px;
-}

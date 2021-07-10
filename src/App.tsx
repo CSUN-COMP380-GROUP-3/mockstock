@@ -10,6 +10,8 @@ import WatchList from './components/WatchList/WatchList';
 import SellBox from './components/SellBox/SellBox';
 import StockInfo from './components/StockInfo/StockInfo';
 import Portfolio from './components/Portfolio/Portfolio';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
 
 function App() {
     return (
@@ -33,7 +35,7 @@ function App() {
                     <Grid item>
                         <StockInfo />
                     </Grid>
-                    <Grid item className="stock-box">
+                    <Grid item>
                         <StockChart />
                     </Grid>
                 </Grid>
@@ -49,9 +51,13 @@ function App() {
                     <Grid item>
                         <WatchList />
                     </Grid>
-                    <Grid item className="buy-sell-container">
-                        <BuyBox />
-                        <SellBox />
+                    <Grid item>
+                        <Card>
+                            <CardContent>
+                                <BuyBox />
+                                <SellBox />
+                            </CardContent>
+                        </Card>
                     </Grid>
                 </Grid>
             </Grid>
