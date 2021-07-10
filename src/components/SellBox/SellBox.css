@@ -3,7 +3,7 @@
 
 }
 
-.sell-box > .MuiButton-root{
+.sell-box > .MuiButton-root.Mui-disabled{
     color: rgb(255, 255, 255);
 
 }
