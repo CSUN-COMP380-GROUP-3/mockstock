@@ -79,7 +79,7 @@ export default function TradeHistoryTable() {
                 </TableHead>
                 <TableBody>
                     {trades.map((trade) => {
-                        const timestamp = moment.unix(trade.date).format("MM/DD/YYYY HH:mm:ss A");
+                        const timestamp = moment.unix(trade.date).format("MM/DD/YYYY");
                         return (
                             <StyledTableRow key={'t'+uuid()}>
                                 <StyledTableCell component="th" scope="trade">
