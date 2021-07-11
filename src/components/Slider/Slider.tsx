@@ -8,7 +8,11 @@ export interface SliderProps extends MuiSliderProps {}
 export default function Slider(props: SliderProps) {
     return (
         <div data-testid="slider">
-            <MuiSlider {...props} step={0.0001} min={0} />
+            <MuiSlider 
+                {...props} 
+                step={0.0001} 
+                min={0}
+            />
         </div>
     );
 }

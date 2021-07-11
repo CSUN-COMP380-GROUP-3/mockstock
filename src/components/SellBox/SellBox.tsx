@@ -12,6 +12,37 @@ import Input from '../Input/Input';
 import { tradesProvider } from '../../contexts/TradesContext';
 import "./SellBox.css";
 import { portfolioProvider } from '../../contexts/PortfolioContext';
+import Grid from '@material-ui/core/Grid';
+import { makeStyles } from '@material-ui/core/styles';
+import currency from 'currency.js';
+
+const useStyles = makeStyles({
+    root: {
+        paddingTop: "1rem",
+    },
+    sellButton: {
+        backgroundColor: "var(--red)",
+        color: "white",
+        width: "100%",
+        border: "2px solid var(--less-dark)",
+        "&:hover": {
+            backgroundColor: "var(--red)",
+        },
+        "&:disabled": {
+            backgroundColor: "var(--less-red)"
+        }
+    },
+    inputLabel: {
+        paddingBottom: ".1rem"
+    },
+    sliderContainer: {
+        paddingLeft: '1rem',
+        paddingBottom: '.5rem',
+    },
+    slider: {
+        color: "var(--less-dark)"
+    }
+});
 
 export interface SellBoxForm extends Trade {
     type: 'SELL';
@@ -98,8 +129,9 @@ export default function SellBox() {
     };
 
     const getTotal = () => {
-        const gP = getPrice();
-        return Number(gP) * shareAmount;
+        const price = getPrice();
+        if (price) { return price * shareAmount; };
+        return 0;
     };
 
     const onChangeInput = (event: any) => {
@@ -164,48 +196,111 @@ export default function SellBox() {
             candlestickIndex === -1 || totalShares <= 0 || resultingTrade < 0
         );
     };
+
+    const classes = useStyles();
+
     return (
-        <div className = "sell-box"
-            data-testid="sellbox"
-            // style={{
-            //     backgroundColor: '#fff',
-            //     border: 10,
-            //     borderRadius: 3,
-            //     padding: 25,
-            //     marginTop: 20,
-            // }}
+        <Grid 
+            container
+            spacing={1}
+            className={"main-container " + classes.root}
         >
-            <Typography variant="h5">Sell {stock.symbol}</Typography>
-            <DatePicker
-                id="sellDate"
-                value={moment.unix(date)}
-                onChange={onChangeSellDate}
-                minDate={earliestDate || activeStockProvider.minDate || minDate}
-                maxDate={activeStockProvider.maxDate || maxDate}
-                validUnixTimestamps={candles.t}
-            />
-            <Input
-                adornment="Shares:"
-                value={shareAmount}
-                onChange={onChangeInput}
-                onBlur={handleBlur}
-                inputProps={{
-                    type: 'number || string',
-                    min: 0,
-                    step: 1,
-                    max: totalShares,
-                }}
-                id="amount"
-            />
-            <Slider
-                value={shareAmount}
-                onChange={onChangeSlider}
-                marks={getMarks(totalShares)}
-                max={totalShares}
-            />
-            <Button onClick={onClick} disabled={isDisabled()} className = "sell-button">
-                Sell
-            </Button>
-        </div>
+            <Grid item xs={9}>
+                <Grid 
+                    container
+                    direction="column"
+                >
+                    <Grid item>
+                        <Typography gutterBottom variant="h6">
+                            Sell {stock.symbol}
+                        </Typography>
+                    </Grid>
+                    <Grid item>
+                        <Grid 
+                            container
+                            alignItems="flex-end"
+                            spacing={1}
+                        >
+                            <Grid item xs={3}>
+                                <Typography 
+                                    gutterBottom 
+                                    variant="body2"
+                                    align="right"
+                                    className={classes.inputLabel}
+                                >
+                                    Shares:
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={9}>
+                                <Grid container direction="column">
+                                    <Grid item>
+                                        <Typography gutterBottom variant="caption">
+                                            Est. Return: {currency(getTotal()).format()}
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item>
+                                        <Input
+                                            value={shareAmount}
+                                            onChange={onChangeInput}
+                                            onBlur={handleBlur}
+                                            inputProps={{
+                                                type: 'number || string',
+                                                min: 0,
+                                                step: 1,
+                                                max: totalShares,
+                                            }}
+                                        />
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                    <Grid item className={classes.sliderContainer}>
+                        <Slider
+                            value={shareAmount}
+                            onChange={onChangeSlider}
+                            marks={getMarks(totalShares)}
+                            max={totalShares}
+                            classes={{
+                                root: classes.slider,
+                            }}
+                        />
+                    </Grid>
+                </Grid>
+            </Grid>
+            <Grid item xs={3}>
+                <Grid
+                    container
+                    direction="column"
+                    justify="flex-start"
+                    alignItems="center"
+                    spacing={1}
+                    className="date-sellbutton-container"
+                >
+                    <Grid item>
+                        <DatePicker
+                            id="sellDate"
+                            value={moment.unix(date)}
+                            onChange={onChangeSellDate}
+                            minDate={earliestDate || activeStockProvider.minDate || minDate}
+                            maxDate={activeStockProvider.maxDate || maxDate}
+                            validUnixTimestamps={candles.t}
+                        />
+                    </Grid>
+                    <Grid item className="sellbutton-container">
+                        <Button 
+                            disabled={isDisabled()} 
+                            onClick={onClick}
+                            classes={{
+                                root: classes.sellButton,
+                            }}
+                            variant="contained"
+                        >
+                            Sell
+                        </Button>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Grid>
     );
 }

@@ -10,14 +10,29 @@ import WatchList from './components/WatchList/WatchList';
 import SellBox from './components/SellBox/SellBox';
 import StockInfo from './components/StockInfo/StockInfo';
 import Portfolio from './components/Portfolio/Portfolio';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import Divider from '@material-ui/core/Divider';
+import {makeStyles} from '@material-ui/core/styles';
+
+const useStyles = makeStyles({
+    appContent: {
+        height: "100vh",
+        '& .MuiCardContent-root:last-child': {
+            paddingBottom: "1rem",
+        }
+    }
+});
 
 function App() {
+    const classes = useStyles();
+
     return (
         <Grid
             container
             alignItems="stretch"
             spacing={0}
-            className="all-content"
+            className={classes.appContent}
         >
             <Grid item xs={8}>
                 <Grid
@@ -33,13 +48,13 @@ function App() {
                     <Grid item>
                         <StockInfo />
                     </Grid>
-                    <Grid item className="stock-box">
+                    <Grid item>
                         <StockChart />
                     </Grid>
                 </Grid>
             </Grid>
             <Grid item xs={4} className="side-bar">
-                <Grid container spacing={2} direction="column">
+                <Grid container spacing={1} direction="column">
                     <Grid item>
                         <LiquidBalance />
                     </Grid>
@@ -49,9 +64,14 @@ function App() {
                     <Grid item>
                         <WatchList />
                     </Grid>
-                    <Grid item className="buy-sell-container">
-                        <BuyBox />
-                        <SellBox />
+                    <Grid item >
+                        <Card>
+                            <CardContent>
+                                <BuyBox />
+                                <Divider />
+                                <SellBox />
+                            </CardContent>
+                        </Card>
                     </Grid>
                 </Grid>
             </Grid>

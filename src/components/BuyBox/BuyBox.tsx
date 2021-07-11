@@ -13,11 +13,37 @@ import { liquidBalanceProvider } from '../../contexts/LiquidBalanceContext';
 import { activeStockProvider } from '../../contexts/ActiveStockContext';
 import Input from '../Input/Input';
 import "./BuyBox.css";
+import Grid from '@material-ui/core/Grid';
+import { makeStyles } from '@material-ui/core/styles';
+
 export interface BuyBoxForm extends Trade {
     type: 'BUY';
 }
 
-export interface BuyBoxProps { }
+const useStyles = makeStyles({
+    buyButton: {
+        backgroundColor: "var(--green)",
+        color: "white",
+        width: "100%",
+        border: "2px solid var(--less-dark)",
+        "&:hover": {
+            backgroundColor: "var(--green)",
+        },
+        "&:disabled": {
+            backgroundColor: "var(--less-green)"
+        }
+    },
+    inputLabel: {
+        paddingBottom: ".1rem"
+    },
+    sliderContainer: {
+        paddingLeft: '1rem',
+        paddingBottom: '.5rem',
+    },
+    slider: {
+        color: "var(--less-dark)"
+    }
+});
 
 export default function BuyBox() {
     // when active stock changes we want to rerender this component
@@ -100,6 +126,13 @@ export default function BuyBox() {
         return buyAmount;
     };
 
+    const getShares = () => {
+        const price = getPrice();
+        const total = getTotal();
+        if (price) { return total / price; };
+        return 0;
+    };
+
     const isDisabled = () => {
         return candlestickIndex === -1 || buyAmount > balance;
     };
@@ -154,41 +187,116 @@ export default function BuyBox() {
                 },
             ];
 
+    
+    const classes = useStyles();
+
     return (
-        <div data-testid="buybox" className = "buy-box">
-            <Typography id="input-slider" gutterBottom variant="h5">
-                Buy {stock.symbol}
-            </Typography>
-            <DatePicker
-                id="buyDate"
-                value={moment.unix(date)}
-                onChange={onChangeBuyDate}
-                minDate={activeStockProvider.minDate || minDate}
-                maxDate={activeStockProvider.maxDate || maxDate}
-                validUnixTimestamps={candles.t}
-            />
-            <Input
-                adornment="$"
-                value={buyAmount}
-                onChange={onChangeInput}
-                onBlur={handleBlur}
-                inputProps={{
-                    type: 'number || string',
-                    min: 0,
-                    step: 0.01,
-                    max: balance,
-                }}
-            />
-            <Slider
-                value={buyAmount}
-                onChange={onChangeSlider}
-                marks={getMarks(balance)}
-                max={balance}
-                step={0.01}
-            />
-            <Button disabled={isDisabled()} onClick={onClick} className = "buy-button">
-                Buy
-            </Button>
-        </div>
+        <Grid 
+            container
+            spacing={1}
+            className="main-container"
+        >
+            <Grid item xs={9}>
+                <Grid 
+                    container
+                    direction="column"
+                >
+                    <Grid item>
+                        <Typography gutterBottom variant="h6">
+                            Buy {stock.symbol}
+                        </Typography>
+                    </Grid>
+                    <Grid item>
+                        <Grid 
+                            container
+                            alignItems="flex-end"
+                            spacing={1}
+                        >
+                            <Grid item xs={3}>
+                                <Typography 
+                                    gutterBottom 
+                                    variant="body2"
+                                    align="right"
+                                    className={classes.inputLabel}
+                                >
+                                    Amount:
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={9}>
+                                <Grid container direction="column">
+                                    <Grid item>
+                                        <Typography 
+                                            gutterBottom 
+                                            variant="caption"
+                                        >
+                                            Est. Shares: { getShares().toFixed(4) }
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item>
+                                        <Input
+                                            adornment="$"
+                                            value={buyAmount}
+                                            onChange={onChangeInput}
+                                            onBlur={handleBlur}
+                                            inputProps={{
+                                                type: 'number || string',
+                                                min: 0,
+                                                step: 0.01,
+                                                max: balance,
+                                            }}
+                                        />
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                    <Grid item className={classes.sliderContainer}>
+                        <Slider
+                            value={buyAmount}
+                            onChange={onChangeSlider}
+                            marks={getMarks(balance)}
+                            max={balance}
+                            step={0.01}
+                            classes={{
+                                root: classes.slider,
+                            }}
+                        />
+                    </Grid>
+                </Grid>
+            </Grid>
+            <Grid item xs={3}>
+                <Grid
+                    container
+                    direction="column"
+                    justify="flex-start"
+                    alignItems="center"
+                    spacing={1}
+                    className="date-buybutton-container"
+                >
+                    <Grid item>
+                        <DatePicker
+                            id="buyDate"
+                            value={moment.unix(date)}
+                            onChange={onChangeBuyDate}
+                            minDate={activeStockProvider.minDate || minDate}
+                            maxDate={activeStockProvider.maxDate || maxDate}
+                            validUnixTimestamps={candles.t}
+                        />
+                    </Grid>
+                    <Grid item className="buybutton-container">
+                        <Button 
+                            disabled={isDisabled()} 
+                            onClick={onClick}
+                            classes={{
+                                root: classes.buyButton,
+                            }}
+                            variant="contained"
+                        >
+                            Buy
+                        </Button>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Grid>
     );
 }
