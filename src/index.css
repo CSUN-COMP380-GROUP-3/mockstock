@@ -5,10 +5,10 @@ html {
   --dark: #323232;
   --less-dark: #595959;
   --light: #e2e2e0;
-  /* --red: #ff1000; */
-  /* --green: #09EE10; */
   --red: rgb(239, 64, 60);
+  --less-red: rgba(180, 56, 45, .75);
   --green: rgb(0, 183, 70);
+  --less-green: rgba(169, 189, 54, .75);
 }
 
 body {
