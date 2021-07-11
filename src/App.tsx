@@ -13,14 +13,26 @@ import Portfolio from './components/Portfolio/Portfolio';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Divider from '@material-ui/core/Divider';
+import {makeStyles} from '@material-ui/core/styles';
+
+const useStyles = makeStyles({
+    appContent: {
+        height: "100vh",
+        '& .MuiCardContent-root:last-child': {
+            paddingBottom: "1rem",
+        }
+    }
+});
 
 function App() {
+    const classes = useStyles();
+
     return (
         <Grid
             container
             alignItems="stretch"
             spacing={0}
-            className="all-content"
+            className={classes.appContent}
         >
             <Grid item xs={8}>
                 <Grid

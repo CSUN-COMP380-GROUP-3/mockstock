@@ -1,7 +1,3 @@
-.all-content {
-  height: 100vh;
-}
-
 .main-content {
   background: var(--dark);
   padding: 60px;
