@@ -200,9 +200,10 @@ export default function SellBox() {
         // should not be able to click if there is no oneDayCandle
 
         // also cannot sell if the resulting trade would be less than 0;
-        const resultingTrade = totalShares - shareAmount;
+        const maxShares = getMaxShares();
+        const resultingTrade = maxShares - shareAmount;
         return (
-            candlestickIndex === -1 || totalShares <= 0 || resultingTrade < 0
+            candlestickIndex === -1 || maxShares <= 0 || resultingTrade < 0
         );
     };
 
