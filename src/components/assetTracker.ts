@@ -1,19 +1,19 @@
-import storage from '../components/storage';
+import storage from './storage';
 import { activeStockProvider } from '../contexts/ActiveStockContext';
 import CandleStickData from '../interfaces/CandleStickData';
 
-interface RecordBook {
-	candlesticks: CandlestickRecordBook,
-	records: Record[]
+interface SymbolBooks {
+	candlestickBook: CandlestickBook,
+	recordBook: Record[]
 }
 
-interface CandlestickRecordBook {
+interface CandlestickBook {
 	lastUpdated: number,
 	data: CandleStickData
 }
 
 interface Record {
-	candlestickIndex: number,
+	candleStickTimestamp: number,
 	sharesOwned: number,
 	costBasis: number,
 	// trades: SOMETHING[]
@@ -25,13 +25,15 @@ interface CashRecord {
 	// trades: SOMETHING[]
 }
 
-module RecordBooks {
+module AssetTracker {
 
 	const RECORDBOOK_SYMBOL_LIST_KEY = "RECORDBOOK_SYMBOL_LIST"
 	const CASH_RECORDBOOK_KEY = "CASH_RECORDBOOK"
+	const RECORDBOOK_SUFFIX_KEY = "RecordBook";
+	const CANDLESTICK_SUFFIX_KEY = "CandlestickBook";
 	const INITIAL_CASH = 100000;
 
-	const _recordbook: { [symbol: string]: RecordBook } = {};
+	const _recordbook: { [symbol: string]: SymbolBooks } = {};
 	let _cashRecordBook: CashRecord[] = [];
 
 	/**
@@ -44,15 +46,15 @@ module RecordBooks {
 		try {
 			const symbolList = getFromStorage(RECORDBOOK_SYMBOL_LIST_KEY);
 
-			// for each symbol, get the recordBook for that and store into _recordBooks.
+			// for each symbol, retrieve and store its records and candlesticks into _recordBooks.
 			for (let i = 0; i < symbolList.length; i++) {
 				const symbol = symbolList[i];
 				try {
-					const recordBook = getFromStorage(symbol + "RecordBook");
-					const candlestickData = getFromStorage(symbol + "CandlestickData");
+					const recordBook = getFromStorage(symbol + RECORDBOOK_SUFFIX_KEY);
+					const candlestickData = getFromStorage(symbol + CANDLESTICK_SUFFIX_KEY);
 					_recordbook[symbol] = {
-						candlesticks: candlestickData,
-						records: recordBook
+						candlestickBook: candlestickData,
+						recordBook: recordBook
 					}
 				} catch (e) {
 					// no data found for one of our symbols...
@@ -123,6 +125,17 @@ module RecordBooks {
 	}
 
 	/**
+	 * @param timestamp timestamp to search for
+	 * @param symbol symbol to search for
+	 * @returns the index to access the candlestick data for the given symbol, or -1 if no candlestick data exists for the given timestamp. 
+	 */
+	const getFirstCandlestickIndexAtFor = function (timestamp: number, symbol: string): number {
+		return _recordbook[symbol].candlestickBook.data.t.findIndex((value) => {
+			return value <= timestamp;
+		})
+	}
+
+	/**
 	 * Searches the Recordbook for the earliest Record that is at or before the given timestamp for the given symbol.
 	 * @param timestamp Timestamp to search for
 	 * @param symbol Symbol to search for
@@ -132,14 +145,14 @@ module RecordBooks {
 		let recordIndex: number = -1;
 
 		// If we don't have records for the symbol, just return -1.
-		if (_recordbook[symbol] == undefined || _recordbook[symbol].records.length <= 0) {
+		if (_recordbook[symbol] == undefined || _recordbook[symbol].recordBook.length <= 0) {
 			return recordIndex;
 		}
 
 		// TODO: Alternatively we could search through this using binary search or something but linear is fine for now.
-		for (let i = _recordbook[symbol].records.length - 1; i > 0; i++) {
-			const record = _recordbook[symbol].records[i];
-			const recordTimestamp = _recordbook[symbol].candlesticks.data.t[record.candlestickIndex];
+		for (let i = _recordbook[symbol].recordBook.length - 1; i > 0; i++) {
+			const record = _recordbook[symbol].recordBook[i];
+			const recordTimestamp = _recordbook[symbol].candlestickBook.data.t[record.candleStickTimestamp];
 
 			if (recordTimestamp <= timestamp) {
 				// found the record for the given day!
@@ -173,23 +186,18 @@ module RecordBooks {
 	}
 
 	/**
-	 * @param timestamp timestamp to search for
-	 * @param symbol symbol to search for
-	 * @returns the index to access the candlestick data for the given symbol, or -1 if no candlestick data exists for the given timestamp. 
-	 */
-	const getFirstCandlestickIndexAtFor = function (timestamp: number, symbol: string): number {
-		return _recordbook[symbol].candlesticks.data.t.findIndex((value) => {
-			return value <= timestamp;
-		})
-	}
-
-	/**
+	 * Converts a given timestamp into 0:00 UTC on the SAME DAY. 
+	 * 
+	 * If for example is given Thursday 5:00PM PDT (-7:00 UTC), this will return Thursday 0:00AM UTC (+0:00 UTC).
+	 * A typical truncation is NOT enough to convert, because Thursday 5:00PM PDT would convert to Friday 0:00AM UTC. 
 	 * @param timestamp non-candlestick Timestamp
+	 * @param UTCOffset The UTC Offset in SECONDS
 	 * @returns Candlestick Timestamp (0:00 UTC on the same day)
 	 * @todo this.
 	 */
-	const convertTimestampToCandlestickTimestamp = function (timestamp: number): number {
-		return timestamp;
+	const convertTimestampToMidnightUTC = function (timestamp: number, UTCOffset: number): number {
+		timestamp += UTCOffset;
+		return timestamp - (timestamp % 86400); // divides the number by the seconds in a day and substracts what's left. Truncates to midnight of that day.
 	}
 
 	/**
@@ -197,17 +205,17 @@ module RecordBooks {
 	 * @todo Can potentially have a gap in data if we don't store candlestick data after a year the old data is stored...
 	 * @todo This should probably be moved to some other module/class. Perhaps in ActiveContext
 	 */
-	const storeCandlesticksFromActiveAt = (currentDate: number) => {
+	const storeCandlesticksFromActiveAt = (currentDateTimestamp: number) => {
 		const activeStock = activeStockProvider.activeStock;
 		const candleStickData = activeStock.candles;
 		const symbol = activeStock.stock.symbol;
 		try {
-			const existingCandleStickRecordBook: CandlestickRecordBook = getFromStorage(symbol + "CandlestickData");
+			const existingCandleStickRecordBook: CandlestickBook = getFromStorage(symbol + CANDLESTICK_SUFFIX_KEY);
 			const lastUpdated = existingCandleStickRecordBook.lastUpdated;
 			const existingCandleSticks = existingCandleStickRecordBook.data;
 
 			// if lastUpdated is within a day of the previous record's "lastUpdated" value, just don't update 'cause it's already in there.
-			if (lastUpdated + (24 * 60 * 60) > currentDate) {
+			if (lastUpdated + (24 * 60 * 60) > currentDateTimestamp) {
 				return;
 			}
 
@@ -236,18 +244,18 @@ module RecordBooks {
 				existingCandleSticks.t.concat(tConcat);
 
 				// Store to Storage
-				const newRecordBook: CandlestickRecordBook = {
-					lastUpdated: currentDate,
+				const newRecordBook: CandlestickBook = {
+					lastUpdated: currentDateTimestamp,
 					data: existingCandleSticks
 				}
-				setToStorage(symbol + "candleStickData", newRecordBook);
+				setToStorage(symbol + CANDLESTICK_SUFFIX_KEY, newRecordBook);
 			} else {
 				// activeStock's candlestick data does not contain any new data
 				return;
 			}
 		} catch (e) {
 			// no stored candlestick data, store what's in activecontext.
-			setToStorage(symbol + "candleStickData", activeStock.candles);
+			setToStorage(symbol + CANDLESTICK_SUFFIX_KEY, activeStock.candles);
 		}
 
 	}
@@ -263,7 +271,7 @@ module RecordBooks {
 	export const getSellableSharesAtFor = (timestamp: number, symbol: string): number => {
 
 		let recordIndex = getFirstRecordIndexAtFor(timestamp, symbol);
-		let shares = _recordbook[symbol].records[recordIndex].sharesOwned;
+		let shares = _recordbook[symbol].recordBook[recordIndex].sharesOwned;
 
 		// if no record for the day, or no owned stocks for the day, return 0
 		if (shares <= 0 || recordIndex == -1) {
@@ -271,8 +279,8 @@ module RecordBooks {
 		}
 
 		// for all records after that record, store lowest.
-		for (let i = recordIndex; i < _recordbook[symbol].records.length; i++) {
-			const record = _recordbook[symbol].records[i];
+		for (let i = recordIndex; i < _recordbook[symbol].recordBook.length; i++) {
+			const record = _recordbook[symbol].recordBook[i];
 			if (record.sharesOwned < shares) {
 				shares = record.sharesOwned;
 
@@ -330,15 +338,16 @@ module RecordBooks {
 	/**
 	 * Ensures the user can actually spend the given amount, conducts the transaction, and records it.
 	 * @param timestamp Timestamp of transaction
+	 * @param utcOffset Timestamp's UTC Offset in SECONDS
 	 * @param symbol The symbol to transact in
 	 * @param amount The amount of money to invest
 	 * @param sharePrice The Price of a single share of the given symbol
 	 * @returns True if successful, False if unsucessful.
 	 */
-	export const buyAtForAmountAt = function (timestamp: number, symbol: string, amount: number, sharePrice: number) {
+	export const buyAtForAmountAt = function (timestamp: number, utcOffset: number, symbol: string, amount: number, sharePrice: number) {
 		// there is a corresponding candlestick for this transaction, so this is a historical trade.
 		// Make sure they have enough cash at this timestamp.
-		const candlestickTimestamp = convertTimestampToCandlestickTimestamp(timestamp)
+		const candlestickTimestamp = convertTimestampToMidnightUTC(timestamp, utcOffset)
 		const historicalCash = getSpendableCashAt(candlestickTimestamp);
 		if (historicalCash < amount) {
 			// they don't have enough cash.
@@ -367,25 +376,25 @@ module RecordBooks {
 			// historical trade
 
 			const firstRecordIndex = getFirstRecordIndexAtFor(timestamp, symbol);
-			const firstRecord = _recordbook[symbol].records[firstRecordIndex];
+			const firstRecord = _recordbook[symbol].recordBook[firstRecordIndex];
 
 			const newSharesOwned = firstRecord.sharesOwned + (amount / sharePrice);
 			const newCostBasis = ((firstRecord.sharesOwned * firstRecord.costBasis) + amount) / newSharesOwned;
 
-			if (firstRecord.candlestickIndex == correspondingCandleStickIndex) {
+			if (firstRecord.candleStickTimestamp == correspondingCandleStickIndex) {
 				// firstRecordIndex corresponds to the timestamp.
-				_recordbook[symbol].records[firstRecordIndex].sharesOwned = newSharesOwned;
-				_recordbook[symbol].records[firstRecordIndex].costBasis = newCostBasis;
-				setToStorage(symbol + "RecordBook", _recordbook[symbol].records);
+				_recordbook[symbol].recordBook[firstRecordIndex].sharesOwned = newSharesOwned;
+				_recordbook[symbol].recordBook[firstRecordIndex].costBasis = newCostBasis;
+				setToStorage(symbol + "RecordBook", _recordbook[symbol].recordBook);
 			} else {
 				// firstRecordIndex does NOT correspond to the given timestamp, must splice in a new record.
 				const newRecord: Record = {
-					candlestickIndex: correspondingCandleStickIndex,
+					candleStickTimestamp: correspondingCandleStickIndex,
 					sharesOwned: newSharesOwned,
 					costBasis: newCostBasis,
 				}
-				_recordbook[symbol].records.splice(firstRecordIndex + 1, 0, newRecord);
-				setToStorage(symbol + "RecordBook", _recordbook[symbol].records);
+				_recordbook[symbol].recordBook.splice(firstRecordIndex + 1, 0, newRecord);
+				setToStorage(symbol + "RecordBook", _recordbook[symbol].recordBook);
 				// TODO: ensure the above does what we think it's doing.
 			}
 		} else {
@@ -395,4 +404,4 @@ module RecordBooks {
 	}
 }
 
-export default RecordBooks;
+export default AssetTracker;
