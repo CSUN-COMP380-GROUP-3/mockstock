@@ -36,6 +36,10 @@ const useStyles = makeStyles({
     inputlabel: {
         paddingBottom: ".1rem"
     },
+    sliderContainer: {
+        paddingLeft: '1rem',
+        paddingBottom: '.5rem',
+    },
     slider: {
         color: "var(--less-dark)"
     }
@@ -236,7 +240,7 @@ export default function BuyBox() {
                             </Grid>
                         </Grid>
                     </Grid>
-                    <Grid item>
+                    <Grid item className={classes.sliderContainer}>
                         <Slider
                             value={buyAmount}
                             onChange={onChangeSlider}
