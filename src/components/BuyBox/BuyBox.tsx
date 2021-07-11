@@ -13,6 +13,7 @@ import { liquidBalanceProvider } from '../../contexts/LiquidBalanceContext';
 import { activeStockProvider } from '../../contexts/ActiveStockContext';
 import Input from '../Input/Input';
 import "./BuyBox.css";
+import AssetTracker from '../assetTracker';
 export interface BuyBoxForm extends Trade {
     type: 'BUY';
 }
@@ -76,6 +77,8 @@ export default function BuyBox() {
         const total = getTotal(); // total is the amount the user wants to spend
         // from the two vars above we can do all the calculations we need
         if (total === 0) return;
+
+        AssetTracker.buyAtForAmountAt(date, moment().utcOffset(), stock.symbol, total, price);
 
         const trade: BuyBoxForm = {
             ...form,
@@ -154,8 +157,13 @@ export default function BuyBox() {
                 },
             ];
 
+    const getMaxBalance = () => {
+        const convertedDate = AssetTracker.convertTimestampToMidnightUTC(date, moment().utcOffset());
+        return AssetTracker.getSpendableCashAt(convertedDate);
+    }
+
     return (
-        <div data-testid="buybox" className = "buy-box">
+        <div data-testid="buybox" className="buy-box">
             <Typography id="input-slider" gutterBottom variant="h5">
                 Buy {stock.symbol}
             </Typography>
@@ -183,10 +191,10 @@ export default function BuyBox() {
                 value={buyAmount}
                 onChange={onChangeSlider}
                 marks={getMarks(balance)}
-                max={balance}
+                max={getMaxBalance()}
                 step={0.01}
             />
-            <Button disabled={isDisabled()} onClick={onClick} className = "buy-button">
+            <Button disabled={isDisabled()} onClick={onClick} className="buy-button">
                 Buy
             </Button>
         </div>

@@ -90,7 +90,7 @@ module AssetTracker {
 		}
 
 		// TODO: Alternatively we could search through this using binary search or something but linear is fine for now.
-		for (let i = _symbolBook[symbol].length - 1; i > 0; i++) { // Search backwards for first-past-record
+		for (let i = _symbolBook[symbol].length - 1; i >= 0; i--) { // Search backwards for first-past-record
 			if (_symbolBook[symbol][i].candlestickTimestamp <= candlestickTimestamp) {
 				// found the record for the given timestamp!
 				recordIndex = i;
@@ -109,7 +109,7 @@ module AssetTracker {
 		let recordIndex = -1;
 
 		// TODO: Alternatively we could search through this using binary search or somerhing but linear is fine for now.
-		for (let i = _cashRecordBook.length - 1; i > 0; i++) { // it's important we search backwards for first-past-record
+		for (let i = _cashRecordBook.length - 1; i >= 0; i--) { // it's important we search backwards for first-past-record
 			if (_cashRecordBook[i].candlestickTimestamp <= candlestickTimestamp) {
 				// found the record for the given timestamp!
 				recordIndex = i;
@@ -251,6 +251,18 @@ module AssetTracker {
 	 */
 	export const buyAtForAmountAt = function (timestamp: number, utcOffset: number, symbol: string, amount: number, sharePrice: number) {
 		const candlestickTimestamp = convertTimestampToMidnightUTC(timestamp, utcOffset);
+		if (_symbolBook[symbol] === undefined) {
+			_symbolBook[symbol] = [{
+				candlestickTimestamp: 0,
+				sharesOwned: 0,
+				costBasis: 0,
+				trades: {
+					bought: 0,
+					costBasis: 0
+				}
+			}]
+			setToStorage(RECORDBOOK_SYMBOL_LIST_KEY, Object.keys(_symbolBook));
+		}
 		// Update Cash Record
 		// Makes sure they have enough cash at this timestamp.
 		const firstCashIndex = getFirstCashRecordAt(candlestickTimestamp);
@@ -328,6 +340,18 @@ module AssetTracker {
 	export const sellAtForAmountAt = function (timestamp: number, utcOffset: number, symbol: string, quantity: number, sharePrice: number) {
 		// Make sure they have enough shares at this timestamp.
 		const candlestickTimestamp = convertTimestampToMidnightUTC(timestamp, utcOffset)
+		if (_symbolBook[symbol] === undefined) {
+			_symbolBook[symbol] = [{
+				candlestickTimestamp: 0,
+				sharesOwned: 0,
+				costBasis: 0,
+				trades: {
+					bought: 0,
+					costBasis: 0
+				}
+			}]
+			setToStorage(RECORDBOOK_SYMBOL_LIST_KEY, Object.keys(_symbolBook));
+		}
 		const sellableShares = getSellableSharesAtFor(candlestickTimestamp, symbol);
 		if (sellableShares < quantity) {
 			// they don't have enough shares.
@@ -380,13 +404,13 @@ module AssetTracker {
 	 * If for example is given Thursday 5:00PM PDT (-7:00 UTC), this will return Thursday 0:00AM UTC (+0:00 UTC).
 	 * A typical truncation is NOT enough to convert, because Thursday 5:00PM PDT would directly convert to Friday 0:00AM UTC. 
 	 * @param timestamp non-candlestick Timestamp
-	 * @param UTCOffset The UTC Offset in SECONDS
+	 * @param UTCOffset The UTC Offset in MINUTES
 	 * @returns Candlestick Timestamp (0:00 UTC on the same day)
 	 * @todo this.
 	 */
 	export const convertTimestampToMidnightUTC = function (timestamp: number, UTCOffset: number): number {
-		timestamp += UTCOffset;
-		return timestamp - (timestamp % 86400); // divides the number by the seconds in a day and substracts what's left. Truncates to midnight of that day.
+		timestamp += UTCOffset * 60;
+		return timestamp - (timestamp % (24 * 60 * 60)); // divides the number by the seconds in a day and substracts what's left. Truncates to midnight of that day.
 	}
 
 }

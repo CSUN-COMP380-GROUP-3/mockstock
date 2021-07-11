@@ -12,24 +12,25 @@ import Input from '../Input/Input';
 import { tradesProvider } from '../../contexts/TradesContext';
 import "./SellBox.css";
 import { portfolioProvider } from '../../contexts/PortfolioContext';
+import AssetTracker from '../assetTracker';
 
 export interface SellBoxForm extends Trade {
     type: 'SELL';
 }
 
-export interface SellBoxProps {}
+export interface SellBoxProps { }
 
 export default function SellBox() {
-    const [ activeStock, updateActiveStock ] = React.useState(activeStockProvider.activeStock);
+    const [activeStock, updateActiveStock] = React.useState(activeStockProvider.activeStock);
 
-    const [ portfolio, updatePortfolio ] = React.useState(portfolioProvider.portfolio);
-    
+    const [portfolio, updatePortfolio] = React.useState(portfolioProvider.portfolio);
+
     React.useEffect(() => {
         const activeStockSubscription = activeStockProvider.activeStock$.subscribe(updateActiveStock);
         const portfolioSubscription = portfolioProvider.portfolio$.subscribe(updatePortfolio);
-        return () => { 
+        return () => {
             activeStockSubscription.unsubscribe();
-            portfolioSubscription.unsubscribe(); 
+            portfolioSubscription.unsubscribe();
         };
     }, []);
 
@@ -77,6 +78,8 @@ export default function SellBox() {
         if (price === undefined) return;
         const total = getTotal();
         if (total === undefined) return;
+
+        AssetTracker.sellAtForAmountAt(date, moment().utcOffset(), stock.symbol, shareAmount, price);
 
         const trade: SellBoxForm = {
             ...form,
@@ -131,27 +134,33 @@ export default function SellBox() {
         maxShares === 0
             ? []
             : [
-                  {
-                      value: 0,
-                      label: '0%',
-                  },
-                  {
-                      value: maxShares * 0.25,
-                      label: '25%',
-                  },
-                  {
-                      value: maxShares * 0.5,
-                      label: '50%',
-                  },
-                  {
-                      value: maxShares * 0.75,
-                      label: '75%',
-                  },
-                  {
-                      value: maxShares,
-                      label: '100%',
-                  },
-              ];
+                {
+                    value: 0,
+                    label: '0%',
+                },
+                {
+                    value: maxShares * 0.25,
+                    label: '25%',
+                },
+                {
+                    value: maxShares * 0.5,
+                    label: '50%',
+                },
+                {
+                    value: maxShares * 0.75,
+                    label: '75%',
+                },
+                {
+                    value: maxShares,
+                    label: '100%',
+                },
+            ];
+
+    const getMaxShares = () => {
+        const convertedDate = AssetTracker.convertTimestampToMidnightUTC(date, moment().utcOffset());
+        const maxShares = AssetTracker.getSellableSharesAtFor(convertedDate, stock.symbol);
+        return maxShares;
+    }
 
     const isDisabled = () => {
         // here we need to check and see if the stock is in the portfolio
@@ -165,15 +174,15 @@ export default function SellBox() {
         );
     };
     return (
-        <div className = "sell-box"
+        <div className="sell-box"
             data-testid="sellbox"
-            // style={{
-            //     backgroundColor: '#fff',
-            //     border: 10,
-            //     borderRadius: 3,
-            //     padding: 25,
-            //     marginTop: 20,
-            // }}
+        // style={{
+        //     backgroundColor: '#fff',
+        //     border: 10,
+        //     borderRadius: 3,
+        //     padding: 25,
+        //     marginTop: 20,
+        // }}
         >
             <Typography variant="h5">Sell {stock.symbol}</Typography>
             <DatePicker
@@ -201,9 +210,9 @@ export default function SellBox() {
                 value={shareAmount}
                 onChange={onChangeSlider}
                 marks={getMarks(totalShares)}
-                max={totalShares}
+                max={getMaxShares()}
             />
-            <Button onClick={onClick} disabled={isDisabled()} className = "sell-button">
+            <Button onClick={onClick} disabled={isDisabled()} className="sell-button">
                 Sell
             </Button>
         </div>
