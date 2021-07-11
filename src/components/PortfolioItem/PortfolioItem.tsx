@@ -1,4 +1,4 @@
-import Card, { CardProps } from '@material-ui/core/Card';
+import { CardProps } from '@material-ui/core/Card';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import { activeStockProvider } from '../../contexts/ActiveStockContext';
@@ -32,7 +32,7 @@ export default function PortfolioListItem(props: PortfolioListItemProps) {
     };
 
     const comp = (
-        <Card
+        <div
             data-testid="watchlistitem"
             style={style}
             className={root}
@@ -58,7 +58,7 @@ export default function PortfolioListItem(props: PortfolioListItemProps) {
                     </Grid>
                 </Grid>
             </Grid>
-        </Card>
+        </div>
     );
 
     return comp;

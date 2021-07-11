@@ -29,11 +29,13 @@ export interface WatchListItemPriceProps extends TypographyProps {
 };
 
 export function WatchListItemPrice(props: WatchListItemPriceProps) {
-    const [ displayedPrice, updateDisplayedPrice ] = React.useState(0);
+    const cachedPrice = React.useRef(0);
+    const [ displayedPrice, updateDisplayedPrice ] = React.useState(cachedPrice.current);
     const { displayedPrice$, previousClose } = props;
 
     React.useEffect(() => {
         const subscription = displayedPrice$.subscribe(price => {
+            cachedPrice.current = price;
             updateDisplayedPrice(price);
         });
         return () => {
