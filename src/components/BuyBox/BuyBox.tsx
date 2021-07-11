@@ -261,7 +261,7 @@ export default function BuyBox() {
                         <Slider
                             value={buyAmount}
                             onChange={onChangeSlider}
-                            marks={getMarks(balance)}
+                            marks={getMarks(getMaxBalance())}
                             max={getMaxBalance()}
                             step={0.01}
                             classes={{

@@ -269,7 +269,7 @@ export default function SellBox() {
                         <Slider
                             value={shareAmount}
                             onChange={onChangeSlider}
-                            marks={getMarks(totalShares)}
+                            marks={getMarks(getMaxShares())}
                             max={getMaxShares()}
                             classes={{
                                 root: classes.slider,
