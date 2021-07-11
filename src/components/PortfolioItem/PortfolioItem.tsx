@@ -3,6 +3,8 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import { activeStockProvider } from '../../contexts/ActiveStockContext';
 import { PortfolioDataInterface } from '../../contexts/PortfolioContext';
+import Grid from '@material-ui/core/Grid';
+import currency from 'currency.js';
 
 export interface PortfolioListItemProps extends CardProps {
     data: PortfolioDataInterface;
@@ -21,16 +23,7 @@ export default function PortfolioListItem(props: PortfolioListItemProps) {
             '& .symbol': {
                 marginLeft: '1rem',
             },
-            '& .details': {
-                marginRight: '1rem',
-                '& .dollar': {
-                    textAlign: 'right',
-                },
-                '& .percent': {
-                    textAlign: 'right',
-                },
-            },
-        },
+        }
     });
     const { root } = useStyles();
 
@@ -45,28 +38,26 @@ export default function PortfolioListItem(props: PortfolioListItemProps) {
             className={root}
             onClick={onClick}
         >
-            <Typography variant="h6" className="symbol">
-                {symbol}
-            </Typography>
-            <div className="details">
-                {/* <Typography variant="subtitle2" className="dollar" data-testid="portfolioitem-dollar">{(total$Buys.subtract(total$Sells)).toString()}</Typography> */}
-                <Typography
-                    variant="subtitle2"
-                    className="cost"
-                    data-testid="portfolioitem-cost"
-                >
-                    {/* {costBasis.toString()} */}
-                    {data.sharesPrice}
-                </Typography>
-                <Typography
-                    variant="subtitle2"
-                    className="shares"
-                    data-testid="portfolioitem-shares"
-                >
-                    {/* {totalShares} */}
-                    {data.totalShares}
-                </Typography>
-            </div>
+            <Grid container spacing={1} justify="space-around" alignItems="center">
+                <Grid item xs={2}>
+                    <Typography variant="h6" className="symbol">
+                        {symbol}
+                    </Typography>
+                </Grid>
+                <Grid item xs={8}>
+                    <Typography variant="subtitle1">{data.totalShares.toFixed(4)} Shares</Typography>
+                </Grid>
+                <Grid item xs={2}>
+                    <Grid container direction="column" alignItems="center">
+                        <Grid item>
+                            <Typography variant="caption">Cost Basis</Typography>
+                        </Grid>
+                        <Grid item>
+                            <Typography variant="subtitle1">{currency(data.sharesPrice).format()}</Typography>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Grid>
         </Card>
     );
 

@@ -54,7 +54,7 @@ function App() {
                 </Grid>
             </Grid>
             <Grid item xs={4} className="side-bar">
-                <Grid container spacing={2} direction="column">
+                <Grid container spacing={1} direction="column">
                     <Grid item>
                         <LiquidBalance />
                     </Grid>
@@ -64,7 +64,7 @@ function App() {
                     <Grid item>
                         <WatchList />
                     </Grid>
-                    <Grid item>
+                    <Grid item >
                         <Card>
                             <CardContent>
                                 <BuyBox />
