@@ -32,6 +32,12 @@ const useStyles = makeStyles({
         "&:disabled": {
             backgroundColor: "var(--less-dark)"
         }
+    },
+    inputlabel: {
+        paddingBottom: ".1rem"
+    },
+    slider: {
+        color: "var(--less-dark)"
     }
 });
 
@@ -184,33 +190,51 @@ export default function BuyBox() {
                     container
                     direction="column"
                 >
-                    <Grid
-                        container
-                    >
-                        <Grid item>
-                            <Typography gutterBottom variant="h5">
-                                Buy {stock.symbol}
-                            </Typography>
-                        </Grid>
-                        <Grid item>
-                            <Typography gutterBottom variant="subtitle2">
-                                Est. Shares: 0
-                            </Typography>
-                        </Grid>
+                    <Grid item>
+                        <Typography gutterBottom variant="h6">
+                            Buy {stock.symbol}
+                        </Typography>
                     </Grid>
                     <Grid item>
-                        <Input
-                            adornment="$"
-                            value={buyAmount}
-                            onChange={onChangeInput}
-                            onBlur={handleBlur}
-                            inputProps={{
-                                type: 'number || string',
-                                min: 0,
-                                step: 0.01,
-                                max: balance,
-                            }}
-                        />
+                        <Grid 
+                            container
+                            alignItems="flex-end"
+                            spacing={1}
+                        >
+                            <Grid item xs={3}>
+                                <Typography 
+                                    gutterBottom 
+                                    variant="body2"
+                                    align="right"
+                                    className={classes.inputlabel}
+                                >
+                                    Amount:
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={9}>
+                                <Grid container direction="column">
+                                    <Grid item>
+                                        <Typography gutterBottom variant="caption">
+                                            Est. Shares: 0
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item>
+                                        <Input
+                                            adornment="$"
+                                            value={buyAmount}
+                                            onChange={onChangeInput}
+                                            onBlur={handleBlur}
+                                            inputProps={{
+                                                type: 'number || string',
+                                                min: 0,
+                                                step: 0.01,
+                                                max: balance,
+                                            }}
+                                        />
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        </Grid>
                     </Grid>
                     <Grid item>
                         <Slider
@@ -219,6 +243,9 @@ export default function BuyBox() {
                             marks={getMarks(balance)}
                             max={balance}
                             step={0.01}
+                            classes={{
+                                root: classes.slider,
+                            }}
                         />
                     </Grid>
                 </Grid>
