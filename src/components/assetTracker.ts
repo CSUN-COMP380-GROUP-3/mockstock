@@ -120,18 +120,6 @@ module AssetTracker {
 	}
 
 	/**
-	 * @param candlestickTimestamp timestamp to search for
-	 * @param symbol symbol to search for
-	 * @returns the index to access the candlestick data for the given symbol, or -1 if no candlestick data exists for the given timestamp. 
-	 */
-	const getFirstCandlestickIndexAtFor = function (candlestickTimestamp: number, symbol: string): number {
-		return _symbolBook[symbol].candleStickData.t.findIndex((value) => {
-			return convertTimestampToMidnightUTC(value, 0) == candlestickTimestamp;
-			// return value == candlestickTimestamp; UNCOMMENT IF WE CAN CONFIRM THAT CANDLESTICK TIMESTAMPS ARE ALWAYS midnight UTC.
-		})
-	}
-
-	/**
 	 * Searches the Recordbook for the earliest Record that is at or before the given timestamp for the given symbol.
 	 * @param candlestickTimestamp Timestamp to search for
 	 * @param symbol Symbol to search for
