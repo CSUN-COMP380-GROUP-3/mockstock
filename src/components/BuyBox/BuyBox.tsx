@@ -249,7 +249,7 @@ export default function BuyBox() {
                                                 type: 'number || string',
                                                 min: 0,
                                                 step: 0.01,
-                                                max: balance,
+                                                max: getMaxBalance(),
                                             }}
                                         />
                                     </Grid>
