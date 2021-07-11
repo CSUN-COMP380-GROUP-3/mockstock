@@ -19,7 +19,7 @@ interface StockInfoWatchListIconProps {
 function StockInfoWatchListIcon(props: StockInfoWatchListIconProps) {
     const { symbol } = props;
 
-    const [ isInWatchList, updateIsInWatchList ] = React.useState(WatchListTracker.has(symbol));
+    const [isInWatchList, updateIsInWatchList] = React.useState(WatchListTracker.has(symbol));
 
     React.useEffect(() => {
         const watchListSubscription = WatchListTracker.WatchList$
@@ -49,7 +49,7 @@ function StockInfoWatchListIcon(props: StockInfoWatchListIconProps) {
 
 export default function StockInfo() {
 
-    const [ activeStock, updateActiveStock ] = React.useState(activeStockProvider.activeStock);
+    const [activeStock, updateActiveStock] = React.useState(activeStockProvider.activeStock);
 
     React.useEffect(() => {
         const activeStockSubscription = activeStockProvider.activeStock$.subscribe(updateActiveStock);
@@ -65,6 +65,7 @@ export default function StockInfo() {
      */
     React.useEffect(() => {
         if (WS.socket.OPEN) {
+            setDisplayPrice(quote.c);
             WS.listen(stock.symbol, updatePrice);
             return () => {
                 WS.stopListen(stock.symbol, updatePrice);
