@@ -3,11 +3,6 @@
   overflow: auto;
 }
 
-.MuiCardHeader-title {
-  font-weight: bold;
-  font-size: 32px;
-}
-
 .MuiCardHeader-root {
   border-bottom: 2px solid var(--dark);
 }

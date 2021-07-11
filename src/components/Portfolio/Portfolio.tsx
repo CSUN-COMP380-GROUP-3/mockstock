@@ -9,8 +9,8 @@ import TradeHistory from '../TradeHistory/TradeHistory';
 import { v4 as uuid } from 'uuid';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-
-
+import { ListItem } from '@material-ui/core';
+import Divider from '@material-ui/core/Divider';
 
 export default function Portfolio() {
 
@@ -22,29 +22,32 @@ export default function Portfolio() {
     }, []);
 
     const useStyles = makeStyles({
-        root: {
-            maxHeight: '300px',
-        },
-        header: {
+        portfolioHeader: {
             justifyContent: "flex-start",
             alignItems: "center",
-            borderBottom: "2px solid #323232",
+            borderBottom: "2px solid var(--dark)",
         },
-        title: {
+        portfolioTitle: {
             width: "100%",
             padding: "1rem 0 14px 1rem",
         },
-        
+        portfolioList: {
+            maxHeight: '20vh',
+            overflow: 'auto'
+        },
+        portfolioListItem: {
+            width: "100%"
+        }
     });
 
     const classes = useStyles();
 
     return (
         <React.Fragment>
-            <Card data-testid="portfoliolist" className={classes.root}>
-                <Grid container spacing={1} className={classes.header}>
+            <Card data-testid="portfoliolist">
+                <Grid container spacing={1} className={classes.portfolioHeader}>
                     <Grid item>
-                        <div className={classes.title}>
+                        <div className={classes.portfolioTitle}>
                             <Typography variant="h5">Portfolio</Typography>
                         </div>
                     </Grid>
@@ -55,11 +58,16 @@ export default function Portfolio() {
                 <CardContent>
                     {
                         portfolioProvider.length === 0 ? 
-                        <Typography variant = "subtitle2">Portfolio is Empty</Typography> : 
-                        <List className = "portfolio-list">
-                            {Object.entries(portfolio).map(([symbol, data]) => {
-                                return <PortfolioItem key={'p'+uuid()} data={data} />;
-                            })}
+                        <Typography variant="body1" align="center">Your portfolio is empty. Purchase stocks to get started.</Typography> : 
+                        <List className={classes.portfolioList}>
+                            {Object.entries(portfolio).map(([symbol, data]) => (
+                                <React.Fragment>
+                                    <ListItem key={'p'+uuid()} >
+                                        <PortfolioItem data={data} />
+                                    </ListItem>
+                                    <Divider />
+                                </React.Fragment>
+                            ))}
                         </List>
                     }
                     
