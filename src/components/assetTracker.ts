@@ -1,7 +1,6 @@
 import storage from './storage';
 import { activeStockProvider } from '../contexts/ActiveStockContext';
 import CandleStickData from '../interfaces/CandleStickData';
-import moment from 'moment';
 
 interface SymbolBooks {
 	candleStickData: CandleStickData,
@@ -12,13 +11,15 @@ interface Record {
 	candlestickTimestamp: number,
 	sharesOwned: number,
 	costBasis: number,
-	// trades: SOMETHING[]
+	trades: {
+		bought: number,
+		costBasis: number
+	}
 }
 
 interface CashRecord {
 	candlestickTimestamp: number,
-	cashOwned: number,
-	// trades: SOMETHING[]
+	cashOwned: number
 }
 
 module AssetTracker {
@@ -326,6 +327,45 @@ module AssetTracker {
 	}
 
 	/**
+	 * Finds existing or creates new cash record and alters the cashOwned appropriately for it and all future cash records.
+	 * @param candlestickTimestamp midnight UTC timestamp
+	 * @param amount dollar amount being exchanged (purchases should come as negative)
+	 */
+	const updateCash = function (candlestickTimestamp: number, firstCashIndex: number, amount: number) {
+		const expendableCash = getSpendableCashAt(candlestickTimestamp);
+		if (expendableCash + amount < 0) {
+			// they don't have enough cash.
+			throw ("Insufficient cash");
+		} else {
+			// the buy is good to go. Update Cash Record!
+			if (_cashRecordBook[firstCashIndex].candlestickTimestamp == candlestickTimestamp) {
+				// There is already a record for this timestamp. Just update it.
+				_cashRecordBook[firstCashIndex].cashOwned += amount;
+			} else {
+				// Need to insert a new cash record.
+				const newCashRecord: CashRecord = {
+					candlestickTimestamp: candlestickTimestamp,
+					cashOwned: _cashRecordBook[firstCashIndex].cashOwned // this puts the old value in because we will update it in the update loop.
+				}
+				_cashRecordBook.splice(firstCashIndex + 1, 0, newCashRecord);
+				// TODO: Ensure that if inserting a new cash record at the end of the cashbook, if splice actually does what we want.
+			}
+		}
+	}
+
+	/**
+	 * Propogates a transaction into the future.
+	 * @param firstCorrectIndex The first index that has the correct balance in it.
+	 * @param amount Dollar amount transacted.
+	 */
+	const updateFutureCashRecords = function (firstCorrectIndex: number, amount: number) {
+		// Update cash for all future cash records
+		for (let i = firstCorrectIndex + 1; i < _cashRecordBook.length; i++) {
+			_cashRecordBook[i].cashOwned += amount;
+		}
+	}
+
+	/**
 	 * Ensures the user can actually spend the given amount, conducts the purchase, and records it.
 	 * @param timestamp Timestamp of transaction
 	 * @param utcOffset Timestamp's UTC Offset in SECONDS
@@ -335,51 +375,69 @@ module AssetTracker {
 	 * @throws "Insufficient cash" if user does not have enough cash at the given date (or in the future).
 	 */
 	export const buyAtForAmountAt = function (timestamp: number, utcOffset: number, symbol: string, amount: number, sharePrice: number) {
-		// Make sure they have enough cash at this timestamp.
-		const candlestickTimestamp = convertTimestampToMidnightUTC(timestamp, utcOffset)
-		const expendableCash = getSpendableCashAt(candlestickTimestamp);
-		if (expendableCash < amount) {
-			// they don't have enough cash.
-			throw ("Insufficient cash");
-		} else {
-			// the buy is good to go. Update Cash Record!
-			const firstCashIndex = getFirstCashRecordAt(candlestickTimestamp);
-			if (_cashRecordBook[firstCashIndex].candlestickTimestamp == candlestickTimestamp) {
-				// There is already a record for this timestamp. Just update it.
-				_cashRecordBook[firstCashIndex].cashOwned -= amount;
-			} else {
-				// Need to insert a new cash record.
-				const newCashRecord: CashRecord = {
-					candlestickTimestamp: candlestickTimestamp,
-					cashOwned: _cashRecordBook[firstCashIndex].cashOwned - amount
-				}
-				_cashRecordBook.splice(firstCashIndex + 1, 0, newCashRecord);
-				// TODO: Ensure that if inserting a new cash record at the end of the cashbook, if splice actually does what we want.
-			}
-			setToStorage(CASH_RECORDBOOK_KEY, _cashRecordBook);
-		}
+		const candlestickTimestamp = convertTimestampToMidnightUTC(timestamp, utcOffset);
+		// Update Cash Record
+		// Makes sure they have enough cash at this timestamp.
+		const firstCashIndex = getFirstCashRecordAt(candlestickTimestamp);
+		updateCash(candlestickTimestamp, firstCashIndex, -amount);
 
-		// Update Record
+		// Update cash for all future cash records
+		updateFutureCashRecords(firstCashIndex, -amount);
+
+		// store to cache
+		setToStorage(CASH_RECORDBOOK_KEY, _cashRecordBook);
+
+		// Update Records
+		const quantity = amount / sharePrice;
 		const firstRecordIndex = getFirstRecordIndexAtFor(candlestickTimestamp, symbol);
 		const firstRecord = _symbolBook[symbol].recordBook[firstRecordIndex];
 
-		const newSharesOwned = firstRecord.sharesOwned + (amount / sharePrice);
-		const newCostBasis = ((firstRecord.sharesOwned * firstRecord.costBasis) + amount) / newSharesOwned; // (old total cost + cost of purchase) / (old shares + newly bought shares)
-
+		// update record
 		if (firstRecord.candlestickTimestamp == candlestickTimestamp) {
 			// There is already a record for this timestamp. Just update it.
+			const newSharesOwned = firstRecord.sharesOwned + quantity;
+			const newCostBasis = ((firstRecord.sharesOwned * firstRecord.costBasis) + amount) / newSharesOwned; // (old total cost + cost of purchase) / (old shares + newly bought shares)
+
 			_symbolBook[symbol].recordBook[firstRecordIndex].sharesOwned = newSharesOwned;
 			_symbolBook[symbol].recordBook[firstRecordIndex].costBasis = newCostBasis;
+
+			// update record's trades
+			const oldTrades = _symbolBook[symbol].recordBook[firstRecordIndex].trades;
+			const newTrades = {
+				bought: oldTrades.bought + quantity,
+				costBasis: ((oldTrades.bought * oldTrades.costBasis) + amount) / quantity
+			}
+			_symbolBook[symbol].recordBook[firstRecordIndex].trades = newTrades;
 		} else {
 			// Need to insert a new record.
 			const newRecord: Record = {
 				candlestickTimestamp: candlestickTimestamp,
-				sharesOwned: newSharesOwned,
-				costBasis: newCostBasis,
+				sharesOwned: firstRecord.sharesOwned, // this puts the old value in because we will update it in the update loop.
+				costBasis: firstRecord.costBasis, // this puts the old value in because we will update it in the update loop.
+				trades: {
+					bought: quantity,
+					costBasis: sharePrice
+				}
 			}
 			_symbolBook[symbol].recordBook.splice(firstRecordIndex + 1, 0, newRecord);
 			// TODO: ensure the above does what we think it's doing.
 		}
+
+		// Update sharesOwned and costBasis for all future records
+		for (let i = firstRecordIndex + 1; i < _symbolBook[symbol].recordBook.length; i++) {
+			// assume firstRecordIndex's Record is correct.
+			// update sharesOwned
+			const previousRecord = _symbolBook[symbol].recordBook[i - 1];
+			const record = _symbolBook[symbol].recordBook[i];
+			_symbolBook[symbol].recordBook[i].sharesOwned = record.sharesOwned + quantity;
+			// update costBasis
+			const oldTotal = previousRecord.sharesOwned * previousRecord.costBasis;
+			const tradeTotal = record.trades.bought * record.trades.costBasis;
+			const newSharesOwned = previousRecord.sharesOwned + record.trades.bought;
+			_symbolBook[symbol].recordBook[i].costBasis = (oldTotal + tradeTotal) / newSharesOwned;
+		}
+
+		// store to cache
 		setToStorage(symbol + RECORDBOOK_SUFFIX_KEY, _symbolBook[symbol].recordBook);
 	}
 
@@ -407,35 +465,37 @@ module AssetTracker {
 				_symbolBook[symbol].recordBook[firstRecordIndex].sharesOwned -= quantity;
 			} else {
 				// Need to insert a new record.
+				const previousRecord = _symbolBook[symbol].recordBook[firstRecordIndex];
 				const newRecord: Record = {
 					candlestickTimestamp: candlestickTimestamp,
-					sharesOwned: _symbolBook[symbol].recordBook[firstRecordIndex].sharesOwned - quantity,
-					costBasis: _symbolBook[symbol].recordBook[firstRecordIndex].costBasis
+					sharesOwned: previousRecord.sharesOwned, // this puts the old value in because we will update it in the update loop
+					costBasis: previousRecord.costBasis,
+					trades: {
+						bought: 0,
+						costBasis: previousRecord.costBasis
+					}
 				}
 				_symbolBook[symbol].recordBook.splice(firstRecordIndex + 1, 0, newRecord);
 				// TODO: Ensure that if inserting a new cash record at the end of the cashbook, if splice actually does what we want.
 			}
+
+			// Update sharesOwned for all future records
+			for (let i = firstRecordIndex + 1; i < _symbolBook[symbol].recordBook.length; i++) {
+				_symbolBook[symbol].recordBook[i].sharesOwned -= quantity;
+			}
+
+			// store to cache
 			setToStorage(symbol + RECORDBOOK_SUFFIX_KEY, _symbolBook[symbol].recordBook);
 		}
 
 		// Update Cash
 		const firstCashIndex = getFirstCashRecordAt(candlestickTimestamp);
-		const oldCashRecord = _cashRecordBook[firstCashIndex];
+		updateCash(candlestickTimestamp, firstCashIndex, quantity * sharePrice);
 
-		const newCash = oldCashRecord.cashOwned + (quantity * sharePrice);
+		// Update all future Cash Records
+		updateFutureCashRecords(firstCashIndex, quantity * sharePrice);
 
-		if (oldCashRecord.candlestickTimestamp == candlestickTimestamp) {
-			// There is already a record for this timestamp. Just update it.
-			_cashRecordBook[firstCashIndex].cashOwned = newCash;
-		} else {
-			// Need to insert a new record.
-			const newRecord: CashRecord = {
-				candlestickTimestamp: candlestickTimestamp,
-				cashOwned: newCash,
-			}
-			_cashRecordBook.splice(firstCashIndex + 1, 0, newRecord);
-			// TODO: ensure the above does what we think it's doing.
-		}
+		// store to cache
 		setToStorage(CASH_RECORDBOOK_KEY, _cashRecordBook);
 	}
 
