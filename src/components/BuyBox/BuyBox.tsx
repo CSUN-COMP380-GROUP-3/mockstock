@@ -136,10 +136,6 @@ export default function BuyBox() {
         return 0;
     };
 
-    const isDisabled = () => {
-        return candlestickIndex === -1 || buyAmount > balance;
-    };
-
     const onChangeInput = (event: any) => {
         if (isNaN(event.target.value)) {
             return;
@@ -193,7 +189,11 @@ export default function BuyBox() {
     const getMaxBalance = () => {
         const convertedDate = AssetTracker.convertTimestampToMidnightUTC(date, moment().utcOffset());
         return AssetTracker.getSpendableCashAt(convertedDate);
-    }
+    };
+
+    const isDisabled = () => {
+        return candlestickIndex === -1 || buyAmount > getMaxBalance();
+    };
     
     const classes = useStyles();
 
