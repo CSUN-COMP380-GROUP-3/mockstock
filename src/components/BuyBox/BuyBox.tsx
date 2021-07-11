@@ -22,12 +22,12 @@ export interface BuyBoxForm extends Trade {
 
 const useStyles = makeStyles({
     buybutton: {
-        backgroundColor: "var(--green)",
+        backgroundColor: "rgb(0, 183, 70)",
         color: "white",
         width: "100%",
         border: "2px solid var(--less-dark)",
         "&:hover": {
-            backgroundColor: "var(--green)",
+            backgroundColor: "rgb(0, 183, 70)",
         },
         "&:disabled": {
             backgroundColor: "var(--less-dark)"
@@ -227,7 +227,7 @@ export default function BuyBox() {
                 <Grid
                     container
                     direction="column"
-                    justify="center"
+                    justify="flex-start"
                     alignItems="center"
                     spacing={1}
                     className="date-buybutton-container"
