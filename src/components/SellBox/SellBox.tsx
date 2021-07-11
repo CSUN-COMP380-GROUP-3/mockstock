@@ -14,6 +14,7 @@ import "./SellBox.css";
 import { portfolioProvider } from '../../contexts/PortfolioContext';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
+import currency from 'currency.js';
 
 const useStyles = makeStyles({
     root: {
@@ -128,8 +129,9 @@ export default function SellBox() {
     };
 
     const getTotal = () => {
-        const gP = getPrice();
-        return Number(gP) * shareAmount;
+        const price = getPrice();
+        if (price) { return price * shareAmount; };
+        return 0;
     };
 
     const onChangeInput = (event: any) => {
@@ -233,7 +235,7 @@ export default function SellBox() {
                                 <Grid container direction="column">
                                     <Grid item>
                                         <Typography gutterBottom variant="caption">
-                                            Est. Return: $0
+                                            Est. Return: {currency(getTotal()).format()}
                                         </Typography>
                                     </Grid>
                                     <Grid item>
