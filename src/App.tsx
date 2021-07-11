@@ -12,6 +12,7 @@ import StockInfo from './components/StockInfo/StockInfo';
 import Portfolio from './components/Portfolio/Portfolio';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
+import Divider from '@material-ui/core/Divider';
 
 function App() {
     return (
@@ -55,6 +56,7 @@ function App() {
                         <Card>
                             <CardContent>
                                 <BuyBox />
+                                <Divider />
                                 <SellBox />
                             </CardContent>
                         </Card>
