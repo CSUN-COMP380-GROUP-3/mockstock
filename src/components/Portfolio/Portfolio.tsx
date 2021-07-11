@@ -58,12 +58,12 @@ export default function Portfolio() {
                 <CardContent>
                     {
                         portfolioProvider.length === 0 ? 
-                        <Typography variant="body1" align="center">Your portfolio is empty. Purchase some stocks to get started.</Typography> : 
+                        <Typography variant="body1" align="center">Your portfolio is empty. Purchase stocks to get started.</Typography> : 
                         <List className={classes.portfolioList}>
                             {Object.entries(portfolio).map(([symbol, data]) => (
                                 <React.Fragment>
-                                    <ListItem>
-                                        <PortfolioItem key={'p'+uuid()} data={data} />
+                                    <ListItem key={'p'+uuid()} >
+                                        <PortfolioItem data={data} />
                                     </ListItem>
                                     <Divider />
                                 </React.Fragment>
