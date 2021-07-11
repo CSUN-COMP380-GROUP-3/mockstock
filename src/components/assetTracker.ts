@@ -1,4 +1,5 @@
 import { setToStorage, getFromStorage } from './storage';
+import { liquidBalanceProvider } from '../contexts/LiquidBalanceContext';
 
 interface Record {
 	candlestickTimestamp: number,
@@ -20,7 +21,7 @@ module AssetTracker {
 	const RECORDBOOK_SYMBOL_LIST_KEY = "RECORDBOOK_SYMBOL_LIST"
 	const CASH_RECORDBOOK_KEY = "CASH_RECORDBOOK"
 	const RECORDBOOK_SUFFIX_KEY = "RecordBook";
-	const INITIAL_CASH = 100000;
+	const INITIAL_CASH = Number(process.env.REACT_APP_SEED_MONEY) || 100000;
 
 	const _symbolBook: { [symbol: string]: Record[] } = {};
 	let _cashRecordBook: CashRecord[] = [];
@@ -412,6 +413,10 @@ module AssetTracker {
 		timestamp += UTCOffset * 60;
 		return timestamp - (timestamp % (24 * 60 * 60)); // divides the number by the seconds in a day and substracts what's left. Truncates to midnight of that day.
 	}
+
+	export const getLatestCashBalance = function (): number {
+		return _cashRecordBook[_cashRecordBook.length - 1].cashOwned;
+	};
 
 }
 

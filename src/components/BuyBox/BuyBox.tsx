@@ -114,9 +114,9 @@ export default function BuyBox() {
             price,
         };
 
-        liquidBalanceProvider.subtract(total);
         tradesProvider.addToTrades(trade);
         portfolioProvider.addToPortfolio(trade);
+        liquidBalanceProvider.updateLiquidBalance(AssetTracker.getLatestCashBalance());
 
         updateBuyAmount(0);
     };

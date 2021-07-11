@@ -120,9 +120,9 @@ export default function SellBox() {
             price,
         };
 
-        liquidBalanceProvider.add(total);
         tradesProvider.addToTrades(trade);
         portfolioProvider.addToPortfolio(trade);
+        liquidBalanceProvider.updateLiquidBalance(AssetTracker.getLatestCashBalance());
 
         updateShareAmount(0);
     };
