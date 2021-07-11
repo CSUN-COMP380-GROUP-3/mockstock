@@ -48,10 +48,10 @@ export default function DatePicker(props: DatePickerProps) {
         <MuiPickersUtilsProvider utils={MomentUtils}>
             <Grid container spacing={1} alignItems="center">
                 <Grid item>
-                    <CalendarTodayIcon onClick={onClick}/>
+                    <Typography variant="subtitle2">{(value as Moment)?.format('l')}</Typography>
                 </Grid>
                 <Grid item>
-                    <Typography variant="subtitle2">{(value as Moment)?.format('l')}</Typography>
+                    <CalendarTodayIcon onClick={onClick}/>
                 </Grid>
             </Grid>
             <Popover
