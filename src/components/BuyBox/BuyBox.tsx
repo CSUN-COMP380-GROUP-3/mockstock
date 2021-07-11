@@ -22,12 +22,12 @@ export interface BuyBoxForm extends Trade {
 
 const useStyles = makeStyles({
     buybutton: {
-        backgroundColor: "rgb(0, 183, 70)",
+        backgroundColor: "var(--green)",
         color: "white",
         width: "100%",
         border: "2px solid var(--less-dark)",
         "&:hover": {
-            backgroundColor: "rgb(0, 183, 70)",
+            backgroundColor: "var(--green)",
         },
         "&:disabled": {
             backgroundColor: "var(--less-dark)"
