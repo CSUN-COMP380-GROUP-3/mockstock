@@ -20,8 +20,7 @@ export default function WatchList() {
 
     return <React.Fragment>
         <Card data-testid="watchlist">
-            <CardHeader title="Watchlist">
-            </CardHeader>
+            <CardHeader title="Watchlist"/>
             <CardContent className="watch-list">
                 <List>
                     {Object.entries(watchList).map(([symbol]) => {
