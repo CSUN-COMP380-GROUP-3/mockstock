@@ -35,7 +35,10 @@ module AssetTracker {
 	const initAssetTracker = function () {
 		// 1. Get the list of symbols for which we have records.
 		try {
-			const symbolList = getFromStorage(RECORDBOOK_SYMBOL_LIST_KEY);
+			let symbolList = getFromStorage(RECORDBOOK_SYMBOL_LIST_KEY);
+			if (symbolList == undefined || symbolList.length <= 0) {
+				symbolList = [];
+			}
 
 			// 2. For each symbol, get stored candlestick records and records
 			for (let i = 0; i < symbolList.length; i++) {
@@ -57,6 +60,8 @@ module AssetTracker {
 		try {
 			_cashRecordBook = getFromStorage(CASH_RECORDBOOK_KEY);
 		} catch (e) {
+		}
+		if (_cashRecordBook == undefined || _cashRecordBook.length <= 0) {
 			// No Cash Record found. Probably first-time user, initializing to initial record.
 			_cashRecordBook = [
 				{
