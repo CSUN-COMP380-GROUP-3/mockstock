@@ -1,9 +1,13 @@
-.buy-box > .MuiButtonBase-root{
-    background-color: green;
-
+.date-buybutton-container {
+    height: 100%;
 }
 
-.buy-box > .MuiButton-root{
-    color: rgb(255, 255, 255);
+.main-container {
+    width: 100%;
+}
 
+.buybutton-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
 }
