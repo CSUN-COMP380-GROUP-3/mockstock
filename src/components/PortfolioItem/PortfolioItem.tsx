@@ -15,6 +15,7 @@ export default function PortfolioListItem(props: PortfolioListItemProps) {
     const useStyles = makeStyles({
         root: {
             display: 'flex',
+            width: '100%',
             justifyContent: 'space-between',
             alignItems: 'center',
             '& .symbol': {
