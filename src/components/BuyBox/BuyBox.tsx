@@ -126,6 +126,13 @@ export default function BuyBox() {
         return buyAmount;
     };
 
+    const getShares = () => {
+        const price = getPrice();
+        const total = getTotal();
+        if (price) { return total / price; };
+        return 0;
+    };
+
     const isDisabled = () => {
         return candlestickIndex === -1 || buyAmount > balance;
     };
@@ -222,7 +229,7 @@ export default function BuyBox() {
                                             gutterBottom 
                                             variant="caption"
                                         >
-                                            Est. Shares: 0
+                                            Est. Shares: { getShares().toFixed(4) }
                                         </Typography>
                                     </Grid>
                                     <Grid item>
