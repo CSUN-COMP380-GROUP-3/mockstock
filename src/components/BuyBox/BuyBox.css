@@ -1,0 +1,9 @@
+.buy-box > .MuiButtonBase-root{
+    background-color: green;
+
+}
+
+.buy-box > .MuiButton-root{
+    color: rgb(255, 255, 255);
+
+}
