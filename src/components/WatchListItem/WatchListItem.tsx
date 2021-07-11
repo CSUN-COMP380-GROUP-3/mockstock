@@ -7,14 +7,30 @@ import { Listener } from '../../interfaces/WebSocketData';
 import "./WatchListItem.css";
 import FinnHubTrade from '../websocket';
 import { BehaviorSubject } from 'rxjs';
+import { fetchQuote, errorHandler } from '../utils';
+import { TOKEN } from '../../contexts/TokenContext';
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles({
+    positive: {
+        color: 'var(--green)',
+    },
+    negative: {
+        color: 'var(--red)'
+    },
+    neutral: {
+        color: 'black'
+    }
+});
 
 export interface WatchListItemPriceProps extends TypographyProps {
     displayedPrice$: BehaviorSubject<number>;
+    previousClose: number;
 };
 
 export function WatchListItemPrice(props: WatchListItemPriceProps) {
     const [ displayedPrice, updateDisplayedPrice ] = React.useState(0);
-    const { displayedPrice$, variant, className } = props;
+    const { displayedPrice$, previousClose } = props;
 
     React.useEffect(() => {
         const subscription = displayedPrice$.subscribe(price => {
@@ -25,13 +41,45 @@ export function WatchListItemPrice(props: WatchListItemPriceProps) {
         };
     }, [displayedPrice$]);
 
-    return <Typography 
-        variant={variant} 
-        className={className} 
-        data-testid={'watchlistitem-'+className}
-        >
-            {!!displayedPrice ? currency(displayedPrice).format() : '$-'}
-        </Typography>;
+    const getPercentDiff = () => {
+        return ((displayedPrice - previousClose) / previousClose) * 100;
+    };
+
+    const { neutral, positive, negative } = useStyles();
+
+    const getPercentColor = () => {
+        const percent = getPercentDiff();
+        if (percent === 0) {
+            return neutral;
+        } else if(percent > 0) {
+            return positive;
+        } else {
+            return negative;
+        };
+    };
+
+    return (
+        <React.Fragment>
+            <Typography 
+                variant="subtitle2" 
+                className="percent" 
+                data-testid="watchlistitem-percent"
+                classes={{
+                    root: getPercentColor()
+                }}
+            > 
+                {!!previousClose ? '('+getPercentDiff().toFixed(2)+'%)': '(-%)'}
+            </Typography>
+            <Typography 
+                variant="h6" 
+                className="dollar"
+                data-testid="watchlistitem-dollar"
+            >
+                {!!displayedPrice ? currency(displayedPrice).format() : '$-'}
+            </Typography>
+        </React.Fragment>
+    );
+    ;
 };
 
 export interface WatchListItemProps extends CardProps {
@@ -40,8 +88,21 @@ export interface WatchListItemProps extends CardProps {
 
 export default function WatchListItem(props: WatchListItemProps) {
     const { symbol, style } = props;
+    const previousClose = React.useRef(0);
 
-    const displayedPrice$ = new BehaviorSubject(0);
+    // if previous price ref is 0 then we need to fetch quote data
+    if (!previousClose.current) {
+        fetchQuote({
+            symbol,
+            token: TOKEN,
+        })
+            .then(res => {
+                previousClose.current = res.data.pc;
+            })
+            .catch(errorHandler);
+    };
+
+    const displayedPrice$ = new BehaviorSubject(previousClose.current);
 
     /**
      * Is called when user clicks on this component.
@@ -86,8 +147,11 @@ export default function WatchListItem(props: WatchListItemProps) {
         <div data-testid="watchlistitem" style={style} className="list-item" onClick={onClick}>
             <Typography variant="h6" className="symbol">{symbol}</Typography>
             <div className="details">
-                <Typography variant="subtitle2" className="percent" data-testid="watchlistitem-percent">(-%)</Typography>
-                <WatchListItemPrice variant="h6" className="dollar" displayedPrice$={displayedPrice$}/>
+                <WatchListItemPrice 
+                    className="dollar" 
+                    displayedPrice$={displayedPrice$}
+                    previousClose={previousClose.current}
+                />
             </div>
         </div>
     );
