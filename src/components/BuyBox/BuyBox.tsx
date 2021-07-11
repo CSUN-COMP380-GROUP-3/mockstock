@@ -21,7 +21,7 @@ export interface BuyBoxForm extends Trade {
 }
 
 const useStyles = makeStyles({
-    buybutton: {
+    buyButton: {
         backgroundColor: "var(--green)",
         color: "white",
         width: "100%",
@@ -30,10 +30,10 @@ const useStyles = makeStyles({
             backgroundColor: "var(--green)",
         },
         "&:disabled": {
-            backgroundColor: "var(--less-dark)"
+            backgroundColor: "var(--less-green)"
         }
     },
-    inputlabel: {
+    inputLabel: {
         paddingBottom: ".1rem"
     },
     sliderContainer: {
@@ -210,7 +210,7 @@ export default function BuyBox() {
                                     gutterBottom 
                                     variant="body2"
                                     align="right"
-                                    className={classes.inputlabel}
+                                    className={classes.inputLabel}
                                 >
                                     Amount:
                                 </Typography>
@@ -218,7 +218,10 @@ export default function BuyBox() {
                             <Grid item xs={9}>
                                 <Grid container direction="column">
                                     <Grid item>
-                                        <Typography gutterBottom variant="caption">
+                                        <Typography 
+                                            gutterBottom 
+                                            variant="caption"
+                                        >
                                             Est. Shares: 0
                                         </Typography>
                                     </Grid>
@@ -278,7 +281,7 @@ export default function BuyBox() {
                             disabled={isDisabled()} 
                             onClick={onClick}
                             classes={{
-                                root: classes.buybutton,
+                                root: classes.buyButton,
                             }}
                             variant="contained"
                         >

@@ -1,9 +1,13 @@
-.sell-box > .MuiButtonBase-root{
-    background-color: rgb(216, 0, 0);
-
+.date-sellbutton-container {
+    height: 100%;
 }
 
-.sell-box > .MuiButton-root.Mui-disabled{
-    color: rgb(255, 255, 255);
+.main-container {
+    width: 100%;
+}
 
+.sellbutton-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
 }
