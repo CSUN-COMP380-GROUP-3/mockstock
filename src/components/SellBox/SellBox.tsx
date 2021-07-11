@@ -256,7 +256,7 @@ export default function SellBox() {
                                                 type: 'number || string',
                                                 min: 0,
                                                 step: 1,
-                                                max: totalShares,
+                                                max: getMaxShares(),
                                             }}
                                         />
                                     </Grid>
