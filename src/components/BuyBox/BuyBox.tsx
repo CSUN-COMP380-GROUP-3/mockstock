@@ -13,6 +13,7 @@ import { liquidBalanceProvider } from '../../contexts/LiquidBalanceContext';
 import { activeStockProvider } from '../../contexts/ActiveStockContext';
 import Input from '../Input/Input';
 import "./BuyBox.css";
+import AssetTracker from '../assetTracker';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -103,6 +104,8 @@ export default function BuyBox() {
         // from the two vars above we can do all the calculations we need
         if (total === 0) return;
 
+        AssetTracker.buyAtForAmountAt(date, moment().utcOffset(), stock.symbol, total, price);
+
         const trade: BuyBoxForm = {
             ...form,
             stock,
@@ -111,9 +114,9 @@ export default function BuyBox() {
             price,
         };
 
-        liquidBalanceProvider.subtract(total);
         tradesProvider.addToTrades(trade);
         portfolioProvider.addToPortfolio(trade);
+        liquidBalanceProvider.updateLiquidBalance(AssetTracker.getLatestCashBalance());
 
         updateBuyAmount(0);
     };
@@ -131,10 +134,6 @@ export default function BuyBox() {
         const total = getTotal();
         if (price) { return total / price; };
         return 0;
-    };
-
-    const isDisabled = () => {
-        return candlestickIndex === -1 || buyAmount > balance;
     };
 
     const onChangeInput = (event: any) => {
@@ -187,6 +186,14 @@ export default function BuyBox() {
                 },
             ];
 
+    const getMaxBalance = () => {
+        const convertedDate = AssetTracker.convertTimestampToMidnightUTC(date, moment().utcOffset());
+        return AssetTracker.getSpendableCashAt(convertedDate);
+    };
+
+    const isDisabled = () => {
+        return candlestickIndex === -1 || buyAmount > getMaxBalance();
+    };
     
     const classes = useStyles();
 
@@ -242,7 +249,7 @@ export default function BuyBox() {
                                                 type: 'number || string',
                                                 min: 0,
                                                 step: 0.01,
-                                                max: balance,
+                                                max: getMaxBalance(),
                                             }}
                                         />
                                     </Grid>
@@ -255,7 +262,7 @@ export default function BuyBox() {
                             value={buyAmount}
                             onChange={onChangeSlider}
                             marks={getMarks(balance)}
-                            max={balance}
+                            max={getMaxBalance()}
                             step={0.01}
                             classes={{
                                 root: classes.slider,

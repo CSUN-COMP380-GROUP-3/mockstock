@@ -12,7 +12,7 @@ function isLocalStorageAvailable() {
         storage.setItem(x, x);
         storage.removeItem(x);
         return true;
-    } catch(e) {
+    } catch (e) {
         return e instanceof DOMException && (
             // everything except Firefox
             e.code === 22 ||
@@ -31,3 +31,39 @@ function isLocalStorageAvailable() {
 const storage = !!(isLocalStorageAvailable()) ? window['localStorage'] : undefined;
 
 export default storage;
+
+/**
+ * @todo Move this to some kind of storage module or something.
+ * @param key Key to access from Storage
+ * @returns The value found in Storage at that key
+ * @throws Failed to import key from storage
+ */
+export const getFromStorage = function (key: string) {
+    const listOfSymbolsRAW = storage?.getItem(key);
+
+    if (!!listOfSymbolsRAW) {
+        try {
+            const keysValue = JSON.parse(listOfSymbolsRAW);
+            // here is where we can verify
+            if (!!keysValue) {
+                return keysValue
+            }
+        } catch (e) {
+            console.error(`Failed to import ${key} from storage`);
+            throw (`Failed to import key from storage`);
+        }
+    }
+}
+
+/**
+ * @todo Move this to some kind of storage module or something.
+ * @param key Key to access from Storage
+ * @returns The value to store in Storage at that key
+ */
+export const setToStorage = function (key: string, value: any) {
+    const valueJSON = JSON.stringify(value);
+    // here is where we would sign the string
+    if (!!valueJSON) {
+        storage?.setItem(key, valueJSON);
+    };
+}

@@ -10,12 +10,14 @@ import { AxiosResponse } from 'axios';
 import { NoDataError } from '../components/errors';
 import storage from '../components/storage';
 import { BehaviorSubject } from 'rxjs';
+import { getFromStorage, setToStorage } from '../components/storage';
 
 // ActiveStock provides data about the stock currently being displayed on the left-side of the screen.
 // ActiveStock provides two essential pieces of information, Candlestick Information and Quote Information.
 // The ActiveStock is only expected to change ONCE every time the user chooses a new symbol to view.
 
 const STORAGE_KEY = 'activeStock';
+const CANDLESTICK_SUFFIX_KEY = "CandlestickBook";
 
 /**The initial Symbol to load up when first visiting the site */
 export const initSymbol = storage?.getItem(STORAGE_KEY) || process.env.REACT_APP_INITIAL_STOCK || 'GME';
@@ -35,9 +37,6 @@ export interface ActiveStockProviderInterface {
     fetchCandlesAndQuoteByStockSymbol: ({
         symbol,
     }: StockSymbolData) => Promise<
-        [AxiosResponse<CandleStickData>, AxiosResponse<QuoteData>]
-    >;
-    fetchCandlesAndQuote: () => Promise<
         [AxiosResponse<CandleStickData>, AxiosResponse<QuoteData>]
     >;
     switchActiveStock: (newStockSymbol: StockSymbolData) => void;
@@ -79,7 +78,7 @@ class ActiveStockProvider implements ActiveStockProviderInterface {
      */
     private initializeData() {
         storage?.setItem(STORAGE_KEY, initSymbol);
-        this.fetchCandlesAndQuote().then(([candlesResponse, quoteResponse]) => {
+        this.fetchCandlesAndQuoteByStockSymbol(this.activeStock.stock).then(([candlesResponse, quoteResponse]) => {
             this.updateActiveStock({
                 stock: this.activeStock.stock,
                 candles: candlesResponse.data,
@@ -94,28 +93,20 @@ class ActiveStockProvider implements ActiveStockProviderInterface {
     };
 
     /**
-     * Fetch the max amount of candles and quote data together of current activeStock.
-     * @returns An array of axios responses
-     */
-    fetchCandlesAndQuote(): Promise<
-        [AxiosResponse<CandleStickData>, AxiosResponse<QuoteData>]
-    > {
-        return this.fetchCandlesAndQuoteByStockSymbol(this.activeStock.stock);
-    }
-
-    /**
      * Fetches the max amoutn of candles and quote data together of stockSymbol
      * @param stockSymbol StockSymbolData of the desired stock
      * @returns
      */
     fetchCandlesAndQuoteByStockSymbol({
         symbol,
-    }: StockSymbolData): Promise<
+    }: StockSymbolData,
+        fromDate: number = minDate.unix()
+    ): Promise<
         [AxiosResponse<CandleStickData>, AxiosResponse<QuoteData>]
     > {
         const candlePromise = fetchCandles({
             symbol,
-            from: minDate.unix(),
+            from: fromDate,
             to: maxDate.unix(),
             resolution: 'D',
             token: TOKEN,
@@ -137,17 +128,40 @@ class ActiveStockProvider implements ActiveStockProviderInterface {
      */
     async switchActiveStock(newStockSymbol: StockSymbolData) {
         try {
+            let latestStoredDate = minDate.unix();
+            let storedCandlestickData: CandleStickData | undefined = undefined;
+            try {
+                storedCandlestickData = getFromStorage(newStockSymbol.symbol + CANDLESTICK_SUFFIX_KEY);
+                if (storedCandlestickData != undefined && storedCandlestickData.t.length > 0) {
+                    const lengthOfData = storedCandlestickData.t.length;
+                    latestStoredDate = storedCandlestickData.t[lengthOfData - 1];
+                } else {
+                    storedCandlestickData = undefined;
+                }
+            } catch (e) {
+                // no candlesticks for this symbol in storage. Call for more default amount.
+                latestStoredDate = minDate.unix();
+            }
+
             const [candlesResponse, quoteResponse] =
-                await this.fetchCandlesAndQuoteByStockSymbol(newStockSymbol);
+                await this.fetchCandlesAndQuoteByStockSymbol(newStockSymbol, latestStoredDate);
             if (candlesResponse.data.s === 'no_data') {
                 throw new NoDataError();
             }
+
+            if (storedCandlestickData != undefined) {
+                concatCandlestickData(storedCandlestickData, candlesResponse.data);
+            } else {
+                storedCandlestickData = candlesResponse.data;
+            }
+
             this.updateActiveStock({
                 stock: newStockSymbol,
                 quote: quoteResponse.data,
-                candles: candlesResponse.data,
+                candles: Object.assign({}, storedCandlestickData),
             });
             storage?.setItem(STORAGE_KEY, newStockSymbol.symbol);
+            setToStorage(newStockSymbol.symbol + CANDLESTICK_SUFFIX_KEY, storedCandlestickData);
         } catch (error) {
             errorHandler(error);
 
@@ -247,3 +261,36 @@ class ActiveStockProvider implements ActiveStockProviderInterface {
 }
 
 export const activeStockProvider = new ActiveStockProvider();
+
+const concatCandlestickData = function (trunk: CandleStickData, branch: CandleStickData) {
+    const latestTrunkTimestamp = trunk.t[trunk.t.length - 1];
+    const firstNewIndex = branch.t.findIndex((timestamp) => {
+        return (timestamp > latestTrunkTimestamp);
+    })
+
+    // if there is nothing new in the branch, just return the trunk
+    if (firstNewIndex == -1) {
+        return trunk;
+    } else {
+        // Concatenate the Data
+        const cConcat = branch.c.slice(firstNewIndex);
+        trunk.c.concat(cConcat);
+
+        const hConcat = branch.h.slice(firstNewIndex);
+        trunk.h.concat(hConcat);
+
+        const lConcat = branch.l.slice(firstNewIndex);
+        trunk.l.concat(lConcat);
+
+        const oConcat = branch.o.slice(firstNewIndex);
+        trunk.o.concat(oConcat);
+
+        const vConcat = branch.v.slice(firstNewIndex);
+        trunk.v.concat(vConcat);
+
+        const tConcat = branch.t.slice(firstNewIndex);
+        trunk.t.concat(tConcat);
+
+        return trunk;
+    }
+}

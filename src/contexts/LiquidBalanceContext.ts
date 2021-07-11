@@ -8,8 +8,6 @@ export interface LiquidBalanceProviderInterface {
     balance: number;
     balance$: BehaviorSubject<number>;
     updateLiquidBalance: (balance: number) => void;
-    add: (balance: number) => void;
-    subtract: (balance: number) => void;
     balanceAsCurrency: currency;
 };
 
@@ -31,20 +29,7 @@ class LiquidBalanceProvider implements LiquidBalanceProviderInterface {
     updateLiquidBalance(balance: number) {
         this.balance = balance;
         this.balance$.next(this.balance);
-    };
-
-    add(balance: number) {
-        const newBalance = currency(this.balance).add(currency(balance));
-        this.updateLiquidBalance(newBalance.value);
-        // sign
-        storage?.setItem(STORAGE_KEY, newBalance.toString());
-    };
-
-    subtract(balance: number) {
-        const newBalance = currency(this.balance).subtract(currency(balance));
-        this.updateLiquidBalance(newBalance.value);
-        // sign
-        storage?.setItem(STORAGE_KEY, newBalance.toString());
+        storage?.setItem(STORAGE_KEY, this.balance.toString());
     };
 
     get balanceAsCurrency() {

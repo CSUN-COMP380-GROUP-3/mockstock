@@ -12,6 +12,7 @@ import Input from '../Input/Input';
 import { tradesProvider } from '../../contexts/TradesContext';
 import "./SellBox.css";
 import { portfolioProvider } from '../../contexts/PortfolioContext';
+import AssetTracker from '../assetTracker';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 import currency from 'currency.js';
@@ -48,19 +49,19 @@ export interface SellBoxForm extends Trade {
     type: 'SELL';
 }
 
-export interface SellBoxProps {}
+export interface SellBoxProps { }
 
 export default function SellBox() {
-    const [ activeStock, updateActiveStock ] = React.useState(activeStockProvider.activeStock);
+    const [activeStock, updateActiveStock] = React.useState(activeStockProvider.activeStock);
 
-    const [ portfolio, updatePortfolio ] = React.useState(portfolioProvider.portfolio);
-    
+    const [portfolio, updatePortfolio] = React.useState(portfolioProvider.portfolio);
+
     React.useEffect(() => {
         const activeStockSubscription = activeStockProvider.activeStock$.subscribe(updateActiveStock);
         const portfolioSubscription = portfolioProvider.portfolio$.subscribe(updatePortfolio);
-        return () => { 
+        return () => {
             activeStockSubscription.unsubscribe();
-            portfolioSubscription.unsubscribe(); 
+            portfolioSubscription.unsubscribe();
         };
     }, []);
 
@@ -109,6 +110,8 @@ export default function SellBox() {
         const total = getTotal();
         if (total === undefined) return;
 
+        AssetTracker.sellAtForAmountAt(date, moment().utcOffset(), stock.symbol, shareAmount, price);
+
         const trade: SellBoxForm = {
             ...form,
             stock,
@@ -117,9 +120,9 @@ export default function SellBox() {
             price,
         };
 
-        liquidBalanceProvider.add(total);
         tradesProvider.addToTrades(trade);
         portfolioProvider.addToPortfolio(trade);
+        liquidBalanceProvider.updateLiquidBalance(AssetTracker.getLatestCashBalance());
 
         updateShareAmount(0);
     };
@@ -163,27 +166,33 @@ export default function SellBox() {
         maxShares === 0
             ? []
             : [
-                  {
-                      value: 0,
-                      label: '0%',
-                  },
-                  {
-                      value: maxShares * 0.25,
-                      label: '25%',
-                  },
-                  {
-                      value: maxShares * 0.5,
-                      label: '50%',
-                  },
-                  {
-                      value: maxShares * 0.75,
-                      label: '75%',
-                  },
-                  {
-                      value: maxShares,
-                      label: '100%',
-                  },
-              ];
+                {
+                    value: 0,
+                    label: '0%',
+                },
+                {
+                    value: maxShares * 0.25,
+                    label: '25%',
+                },
+                {
+                    value: maxShares * 0.5,
+                    label: '50%',
+                },
+                {
+                    value: maxShares * 0.75,
+                    label: '75%',
+                },
+                {
+                    value: maxShares,
+                    label: '100%',
+                },
+            ];
+
+    const getMaxShares = () => {
+        const convertedDate = AssetTracker.convertTimestampToMidnightUTC(date, moment().utcOffset());
+        const maxShares = AssetTracker.getSellableSharesAtFor(convertedDate, stock.symbol);
+        return maxShares;
+    }
 
     const isDisabled = () => {
         // here we need to check and see if the stock is in the portfolio
@@ -191,9 +200,10 @@ export default function SellBox() {
         // should not be able to click if there is no oneDayCandle
 
         // also cannot sell if the resulting trade would be less than 0;
-        const resultingTrade = totalShares - shareAmount;
+        const maxShares = getMaxShares();
+        const resultingTrade = maxShares - shareAmount;
         return (
-            candlestickIndex === -1 || totalShares <= 0 || resultingTrade < 0
+            candlestickIndex === -1 || maxShares <= 0 || resultingTrade < 0
         );
     };
 
@@ -247,7 +257,7 @@ export default function SellBox() {
                                                 type: 'number || string',
                                                 min: 0,
                                                 step: 1,
-                                                max: totalShares,
+                                                max: getMaxShares(),
                                             }}
                                         />
                                     </Grid>
@@ -260,7 +270,7 @@ export default function SellBox() {
                             value={shareAmount}
                             onChange={onChangeSlider}
                             marks={getMarks(totalShares)}
-                            max={totalShares}
+                            max={getMaxShares()}
                             classes={{
                                 root: classes.slider,
                             }}
