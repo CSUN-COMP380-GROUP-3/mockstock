@@ -16,6 +16,9 @@ import "./BuyBox.css";
 import AssetTracker from '../assetTracker';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
+import { isMarketOpen } from '../utils';
+import WS from '../websocket';
+import { Listener } from '../../interfaces/WebSocketData';
 
 export interface BuyBoxForm extends Trade {
     type: 'BUY';
@@ -64,6 +67,39 @@ export default function BuyBox() {
 
     const { stock, candles } = activeStock;
 
+    const [displayPrice, setDisplayPrice] = React.useState<number>(activeStock.quote.c);
+
+    /**
+     * Sets up a listener for the active symbol to retrieve live price data every time the active stock changes.
+     */
+    React.useEffect(() => {
+        if (WS.socket.OPEN) {
+            setDisplayPrice(activeStock.quote.c);
+            WS.listen(stock.symbol, updatePrice);
+            return () => {
+                WS.stopListen(stock.symbol, updatePrice);
+            };
+        }
+    }, [stock.symbol]);
+
+    /**
+     * Updates the price state whenever the websocket calls it because of a message.
+     * @param symbolName
+     * @param price
+     * @param timestamp
+     * @param volume
+     * @param tradeConditions
+     */
+    const updatePrice: Listener = (
+        symbolName: string,
+        price: number,
+        timestamp: number,
+        volume: number,
+        tradeConditions: string[],
+    ) => {
+        setDisplayPrice(price);
+    };
+
     const [form, updateForm] = React.useState<BuyBoxForm>({
         date: activeStockProvider.maxDate?.unix() || maxDate.unix(), // this is the selected date of the buy
         total: 0,
@@ -83,7 +119,7 @@ export default function BuyBox() {
     const onChangeBuyDate: BaseKeyboardPickerProps['onChange'] = (date) => {
         if (!!date) {
             const index = activeStockProvider.getIndexByTimestamp(date.unix());
-            if (index === -1) {
+            if (index === -1 && !isMarketOpen()) {
                 // invalid date
                 return alert(
                     'No trading data available for selected date. Please pick another date.',
@@ -122,6 +158,10 @@ export default function BuyBox() {
     };
 
     const getPrice = () => {
+        if (isMarketOpen()) {
+            // then we can transact using the active price.
+            return displayPrice;
+        }
         return activeStockProvider.getBuyPriceByIndex(candlestickIndex);
     };
 

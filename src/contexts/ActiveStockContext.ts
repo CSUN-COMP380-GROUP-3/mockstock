@@ -251,12 +251,18 @@ class ActiveStockProvider implements ActiveStockProviderInterface {
      * Gets the latest possible date to stop trading the underlying stock
      */
     get maxDate(): Moment | undefined {
+        if (isMarketOpen()) {
+            // market is open, we don't care about candlesticks. User can day trade.
+            return moment();
+        }
+        // market is closed, the latest day they can trade is determiend by candlestick data.
         const candleTimestamps = this.activeStock.candles.t;
         if (candleTimestamps.length > 0) {
             const lastTimestamp = candleTimestamps[candleTimestamps.length - 1];
             return moment.unix(lastTimestamp).utc();
         }
-        return isMarketOpen() ? moment() : moment().subtract(moment().weekday() <= 1 ? moment().weekday() + 2 : 1, 'day');
+        // no candlestick data. Will return the most recent weekday.
+        return moment().subtract(moment().weekday() <= 1 ? moment().weekday() + 2 : 1, 'day');
     }
 }
 

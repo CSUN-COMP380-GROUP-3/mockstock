@@ -12,6 +12,7 @@ import Popover from '@material-ui/core/Popover';
 import Grid from '@material-ui/core/Grid';
 import { Typography } from '@material-ui/core';
 import { Moment } from 'moment';
+import { isMarketOpen } from '../utils';
 
 export interface DatePickerProps extends MuiDatePickerProps {
     validUnixTimestamps?: number[];
@@ -33,6 +34,9 @@ export default function DatePicker(props: DatePickerProps) {
 
     const shouldDisableDateHandler = (date?: MaterialUiPickersDate) => {
         if (date) {
+            if (isMarketOpen() && moment().isSame(date, 'day')) {
+                return false;
+            }
             if (validUnixTimestamps) {
                 for (const t of validUnixTimestamps) {
                     const finnhub = moment.unix(t).utc();
