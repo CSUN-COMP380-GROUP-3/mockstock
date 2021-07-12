@@ -28,7 +28,6 @@ const useStyles = makeStyles({
         fontSize: "x-large",
         marginBottom: "2rem",
         width: "80%",
-        // height: "50%",
         border: "2px solid var(--less-dark)",
         "&:hover": {
             backgroundColor: "var(--green)",
