@@ -51,7 +51,8 @@ export const isMarketOpen = function (): boolean {
     // const isOpen = now.isBetween(openingToday, closingToday);
 
     const timeSinceOpen = now.diff(openingToday);
-    const isOpen = timeSinceOpen >= 0 && timeSinceOpen < (6.5 * 60 * 60 * 1000) // 6.5 hours * 60 minutes * 60 seconds * 1000 milliseconds
+    // const isOpen = timeSinceOpen >= 0 && timeSinceOpen < (6.5 * 60 * 60 * 1000) // 6.5 hours * 60 minutes * 60 seconds * 1000 milliseconds
+    const isOpen = timeSinceOpen >= 0 && timeSinceOpen < (10.5 * 60 * 60 * 1000) // 10.5 hours * 60 minutes * 60 seconds * 1000 milliseconds JUST SO WE CAN TRADE DURING AFTER HOURS
 
     return isOpen;
 }
