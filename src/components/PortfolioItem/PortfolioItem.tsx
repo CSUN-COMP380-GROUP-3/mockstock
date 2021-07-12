@@ -72,7 +72,8 @@ export default function PortfolioListItem(props: PortfolioListItemProps) {
                 // marginLeft: '1rem',
             },
             '& .price-data': {
-                textAlign: "right"
+                textAlign: "right",
+                paddingRight: "20px"
             },
             '& .positive': {
                 color: "var(--green)"
@@ -107,33 +108,40 @@ export default function PortfolioListItem(props: PortfolioListItemProps) {
     }
 
     const comp = (
-        <div
+        // <div
+        //     data-testid="watchlistitem"
+        //     style={style}
+        //     className={root}
+        //     onClick={onClick}
+        // >
+        <Grid
+            container
+            spacing={0}
+            alignItems="center"
+            direction="row"
             data-testid="watchlistitem"
             style={style}
             className={root}
             onClick={onClick}
         >
-            <Grid container spacing={1} justify="space-around" alignItems="center">
-                <Grid item xs={2}>
-                    <Typography variant="h6" className="symbol">
-                        ${symbol}
-                    </Typography>
+            <Grid item xs={2}>
+                <Typography variant="h6" className="symbol">
+                    ${symbol}
+                </Typography>
+            </Grid>
+            <Grid item xs={4}>
+                <Typography variant="subtitle1">{data.totalShares.toFixed(4)} Shares</Typography>
+            </Grid>
+            <Grid container xs={6} direction="row" justify="flex-end" alignItems="center">
+                <Grid item>
+                    <Typography variant="subtitle1" className={"price-data " + getPercentColor()}>{((getPercentChange() > 0) ? "+" : "") + getPercentChange().toFixed(2)}%</Typography>
                 </Grid>
-                <Grid item xs={5}>
-                    <Typography variant="subtitle1">{data.totalShares.toFixed(4)} Shares</Typography>
-                </Grid>
-                <Grid item xs={2}>
-                    <Grid item>
-                        <Typography variant="subtitle1" className={"price-data " + getPercentColor()}>{((getPercentChange() > 0) ? "+" : "-") + getPercentChange().toFixed(2)}%</Typography>
-                    </Grid>
-                </Grid>
-                <Grid item xs={3}>
-                    <Grid item>
-                        <Typography variant="h6" className="price-data">{currency(data.totalShares * displayedPrice).format()}</Typography>
-                    </Grid>
+                <Grid item>
+                    <Typography variant="h6" className="price-data">{currency(data.totalShares * displayedPrice).format()}</Typography>
                 </Grid>
             </Grid>
-        </div>
+        </Grid>
+        // </div>
     );
 
     return comp;

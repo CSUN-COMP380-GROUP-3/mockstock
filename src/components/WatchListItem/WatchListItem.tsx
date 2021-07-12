@@ -63,7 +63,7 @@ export function WatchListItemPrice(props: WatchListItemPriceProps) {
     return (
         <React.Fragment>
             <Typography
-                variant="subtitle2"
+                variant="subtitle1"
                 className={getPercentColor() + " percent"}
                 data-testid="watchlistitem-percent"
             >
