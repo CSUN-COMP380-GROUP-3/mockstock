@@ -1,4 +1,5 @@
 import axios, { AxiosResponse } from "axios";
+import moment from "moment";
 import querystring from 'querystring';
 import CandleStickData, { CandleStickQuery } from "../interfaces/CandleStickData";
 import { QuoteData, QuoteQuery } from "../interfaces/QuoteData";
@@ -35,6 +36,25 @@ export const errorHandler = (error: any) => { // generic error handler
 
     console.error(error);
 };
+
+export const isMarketOpen = function (): boolean {
+    const now = moment();
+    if (now.weekday() === 0 || now.weekday() === 6) {
+        return false;
+    }
+    const openingToday = moment().startOf('day').add(9.5, 'hour');
+    openingToday.utcOffset(-4, true);
+
+    // const closingToday = moment().startOf('day').add(16, 'hour');
+    // closingToday.utcOffset(-4, true);
+
+    // const isOpen = now.isBetween(openingToday, closingToday);
+
+    const timeSinceOpen = now.diff(openingToday);
+    const isOpen = timeSinceOpen >= 0 && timeSinceOpen < (6.5 * 60 * 60 * 1000) // 6.5 hours * 60 minutes * 60 seconds * 1000 milliseconds
+
+    return isOpen;
+}
 
 /**
  * Wait for a given amount of milliseconds

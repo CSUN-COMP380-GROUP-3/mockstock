@@ -4,7 +4,7 @@ import CandleStickData from '../interfaces/CandleStickData';
 import { filteredSymbols } from './StockSymbolsContext';
 import { maxDate, minDate } from '../components/DatePicker/DatePicker';
 import { QuoteData } from '../interfaces/QuoteData';
-import { fetchQuote, fetchCandles, errorHandler } from '../components/utils';
+import { fetchQuote, fetchCandles, errorHandler, isMarketOpen } from '../components/utils';
 import { TOKEN } from './TokenContext';
 import { AxiosResponse } from 'axios';
 import { NoDataError } from '../components/errors';
@@ -254,9 +254,9 @@ class ActiveStockProvider implements ActiveStockProviderInterface {
         const candleTimestamps = this.activeStock.candles.t;
         if (candleTimestamps.length > 0) {
             const lastTimestamp = candleTimestamps[candleTimestamps.length - 1];
-            return moment.unix(lastTimestamp);
+            return moment.unix(lastTimestamp).utc();
         }
-        return undefined;
+        return isMarketOpen() ? moment() : moment().subtract(moment().weekday() <= 1 ? moment().weekday() + 2 : 1, 'day');
     }
 }
 

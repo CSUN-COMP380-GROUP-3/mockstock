@@ -1,10 +1,10 @@
 import React from 'react';
 import MomentUtils from '@date-io/moment';
 import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
-import { 
-    MuiPickersUtilsProvider, 
-    DatePicker as MuiDatePicker, 
-    DatePickerProps as MuiDatePickerProps 
+import {
+    MuiPickersUtilsProvider,
+    DatePicker as MuiDatePicker,
+    DatePickerProps as MuiDatePickerProps
 } from '@material-ui/pickers';
 import moment from 'moment';
 import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
@@ -22,7 +22,7 @@ export const maxDate = moment().subtract(1, 'day');
 
 export default function DatePicker(props: DatePickerProps) {
     const { value, validUnixTimestamps } = props;
-    const [ anchorEl, setAnchorEl ] = React.useState<SVGSVGElement | null>(null);
+    const [anchorEl, setAnchorEl] = React.useState<SVGSVGElement | null>(null);
 
     const onClick = (event: React.MouseEvent<SVGSVGElement>) => {
         setAnchorEl(event.currentTarget);
@@ -48,10 +48,10 @@ export default function DatePicker(props: DatePickerProps) {
         <MuiPickersUtilsProvider utils={MomentUtils}>
             <Grid container spacing={1} alignItems="center">
                 <Grid item>
-                    <Typography variant="subtitle2">{(value as Moment)?.format('l')}</Typography>
+                    <Typography variant="subtitle2">{(value as Moment)?.utc().format('l')}</Typography>
                 </Grid>
                 <Grid item>
-                    <CalendarTodayIcon onClick={onClick}/>
+                    <CalendarTodayIcon onClick={onClick} />
                 </Grid>
             </Grid>
             <Popover

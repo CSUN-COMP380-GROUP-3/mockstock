@@ -65,7 +65,7 @@ export default function BuyBox() {
     const { stock, candles } = activeStock;
 
     const [form, updateForm] = React.useState<BuyBoxForm>({
-        date: maxDate.unix(), // this is the selected date of the buy
+        date: activeStockProvider.maxDate?.unix() || maxDate.unix(), // this is the selected date of the buy
         total: 0,
         stock,
         timestamp: moment().unix(),
@@ -194,17 +194,17 @@ export default function BuyBox() {
     const isDisabled = () => {
         return candlestickIndex === -1 || buyAmount > getMaxBalance();
     };
-    
+
     const classes = useStyles();
 
     return (
-        <Grid 
+        <Grid
             container
             spacing={1}
             className="main-container"
         >
             <Grid item xs={9}>
-                <Grid 
+                <Grid
                     container
                     direction="column"
                 >
@@ -214,14 +214,14 @@ export default function BuyBox() {
                         </Typography>
                     </Grid>
                     <Grid item>
-                        <Grid 
+                        <Grid
                             container
                             alignItems="flex-end"
                             spacing={1}
                         >
                             <Grid item xs={3}>
-                                <Typography 
-                                    gutterBottom 
+                                <Typography
+                                    gutterBottom
                                     variant="body2"
                                     align="right"
                                     className={classes.inputLabel}
@@ -232,11 +232,11 @@ export default function BuyBox() {
                             <Grid item xs={9}>
                                 <Grid container direction="column">
                                     <Grid item>
-                                        <Typography 
-                                            gutterBottom 
+                                        <Typography
+                                            gutterBottom
                                             variant="caption"
                                         >
-                                            Est. Shares: { getShares().toFixed(4) }
+                                            Est. Shares: {getShares().toFixed(4)}
                                         </Typography>
                                     </Grid>
                                     <Grid item>
@@ -291,8 +291,8 @@ export default function BuyBox() {
                         />
                     </Grid>
                     <Grid item className="buybutton-container">
-                        <Button 
-                            disabled={isDisabled()} 
+                        <Button
+                            disabled={isDisabled()}
                             onClick={onClick}
                             classes={{
                                 root: classes.buyButton,
