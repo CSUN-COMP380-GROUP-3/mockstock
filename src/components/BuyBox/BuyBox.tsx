@@ -83,7 +83,7 @@ export default function BuyBox() {
                 WS.stopListen(stock.symbol, updatePrice);
             };
         }
-    }, [stock.symbol]);
+    }, [activeStock]);
 
     /**
      * Updates the price state whenever the websocket calls it because of a message.
@@ -117,7 +117,7 @@ export default function BuyBox() {
     const [buyAmount, updateBuyAmount] = React.useState(0);
 
     // this state controls the candlestick index
-    const [candlestickIndex, updateCandlestickIndex] = React.useState(0);
+    const [candlestickIndex, updateCandlestickIndex] = React.useState(-1);
 
     const onChangeBuyDate: BaseKeyboardPickerProps['onChange'] = (date) => {
         if (!!date) {
