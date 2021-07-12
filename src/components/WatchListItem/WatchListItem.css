@@ -20,9 +20,20 @@
   color: black;
 }
 
+.details>.positive {
+  color: var(--green)
+}
+
+.details>.negative {
+  color: var(--red)
+}
+
+.details>.neutral {
+  color: black
+}
+
 .details>.percent {
   text-align: right;
-  color: black;
   padding-right: 20px;
 }
 
