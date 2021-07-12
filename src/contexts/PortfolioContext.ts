@@ -92,7 +92,7 @@ class PortfolioProvider implements PortfolioContextInterface {
         // otherwise we need to create one
         const { stock, total, price, type } = trade;
         const { symbol } = stock;
-        const newPortfolio = Object.assign({}, this.portfolio);
+        let newPortfolio = Object.assign({}, this.portfolio);
         if (this.has(symbol)) {
             const tradeTotalShares = total / Number(price);
             const oldTotalShares = newPortfolio[symbol].totalShares;
@@ -123,12 +123,15 @@ class PortfolioProvider implements PortfolioContextInterface {
             }
         } else {
             // symbol not in portfolio
+            const copyOfNewPortfolio: PortfolioInterface = newPortfolio;
+            newPortfolio = {};
             newPortfolio[symbol] = {
                 stock,
                 totalShares: total / Number(price),
                 sharesPrice: Number(price),
                 costBasis: Number(price),
             };
+            newPortfolio = Object.assign(newPortfolio, copyOfNewPortfolio);
         }
 
         this.updatePortfolio(newPortfolio);
