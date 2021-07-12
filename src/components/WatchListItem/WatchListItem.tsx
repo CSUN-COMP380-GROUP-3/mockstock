@@ -30,7 +30,7 @@ export interface WatchListItemPriceProps extends TypographyProps {
 
 export function WatchListItemPrice(props: WatchListItemPriceProps) {
     const cachedPrice = React.useRef(0);
-    const [ displayedPrice, updateDisplayedPrice ] = React.useState(cachedPrice.current);
+    const [displayedPrice, updateDisplayedPrice] = React.useState(cachedPrice.current);
     const { displayedPrice$, previousClose } = props;
 
     React.useEffect(() => {
@@ -53,7 +53,7 @@ export function WatchListItemPrice(props: WatchListItemPriceProps) {
         const percent = getPercentDiff();
         if (percent === 0) {
             return neutral;
-        } else if(percent > 0) {
+        } else if (percent > 0) {
             return positive;
         } else {
             return negative;
@@ -62,18 +62,18 @@ export function WatchListItemPrice(props: WatchListItemPriceProps) {
 
     return (
         <React.Fragment>
-            <Typography 
-                variant="subtitle2" 
-                className="percent" 
+            <Typography
+                variant="subtitle2"
+                className="percent"
                 data-testid="watchlistitem-percent"
                 classes={{
                     root: getPercentColor()
                 }}
-            > 
-                {!!previousClose ? '('+getPercentDiff().toFixed(2)+'%)': '(-%)'}
+            >
+                {!!previousClose ? '(' + getPercentDiff().toFixed(2) + '%)' : '(-%)'}
             </Typography>
-            <Typography 
-                variant="h6" 
+            <Typography
+                variant="h6"
                 className="dollar"
                 data-testid="watchlistitem-dollar"
             >
@@ -100,6 +100,7 @@ export default function WatchListItem(props: WatchListItemProps) {
         })
             .then(res => {
                 previousClose.current = res.data.pc;
+                displayedPrice$.next(res.data.pc);
             })
             .catch(errorHandler);
     };
@@ -149,8 +150,8 @@ export default function WatchListItem(props: WatchListItemProps) {
         <div data-testid="watchlistitem" style={style} className="list-item" onClick={onClick}>
             <Typography variant="h6" className="symbol">{symbol}</Typography>
             <div className="details">
-                <WatchListItemPrice 
-                    className="dollar" 
+                <WatchListItemPrice
+                    className="dollar"
                     displayedPrice$={displayedPrice$}
                     previousClose={previousClose.current}
                 />
