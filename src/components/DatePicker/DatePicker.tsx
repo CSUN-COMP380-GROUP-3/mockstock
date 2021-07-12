@@ -34,9 +34,6 @@ export default function DatePicker(props: DatePickerProps) {
 
     const shouldDisableDateHandler = (date?: MaterialUiPickersDate) => {
         if (date) {
-            if (isMarketOpen() && moment().isSame(date, 'day')) {
-                return false;
-            }
             if (validUnixTimestamps) {
                 for (const t of validUnixTimestamps) {
                     const finnhub = moment.unix(t).utc();

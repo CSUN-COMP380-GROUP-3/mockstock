@@ -245,9 +245,18 @@ export default function SellBox() {
         const maxShares = getMaxShares();
         const resultingTrade = maxShares - shareAmount;
         return (
-            candlestickIndex === -1 || maxShares <= 0 || resultingTrade < 0
+            (candlestickIndex === -1 && !isMarketOpen()) || maxShares <= 0 || resultingTrade < 0
         );
     };
+
+    const getValidTimestamps = () => {
+        if (isMarketOpen()) {
+            const newCandles = candles.t.concat(moment().unix());
+            return newCandles;
+        } else {
+            return candles.t
+        }
+    }
 
     const classes = useStyles();
 
@@ -333,7 +342,6 @@ export default function SellBox() {
                     justify="flex-start"
                     alignItems="center"
                     spacing={1}
-                    className="date-sellbutton-container"
                 >
                     <Grid item>
                         <DatePicker
@@ -342,7 +350,7 @@ export default function SellBox() {
                             onChange={onChangeSellDate}
                             minDate={earliestDate || activeStockProvider.minDate || minDate}
                             maxDate={activeStockProvider.maxDate || maxDate}
-                            validUnixTimestamps={candles.t}
+                            validUnixTimestamps={getValidTimestamps()}
                         />
                     </Grid>
                     <Grid item className="sellbutton-container">

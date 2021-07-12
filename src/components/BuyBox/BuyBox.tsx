@@ -235,8 +235,17 @@ export default function BuyBox() {
     };
 
     const isDisabled = () => {
-        return candlestickIndex === -1 || buyAmount > getMaxBalance();
+        return (candlestickIndex === -1 && !isMarketOpen()) || buyAmount > getMaxBalance();
     };
+
+    const getValidTimestamps = () => {
+        if (isMarketOpen()) {
+            const newCandles = candles.t.concat(moment().unix());
+            return newCandles;
+        } else {
+            return candles.t
+        }
+    }
 
     const classes = useStyles();
 
@@ -324,7 +333,6 @@ export default function BuyBox() {
                     justify="flex-start"
                     alignItems="center"
                     spacing={1}
-                    className="date-buybutton-container"
                 >
                     <Grid item>
                         <DatePicker
@@ -333,7 +341,7 @@ export default function BuyBox() {
                             onChange={onChangeBuyDate}
                             minDate={activeStockProvider.minDate || minDate}
                             maxDate={activeStockProvider.maxDate || maxDate}
-                            validUnixTimestamps={candles.t}
+                            validUnixTimestamps={getValidTimestamps()}
                         />
                     </Grid>
                     <Grid item className="buybutton-container">
