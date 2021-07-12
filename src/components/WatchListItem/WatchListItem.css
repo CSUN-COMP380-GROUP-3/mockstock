@@ -7,7 +7,6 @@
 }
 
 .list-item>.symbol {
-  margin-left: 1rem;
   color: black;
 }
 
@@ -16,7 +15,6 @@
   flex-direction: row;
   justify-content: flex-end;
   align-items: center;
-  margin-right: 1rem;
   color: black;
 }
 
