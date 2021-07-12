@@ -16,6 +16,9 @@ import AssetTracker from '../assetTracker';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 import currency from 'currency.js';
+import { isMarketOpen } from '../utils';
+import WS from '../websocket';
+import { Listener } from '../../interfaces/WebSocketData';
 
 const useStyles = makeStyles({
     root: {
@@ -74,6 +77,39 @@ export default function SellBox() {
     // should we also keep track of the earliest date on the portfolio?
     const earliestDate = tradesProvider.getEarliestDateBySymbol(stock.symbol);
 
+    const [displayPrice, setDisplayPrice] = React.useState<number>(activeStock.quote.c);
+
+    /**
+     * Sets up a listener for the active symbol to retrieve live price data every time the active stock changes.
+     */
+    React.useEffect(() => {
+        if (WS.socket.OPEN) {
+            setDisplayPrice(activeStock.quote.c);
+            WS.listen(stock.symbol, updatePrice);
+            return () => {
+                WS.stopListen(stock.symbol, updatePrice);
+            };
+        }
+    }, [stock.symbol]);
+
+    /**
+     * Updates the price state whenever the websocket calls it because of a message.
+     * @param symbolName
+     * @param price
+     * @param timestamp
+     * @param volume
+     * @param tradeConditions
+     */
+    const updatePrice: Listener = (
+        symbolName: string,
+        price: number,
+        timestamp: number,
+        volume: number,
+        tradeConditions: string[],
+    ) => {
+        setDisplayPrice(price);
+    };
+
     const [form, updateForm] = React.useState<SellBoxForm>({
         date: earliestDate?.unix() || maxDate.unix(),
         total: 0,
@@ -92,7 +128,7 @@ export default function SellBox() {
     const onChangeSellDate: BaseKeyboardPickerProps['onChange'] = (date) => {
         if (!!date) {
             const index = activeStockProvider.getIndexByTimestamp(date.unix());
-            if (index === -1) {
+            if (index === -1 && !isMarketOpen()) {
                 // invalid date
                 return alert(
                     'No trading data available for selected date. Please pick another date.',
@@ -130,6 +166,10 @@ export default function SellBox() {
     };
 
     const getPrice = () => {
+        if (isMarketOpen()) {
+            // then we can transact using the active price.
+            return displayPrice;
+        }
         return activeStockProvider.getSellPriceByIndex(candlestickIndex);
     };
 
@@ -205,9 +245,18 @@ export default function SellBox() {
         const maxShares = getMaxShares();
         const resultingTrade = maxShares - shareAmount;
         return (
-            candlestickIndex === -1 || maxShares <= 0 || resultingTrade < 0
+            (candlestickIndex === -1 && !isMarketOpen()) || maxShares <= 0 || resultingTrade < 0
         );
     };
+
+    const getValidTimestamps = () => {
+        if (isMarketOpen()) {
+            const newCandles = candles.t.concat(moment().unix());
+            return newCandles;
+        } else {
+            return candles.t
+        }
+    }
 
     const classes = useStyles();
 
@@ -293,7 +342,6 @@ export default function SellBox() {
                     justify="flex-start"
                     alignItems="center"
                     spacing={1}
-                    className="date-sellbutton-container"
                 >
                     <Grid item>
                         <DatePicker
@@ -302,7 +350,7 @@ export default function SellBox() {
                             onChange={onChangeSellDate}
                             minDate={earliestDate || activeStockProvider.minDate || minDate}
                             maxDate={activeStockProvider.maxDate || maxDate}
-                            validUnixTimestamps={candles.t}
+                            validUnixTimestamps={getValidTimestamps()}
                         />
                     </Grid>
                     <Grid item className="sellbutton-container">

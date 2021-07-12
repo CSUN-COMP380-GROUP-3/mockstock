@@ -12,6 +12,7 @@ import Popover from '@material-ui/core/Popover';
 import Grid from '@material-ui/core/Grid';
 import { Typography } from '@material-ui/core';
 import { Moment } from 'moment';
+import { isMarketOpen } from '../utils';
 
 export interface DatePickerProps extends MuiDatePickerProps {
     validUnixTimestamps?: number[];
