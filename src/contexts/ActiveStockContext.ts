@@ -250,7 +250,7 @@ class ActiveStockProvider implements ActiveStockProviderInterface {
     /**
      * Gets the latest possible date to stop trading the underlying stock
      */
-    get maxDate(): Moment | undefined {
+    get maxDate(): Moment {
         if (isMarketOpen()) {
             // market is open, we don't care about candlesticks. User can day trade.
             return moment();

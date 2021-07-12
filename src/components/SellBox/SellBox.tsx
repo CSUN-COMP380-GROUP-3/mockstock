@@ -111,7 +111,7 @@ export default function SellBox() {
     };
 
     const [form, updateForm] = React.useState<SellBoxForm>({
-        date: earliestDate?.unix() || maxDate.unix(),
+        date: activeStockProvider.maxDate.unix() || maxDate.unix(),
         total: 0,
         type: 'SELL',
         stock,

@@ -104,7 +104,7 @@ export default function BuyBox() {
     };
 
     const [form, updateForm] = React.useState<BuyBoxForm>({
-        date: activeStockProvider.maxDate?.unix() || maxDate.unix(), // this is the selected date of the buy
+        date: activeStockProvider.maxDate.unix() || maxDate.unix(), // this is the selected date of the buy
         total: 0,
         stock,
         timestamp: moment().unix(),
