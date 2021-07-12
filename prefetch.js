@@ -4,9 +4,7 @@ const fs = require('fs');
 const moment = require('moment');
 const querystring = require('querystring');
 
-const token = process.env.NODE_ENV === 'production' ? 
-    process.env.REACT_APP_API_KEY :
-    process.env.REACT_APP_SANDBOX_KEY;
+const token = process.env.REACT_APP_API_KEY;
 
 const symbolEndpoint = `https://finnhub.io/api/v1/stock/symbol?exchange=US&currency=USD&token=${token}`;
 const symbolFilename = 'symbols.json';
