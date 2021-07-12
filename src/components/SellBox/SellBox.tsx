@@ -166,7 +166,7 @@ export default function SellBox() {
     };
 
     const getPrice = () => {
-        if (isMarketOpen()) {
+        if (candlestickIndex === -1 && isMarketOpen()) {
             // then we can transact using the active price.
             return displayPrice;
         }

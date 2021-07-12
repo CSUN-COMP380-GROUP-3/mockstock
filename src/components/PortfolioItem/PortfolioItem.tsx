@@ -5,6 +5,12 @@ import { activeStockProvider } from '../../contexts/ActiveStockContext';
 import { PortfolioDataInterface } from '../../contexts/PortfolioContext';
 import Grid from '@material-ui/core/Grid';
 import currency from 'currency.js';
+import { errorHandler, fetchQuote } from '../utils';
+import { TOKEN } from '../../contexts/TokenContext';
+import { BehaviorSubject } from 'rxjs';
+import React from 'react';
+import FinnHubTrade from '../websocket';
+import { Listener } from '../../interfaces/WebSocketData';
 
 export interface PortfolioListItemProps extends CardProps {
     data: PortfolioDataInterface;
@@ -12,7 +18,49 @@ export interface PortfolioListItemProps extends CardProps {
 
 export default function PortfolioListItem(props: PortfolioListItemProps) {
     const { style, data } = props;
-    const {symbol} = data.stock;
+    const { symbol } = data.stock;
+
+    // const displayedPrice$ = new BehaviorSubject(0);
+    const [displayedPrice, updateDisplayedPrice] = React.useState(0);
+
+    /**
+     * Updates the price state whenever the websocket calls it because of a message.
+     * @param symbolName 
+     * @param price 
+     * @param timestamp 
+     * @param volume 
+     * @param tradeConditions 
+     */
+    const updatePrice: Listener = (
+        symbolName: string,
+        price: number,
+        timestamp: number,
+        volume: number,
+        tradeConditions: string[]
+    ) => {
+        updateDisplayedPrice(price);
+    };
+
+    /**
+     * Is responsible for listening and unlistening to the websocket.
+     */
+    React.useEffect(() => {
+        fetchQuote({
+            symbol,
+            token: TOKEN,
+        })
+            .then(res => {
+                updateDisplayedPrice(res.data.c);
+            })
+            .catch(errorHandler);
+
+        if (FinnHubTrade.socket.OPEN) {
+            FinnHubTrade.listen(symbol, updatePrice);
+            return () => {
+                FinnHubTrade.stopListen(symbol, updatePrice);
+            }
+        };
+    }, []);
 
     const useStyles = makeStyles({
         root: {
@@ -21,8 +69,20 @@ export default function PortfolioListItem(props: PortfolioListItemProps) {
             justifyContent: 'space-between',
             alignItems: 'center',
             '& .symbol': {
-                marginLeft: '1rem',
+                // marginLeft: '1rem',
             },
+            '& .price-data': {
+                textAlign: "right"
+            },
+            '& .positive': {
+                color: "var(--green)"
+            },
+            '& .neutral': {
+                color: "black"
+            },
+            '& .negative': {
+                color: "var(--red)"
+            }
         }
     });
     const { root } = useStyles();
@@ -30,6 +90,21 @@ export default function PortfolioListItem(props: PortfolioListItemProps) {
     const onClick = () => {
         activeStockProvider.switchActiveStock(data.stock);
     };
+
+    const getPercentChange = () => {
+        return (displayedPrice / data.costBasis) * 100
+    }
+
+    const getPercentColor = () => {
+        const percentChange = getPercentChange();
+        if (percentChange > 0) {
+            return "positive";
+        } else if (percentChange === 0) {
+            return "neutral";
+        } else {
+            return "negative";
+        }
+    }
 
     const comp = (
         <div
@@ -41,20 +116,20 @@ export default function PortfolioListItem(props: PortfolioListItemProps) {
             <Grid container spacing={1} justify="space-around" alignItems="center">
                 <Grid item xs={2}>
                     <Typography variant="h6" className="symbol">
-                        {symbol}
+                        ${symbol}
                     </Typography>
                 </Grid>
-                <Grid item xs={8}>
+                <Grid item xs={5}>
                     <Typography variant="subtitle1">{data.totalShares.toFixed(4)} Shares</Typography>
                 </Grid>
                 <Grid item xs={2}>
-                    <Grid container direction="column" alignItems="center">
-                        <Grid item>
-                            <Typography variant="caption">Cost Basis</Typography>
-                        </Grid>
-                        <Grid item>
-                            <Typography variant="subtitle1">{currency(data.sharesPrice).format()}</Typography>
-                        </Grid>
+                    <Grid item>
+                        <Typography variant="subtitle1" className={"price-data " + getPercentColor()}>{getPercentChange().toFixed(2)}%</Typography>
+                    </Grid>
+                </Grid>
+                <Grid item xs={3}>
+                    <Grid item>
+                        <Typography variant="h6" className="price-data">{currency(data.totalShares * displayedPrice).format()}</Typography>
                     </Grid>
                 </Grid>
             </Grid>

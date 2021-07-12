@@ -14,7 +14,7 @@ import Divider from '@material-ui/core/Divider';
 
 export default function Portfolio() {
 
-    const [ portfolio, updatePortfolio ] = React.useState(portfolioProvider.portfolio);
+    const [portfolio, updatePortfolio] = React.useState(portfolioProvider.portfolio);
 
     React.useEffect(() => {
         const portfolioSubscription = portfolioProvider.portfolio$.subscribe(updatePortfolio);
@@ -57,20 +57,20 @@ export default function Portfolio() {
                 </Grid>
                 <CardContent>
                     {
-                        portfolioProvider.length === 0 ? 
-                        <Typography variant="body1" align="center">Your portfolio is empty. Purchase stocks to get started.</Typography> : 
-                        <List className={classes.portfolioList}>
-                            {Object.entries(portfolio).map(([symbol, data]) => (
-                                <React.Fragment>
-                                    <ListItem key={'p'+uuid()} >
-                                        <PortfolioItem data={data} />
-                                    </ListItem>
-                                    <Divider />
-                                </React.Fragment>
-                            ))}
-                        </List>
+                        portfolioProvider.length === 0 ?
+                            <Typography variant="body1" align="center">Your portfolio is empty. Purchase stocks to get started.</Typography> :
+                            <List className={classes.portfolioList}>
+                                {Object.entries(portfolio).map(([symbol, data]) => (
+                                    <React.Fragment>
+                                        <ListItem key={symbol} >
+                                            <PortfolioItem data={data} />
+                                        </ListItem>
+                                        <Divider />
+                                    </React.Fragment>
+                                ))}
+                            </List>
                     }
-                    
+
                 </CardContent>
             </Card>
         </React.Fragment>

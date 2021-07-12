@@ -10,6 +10,7 @@ export interface PortfolioInterface {
 export interface PortfolioDataInterface {
     totalShares: number;
     sharesPrice: number;
+    costBasis: number;
     stock: StockSymbolData;
 };
 
@@ -50,10 +51,10 @@ class PortfolioProvider implements PortfolioContextInterface {
                 let localObject = JSON.parse(fromLocal);
                 // here is where we can verify
                 if (!!localObject) {
-                    this.portfolio = {...localObject};
+                    this.portfolio = { ...localObject };
                     this.updatePortfolio(this.portfolio);
                 }
-            } catch(e) {
+            } catch (e) {
                 console.log('Failed to import portfolio from storage');
             }
         }
@@ -126,6 +127,7 @@ class PortfolioProvider implements PortfolioContextInterface {
                 stock,
                 totalShares: total / Number(price),
                 sharesPrice: Number(price),
+                costBasis: Number(price),
             };
         }
 
@@ -133,6 +135,19 @@ class PortfolioProvider implements PortfolioContextInterface {
         this.exportToStorage(newPortfolio);
 
         return true;
+    }
+
+    editPortfolioFor(stock: StockSymbolData, totalShares: number, sharesPrice: number, costBasis: number) {
+        const newPortfolio = Object.assign({}, this.portfolio);
+        newPortfolio[stock.symbol] = {
+            stock,
+            totalShares: totalShares,
+            sharesPrice: sharesPrice,
+            costBasis: costBasis
+        }
+
+        this.updatePortfolio(newPortfolio);
+        this.exportToStorage(newPortfolio);
     }
 
     /**

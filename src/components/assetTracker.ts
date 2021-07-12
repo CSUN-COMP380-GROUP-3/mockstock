@@ -292,7 +292,7 @@ module AssetTracker {
 			const oldTrades = _symbolBook[symbol][firstRecordIndex].trades;
 			const newTrades = {
 				bought: oldTrades.bought + quantity,
-				costBasis: ((oldTrades.bought * oldTrades.costBasis) + amount) / quantity
+				costBasis: ((oldTrades.bought * oldTrades.costBasis) + amount) / (oldTrades.bought + quantity)
 			}
 			_symbolBook[symbol][firstRecordIndex].trades = newTrades;
 		} else {
@@ -415,6 +415,10 @@ module AssetTracker {
 
 	export const getLatestCashBalance = function (): number {
 		return _cashRecordBook[_cashRecordBook.length - 1].cashOwned;
+	};
+
+	export const getLatestRecordFor = function (symbol: string): Record {
+		return _symbolBook[symbol][_symbolBook[symbol].length - 1];
 	};
 
 }
