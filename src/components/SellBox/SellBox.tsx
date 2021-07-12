@@ -28,7 +28,6 @@ const useStyles = makeStyles({
         backgroundColor: "var(--red)",
         color: "white",
         fontSize: "x-large",
-        marginBottom: "2rem",
         width: "80%",
         border: "2px solid var(--less-dark)",
         "&:hover": {
@@ -43,7 +42,7 @@ const useStyles = makeStyles({
     },
     sliderContainer: {
         paddingLeft: '1rem',
-        paddingBottom: '.5rem',
+        // paddingBottom: '.5rem',
     },
     slider: {
         color: "var(--less-dark)"
