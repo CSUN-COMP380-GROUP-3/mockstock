@@ -92,7 +92,7 @@ export default function PortfolioListItem(props: PortfolioListItemProps) {
     };
 
     const getPercentChange = () => {
-        return (displayedPrice / data.costBasis) * 100
+        return ((displayedPrice / data.costBasis) - 1) * 100
     }
 
     const getPercentColor = () => {
@@ -124,7 +124,7 @@ export default function PortfolioListItem(props: PortfolioListItemProps) {
                 </Grid>
                 <Grid item xs={2}>
                     <Grid item>
-                        <Typography variant="subtitle1" className={"price-data " + getPercentColor()}>{getPercentChange().toFixed(2)}%</Typography>
+                        <Typography variant="subtitle1" className={"price-data " + getPercentColor()}>{((getPercentChange() > 0) ? "+" : "-") + getPercentChange().toFixed(2)}%</Typography>
                     </Grid>
                 </Grid>
                 <Grid item xs={3}>
