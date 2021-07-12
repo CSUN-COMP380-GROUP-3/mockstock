@@ -25,13 +25,13 @@ const useStyles = makeStyles({
 
 export interface WatchListItemPriceProps extends TypographyProps {
     displayedPrice$: BehaviorSubject<number>;
-    previousClose: number;
+    previousClose$: BehaviorSubject<number>;
 };
 
 export function WatchListItemPrice(props: WatchListItemPriceProps) {
     const cachedPrice = React.useRef(0);
     const [displayedPrice, updateDisplayedPrice] = React.useState(cachedPrice.current);
-    const { displayedPrice$, previousClose } = props;
+    const { displayedPrice$, previousClose$ } = props;
 
     React.useEffect(() => {
         const subscription = displayedPrice$.subscribe(price => {
@@ -44,7 +44,7 @@ export function WatchListItemPrice(props: WatchListItemPriceProps) {
     }, [displayedPrice$]);
 
     const getPercentDiff = () => {
-        return ((displayedPrice - previousClose) / previousClose) * 100;
+        return ((displayedPrice - previousClose$.getValue()) / previousClose$.getValue()) * 100;
     };
 
     const { neutral, positive, negative } = useStyles();
@@ -52,11 +52,11 @@ export function WatchListItemPrice(props: WatchListItemPriceProps) {
     const getPercentColor = () => {
         const percent = getPercentDiff();
         if (percent === 0) {
-            return neutral;
+            return "neutral";
         } else if (percent > 0) {
-            return positive;
+            return "positive";
         } else {
-            return negative;
+            return "negative";
         };
     };
 
@@ -64,13 +64,10 @@ export function WatchListItemPrice(props: WatchListItemPriceProps) {
         <React.Fragment>
             <Typography
                 variant="subtitle2"
-                className="percent"
+                className={getPercentColor() + " percent"}
                 data-testid="watchlistitem-percent"
-                classes={{
-                    root: getPercentColor()
-                }}
             >
-                {!!previousClose ? '(' + getPercentDiff().toFixed(2) + '%)' : '(-%)'}
+                {!!previousClose$.getValue() ? getPercentDiff().toFixed(2) + '%' : '(-%)'}
             </Typography>
             <Typography
                 variant="h6"
@@ -100,12 +97,14 @@ export default function WatchListItem(props: WatchListItemProps) {
         })
             .then(res => {
                 previousClose.current = res.data.pc;
+                previousClose$.next(res.data.pc);
                 displayedPrice$.next(res.data.pc);
             })
             .catch(errorHandler);
     };
 
     const displayedPrice$ = new BehaviorSubject(previousClose.current);
+    const previousClose$ = new BehaviorSubject(previousClose.current);
 
     /**
      * Is called when user clicks on this component.
@@ -148,12 +147,13 @@ export default function WatchListItem(props: WatchListItemProps) {
 
     return (
         <div data-testid="watchlistitem" style={style} className="list-item" onClick={onClick}>
-            <Typography variant="h6" className="symbol">{symbol}</Typography>
+            <Typography variant="h6" className="symbol">${symbol}</Typography>
             <div className="details">
                 <WatchListItemPrice
                     className="dollar"
                     displayedPrice$={displayedPrice$}
-                    previousClose={previousClose.current}
+                    // previousClose={previousClose.current}
+                    previousClose$={previousClose$}
                 />
             </div>
         </div>

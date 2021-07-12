@@ -28,7 +28,9 @@ const useStyles = makeStyles({
     buyButton: {
         backgroundColor: "var(--green)",
         color: "white",
-        width: "100%",
+        fontSize: "x-large",
+        marginBottom: "2rem",
+        width: "80%",
         border: "2px solid var(--less-dark)",
         "&:hover": {
             backgroundColor: "var(--green)",
@@ -42,6 +44,7 @@ const useStyles = makeStyles({
     },
     sliderContainer: {
         paddingLeft: '1rem',
+        paddingRight: '1rem',
         paddingBottom: '.5rem',
     },
     slider: {
@@ -242,61 +245,64 @@ export default function BuyBox() {
             container
             spacing={1}
             className="main-container"
+            direction="row"
         >
             <Grid item xs={9}>
                 <Grid
                     container
                     direction="column"
                 >
-                    <Grid item>
-                        <Typography gutterBottom variant="h6">
-                            Buy {stock.symbol}
-                        </Typography>
+                    <Grid
+                        container
+                        direction="row"
+                        justify="space-between"
+                    >
+                        <Grid item>
+                            <Typography gutterBottom variant="h5">
+                                Buy {stock.symbol}
+                            </Typography>
+                        </Grid>
+                        <Grid item>
+                            <Typography variant="h6" style={{ fontWeight: 300 }}>
+                                Est. Shares: {getShares().toFixed(4)}
+                            </Typography>
+                        </Grid>
                     </Grid>
-                    <Grid item>
-                        <Grid
-                            container
-                            alignItems="flex-end"
-                            spacing={1}
-                        >
-                            <Grid item xs={3}>
-                                <Typography
-                                    gutterBottom
-                                    variant="body2"
-                                    align="right"
-                                    className={classes.inputLabel}
-                                >
-                                    Amount:
-                                </Typography>
-                            </Grid>
-                            <Grid item xs={9}>
-                                <Grid container direction="column">
-                                    <Grid item>
-                                        <Typography
-                                            gutterBottom
-                                            variant="caption"
-                                        >
-                                            Est. Shares: {getShares().toFixed(4)}
-                                        </Typography>
-                                    </Grid>
-                                    <Grid item>
-                                        <Input
-                                            adornment="$"
-                                            value={buyAmount}
-                                            onChange={onChangeInput}
-                                            onBlur={handleBlur}
-                                            inputProps={{
-                                                type: 'number || string',
-                                                min: 0,
-                                                step: 0.01,
-                                                max: getMaxBalance(),
-                                            }}
-                                        />
-                                    </Grid>
-                                </Grid>
+
+                    <Grid
+                        container
+                        direction="row"
+                        justify="space-between"
+                        spacing={1}
+                    >
+                        <Grid item >
+                            <Typography
+                                gutterBottom
+                                variant="h6"
+                                className={classes.inputLabel}
+                                style={{ fontWeight: 400 }}
+                            >
+                                Amount:
+                            </Typography>
+                        </Grid>
+                        <Grid item >
+                            <Grid item>
+                                <Input
+                                    adornment="$"
+                                    value={buyAmount}
+                                    onChange={onChangeInput}
+                                    onBlur={handleBlur}
+                                    inputProps={{
+                                        type: 'number || string',
+                                        min: 0,
+                                        step: 0.01,
+                                        max: getMaxBalance(),
+                                    }}
+                                />
                             </Grid>
                         </Grid>
                     </Grid>
+
                     <Grid item className={classes.sliderContainer}>
                         <Slider
                             value={buyAmount}

@@ -7,7 +7,6 @@
 }
 
 .list-item>.symbol {
-  margin-left: 1rem;
   color: black;
 }
 
@@ -16,13 +15,23 @@
   flex-direction: row;
   justify-content: flex-end;
   align-items: center;
-  margin-right: 1rem;
   color: black;
+}
+
+.details>.positive {
+  color: var(--green)
+}
+
+.details>.negative {
+  color: var(--red)
+}
+
+.details>.neutral {
+  color: black
 }
 
 .details>.percent {
   text-align: right;
-  color: black;
   padding-right: 20px;
 }
 
