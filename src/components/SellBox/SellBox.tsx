@@ -123,7 +123,7 @@ export default function SellBox() {
     const [shareAmount, updateShareAmount] = React.useState(0);
 
     // this state controls the candlestick index
-    const [candlestickIndex, updateCandlestickIndex] = React.useState(0);
+    const [candlestickIndex, updateCandlestickIndex] = React.useState(-1);
 
     const onChangeSellDate: BaseKeyboardPickerProps['onChange'] = (date) => {
         if (!!date) {
