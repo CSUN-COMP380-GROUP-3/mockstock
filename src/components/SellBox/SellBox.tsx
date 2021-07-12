@@ -147,6 +147,7 @@ export default function SellBox() {
         if (price === undefined) return;
         const total = getTotal();
         if (total === undefined) return;
+        if (shareAmount === 0) return;
 
         AssetTracker.sellAtForAmountAt(date, moment().utcOffset(), stock.symbol, shareAmount, price);
 
