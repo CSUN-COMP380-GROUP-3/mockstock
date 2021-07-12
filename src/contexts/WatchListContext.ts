@@ -27,10 +27,6 @@ export module WatchListTracker {
         let loadWatchList = {
             'GME': 0,
             'AMC': 0,
-            'BB': 0,
-            'AMD': 0,
-            'INTC': 0,
-            'AAPL': 0,
             'TSLA': 0
         };
 
@@ -39,7 +35,7 @@ export module WatchListTracker {
             try {
                 const parsedWatchList = JSON.parse(fromStorage);
                 if (!!parsedWatchList) { loadWatchList = parsedWatchList };
-            } catch(e) {
+            } catch (e) {
                 console.log('Failed to load watchlist from storage');
             };
         };
@@ -69,7 +65,11 @@ export module WatchListTracker {
         } else {
             console.warn("System tried to add a symbol to the Watchlist that is already on the watchlist!");
         }
-        const newWatchList = Object.assign({}, WatchList);
+        const newWatchList: WatchListInterface = {};
+        newWatchList[symbol] = 0;
+        Object.keys(WatchList).forEach((key) => {
+            newWatchList[key] = 0;
+        })
         exportToStorage(newWatchList);
         WatchList$.next(newWatchList);
     }
