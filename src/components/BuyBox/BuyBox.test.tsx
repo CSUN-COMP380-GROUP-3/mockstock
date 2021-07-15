@@ -1,8 +1,16 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, RenderResult } from '@testing-library/react';
 import BuyBox from './BuyBox';
 
-xit('renders component', () => {
-    const { queryByTestId } = render(<BuyBox />);
-    expect(queryByTestId('buybox')).toBeTruthy();
+describe('BuyBox Component', () => {
+    let container: RenderResult;
+
+    beforeEach(() => {
+        container = render(<BuyBox />);
+    });
+
+    it('should render correctly', () => {
+        const { queryByTestId } = container;
+        expect(queryByTestId('buybox')).toBeTruthy();
+    });
 });

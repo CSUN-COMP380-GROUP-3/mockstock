@@ -4,7 +4,7 @@ import App from './App';
 
 describe('App Component', () => {
   it('should render correctly', () => {
-    const { getByTestId } = render(<App />);
-    expect(getByTestId('app')).toBeTruthy();
+    const { queryByTestId } = render(<App />);
+    expect(queryByTestId('app')).toBeTruthy();
   });
 });

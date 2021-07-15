@@ -44,7 +44,7 @@ export default function Portfolio() {
 
     return (
         <React.Fragment>
-            <Card data-testid="portfoliolist">
+            <Card data-testid="portfolio">
                 <Grid container spacing={1} className={classes.portfolioHeader}>
                     <Grid item>
                         <div className={classes.portfolioTitle}>

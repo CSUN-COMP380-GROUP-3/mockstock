@@ -266,6 +266,7 @@ export default function SellBox() {
             spacing={1}
             className={"main-container " + classes.root}
             direction="row"
+            data-testid="sellbox"
         >
             <Grid item xs={9}>
                 <Grid

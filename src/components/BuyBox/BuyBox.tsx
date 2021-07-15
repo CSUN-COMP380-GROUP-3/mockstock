@@ -254,6 +254,7 @@ export default function BuyBox() {
             spacing={1}
             className="main-container"
             direction="row"
+            data-testid="buybox"
         >
             <Grid item xs={9}>
                 <Grid

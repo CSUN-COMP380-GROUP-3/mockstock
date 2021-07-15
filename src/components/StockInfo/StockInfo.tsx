@@ -102,7 +102,7 @@ export default function StockInfo() {
     };
 
     return (
-        <Grid container direction="column" className="active-stock-info">
+        <Grid container direction="column" className="active-stock-info" data-testid="stockinfo">
             <Grid item>
                 <Grid container direction="row">
                     <Grid item>
