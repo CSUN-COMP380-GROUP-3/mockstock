@@ -5,7 +5,7 @@ import { liquidBalanceProvider } from '../../contexts/LiquidBalanceContext';
 import currency from 'currency.js';
 import { act } from 'react-dom/test-utils';
 
-describe.only('LiquidBalance Component', () => {
+describe('LiquidBalance Component', () => {
     let container: RenderResult;
     beforeEach(() => {
         container = render(<LiquidBalance />);
