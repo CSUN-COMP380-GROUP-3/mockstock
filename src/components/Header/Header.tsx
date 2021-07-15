@@ -6,10 +6,10 @@ import SymbolBox from '../SymbolBox/SymbolBox';
 export default function Header() {
     return (
         <React.Fragment>
-            <Grid container direction="row" alignItems="center">
+            <Grid container direction="row" alignItems="center" data-testid="header">
                 <Grid item className="mockstock-logo">
-                    <img src="MockStockLogo.png" alt="" />
-                    <h5 className="subtitle">
+                    <img src="MockStockLogo.png" alt="" data-testid="header-logo"/>
+                    <h5 className="subtitle" data-testid="header-logo-subtitle">
                         Official Stock Market Simulator
                     </h5>
                 </Grid>
