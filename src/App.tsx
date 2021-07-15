@@ -33,6 +33,7 @@ function App() {
             alignItems="stretch"
             spacing={0}
             className={classes.appContent}
+            data-testid="app"
         >
             <Grid item xs={8}>
                 <Grid
