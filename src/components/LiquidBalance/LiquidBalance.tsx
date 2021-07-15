@@ -22,7 +22,7 @@ export default function LiquidBalance() {
     <React.Fragment>
       <Grid data-testid="liquidbalance" className="liquid-balance" container direction="row" justify="space-between">
         <Grid item>
-          <Typography variant="h5" className="label">Funds Available</Typography>
+          <Typography variant="h5" data-testid="liquidbalance-label" className="label">Funds Available</Typography>
         </Grid>
         <Grid item>
           <Typography variant="h5" data-testid="liquidbalance-cash" className="dollar">{currency(balance).format()}</Typography>
